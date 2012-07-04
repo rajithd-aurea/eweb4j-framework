@@ -1,0 +1,7 @@
+.idea
+.settings
+target
+.classpath
+.project
+eweb4j-all.iml
+release.properties

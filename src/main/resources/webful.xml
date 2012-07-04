@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<module id="DemoModule" package="org.demo" >
+	<console open="1" level="info" />
+	<mvc open="1" provider="org.eweb.mvc.WebImpl">
+		<control path="/" class="demo.control.HelloControl">
+			<action path="/" http="GET" method="index" />
+			<action path="/hello" http="GET" method="hello" />
+		</control>
+	</mvc>
+	<ioc open="1" provider="org.eweb.ioc.IOCImpl">
+		<bean id="" class="">
+			<inject ref="" name="" type="" value="" />
+		</bean>
+	</ioc>
+	<orm open="1" provider="org.eweb.orm.ORMImpl">
+		<entity table="t_demo" class="demo.model.DemoModel">
+			<fields>
+				<id name="demoId" column="id" />
+				<field name="demoName" column="demo_name" />
+				<field name="demoAge" column="demo_age" />
+			</fields>  
+		</entity>
+	</orm>
+	<logs open="1" provider="org.eweb.log.LogImpl">
+		<log level="info" size="5" file="logs/info.log" db="t_log(level,time,mess)" />
+		<log level="error" size="5" file="logs/error.log" db="" />
+	</logs>
+	<i18n open="1" provider="org.eweb.i18n.Internectional"></i18n>
+	<cons open="1" provider="org.eweb.cons.ConsImpl">
+		<load id="" global="1" file="conf/demo.conf" />
+	</cons>
+</module>
+
+<app>
+	<db>
+		<ds id="" provider="" dialect="" >
+			<property name="" value="" />
+			<property name="" value="" />
+		</ds>
+	</db>
+	<modules>
+		<module id="" file="" />
+		<module id="" file="" />
+	</modules>
+	
+	<plugins>
+		<plugin id="StrutsPluginImpl" class="org.eweb.mvc.plugins.StrutsPluginImpl" register="1" />
+		<plugin id="" class="" register="0" />
+	</plugins>
+</app>

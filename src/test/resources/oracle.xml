@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans>
+	<dataSource dsName="myDBInfo">
+		<dataBaseType>ORACLE</dataBaseType>
+		<property key="driverClass" value="oracle.jdbc.driver.OracleDriver" />
+		<property key="jdbcUrl" value="jdbc:oracle:thin:@192.168.0.34:1521:GateWaydb" />
+		<property key="user" value="GateWay_dba" />
+		<property key="password" value="GateWay_dba20111206" />
+		<property key="initialPoolSize" value="5" />
+		<property key="maxPoolSize" value="50" />
+		<property key="minPoolSize" value="1" />
+		<property key="acquireIncrement" value="5" />
+		<property key="idleConnectionTestPeriod" value="60" />
+		<property key="maxIdleTime" value="3000" />
+		<property key="autoCommitOnClose" value="true" />
+		<property key="preferredTestQuery" value="" />
+		<property key="testConnectionOnCheckout" value="false" />
+		<property key="testConnectionOnCheckin" value="false" />
+		<property key="acquireRetryAttempts" value="5" />
+		<property key="acquireRetryDelay" value="1000" />
+		<property key="breakAfterAcquireFailure" value="false" />
+		<property key="checkoutTimeout" value="3000" />
+
+	</dataSource>
+</beans>

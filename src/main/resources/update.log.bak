@@ -1,0 +1,617 @@
+v1.a.432 
+2011-05-09 2:05
+修复：mvc action模块的从页面request中自动设值到action属性中不支持数组的bug
+改善：orm 模块的对sql查询回来的结果集缓存的内存结构。新的结构为：一个PO持久化类—>一个SqlResultCache缓存池，其中SqlResultCache缓存池的结构为：一条sql语句—>多个对象ID，一个对象ID—>一个查询出来的对象，这些查询出来的对象被放在一个全局的缓存池中。
+改善：orm sql模块中的插入、删除、更新sql语句创建类，编写了它们的JUnit测试类
+v1.a.433
+2011-05-11 22:55
+撤掉ORM的缓存机制，原因是需要维护全局缓存资源导致需同步多线程产生了额外时间开销。得不偿失。去掉缓存后发现性能更高。
+改善ORM模块，灵活支持多数据库。
+
+v1.b.3
+2011-07-15
+支持REST
+1.b.3 2011-7.16
+MVC添加了注解配置的支持、支持REST风格url配置
+1.b.4 2011-7-26
+ORM添加了注解配置的支持、添加了表关系配置@Many,@One,@ManyMany、添加了级联操作CascadeDAO
+1.b.4.2 
+修复了因调用了Tomcat7的reqeust.getServletContext()而导致7之前的版本无法启动框架的bug
+1.b.4.3
+改善了验证器捕获错误方式，本来是一旦发现错误，马上报告给用户，现在是发现所有能够发现的错误，再来报告给用户。另外，将用户输入过的值返回给页面。第三，废除了Validator的showErrorType属性，改而换到Action配置属性里。注解方式下，@ValErrShow(value={""})，value是一个数组类型，对应着第几个action
+1.b.4.4
+废除了@ReqeustMapping中的数组类型value，转为String类型，因此@Validator和@Result也没有了index属性。
+1.b.4.5 2011-7-30
+修复：action执行方法的bug
+1.将Validator里的Param属性转到Field属性下，同时，@ValParam改名@FieldParam并index属性转到了@ValField下
+2.支持action方法返回值里嵌套"redirect:xxx"客户端跳转，或者"forward:xxx"（当没有@Result注解时，"xxx"也表达此意）服务端跳转
+3.去掉@RequestMethod注解，改为@RequestMapping增加一个属性method，去掉@ValErrShow，改为MVC中的
+@RequestMapping增加一个属性showValErr，且以下注解增加了某些属性的默认值。
+@RequestMapping:method默认"GET",showValErr默认"alert"
+@FieldParam:index默认0，且改成int[]类型
+@ValField：index默认0，且改成int[]类型
+@Validator：clazz默认""
+
+ORM中的
+@Table：value默认""
+@Column：value默认""
+
+1.b.4.6
+修复action方法声明HttpSession参数时发生初始化错误的bug。
+
+1.b.4.7 7-23
+MVC添加了对多个包扫描的配置，即：
+<scanActionPackage>
+	<path></path>
+	<path></path>
+	...
+</scanActionPackage>
+同理ORM的也是
+<scanPojoPackage>
+	<path></path>
+	<path></path>
+	...
+</scanPojoPackage>
+
+为MVC的@Param添加了初始化属性init，默认值为""
+
+1.b.4.8 8-1
+添加@RequestMapping("GET|POST|PUT|DELETE"),支持“|”来表示映射到多个http方法中
+分页组件：添加了首页，末页，下一页，上一页的文字配置。默认是中文的。
+
+1.b.4.9
+发现当pojo的自增长主键名字不是id时，BaseDAOImpl将其名字写死为“id”了，因此会报错，修复此bug
+为@One添加了级联更新的操作。
+
+1.b.5.0
+发现@One注解下的级联查询有一个bug，在获取当前对象的idField上出错了，错在获取的是target类的idField，当前版本修复了这个bug。
+将CascadeDAO的所有对外接口方法的末尾String[]参数类型修改成String...的动态数组类型。
+
+1.b.5.1
+将CascadeDAO的update(T... t)方法修改为update(T[] t)
+
+1.b.5.2
+CascadeDAO的insert方法实现增加一种判断，当@One对象的id值不为0且不为null的时候，会先去查询数据库是否含有该记录，接着如果没有或者为0或者为null，会采用先插入@One对象，获取其ID值，然后插入到当前对象中去完成关联。
+
+1.b.6.0
+重构了整个Jdbc包，添加了事务模板的支持。数据源支持方式更加灵活，重构了CascadeDAO，所有的DAO、JdbcUtil操作都支持事务模板。总之，这个版本做的工作非常多，也非常值得庆贺。这个版本应该是目前功能最完善，最给力的了。
+
+1.b.6版本是一个里程碑
+下面罗列当前版本已经拥有的主要功能：
+IOC：简单POJO的注入
+MVC：支持REST，支持Struts2(Xml)、SpringMVC3(Annotation)两种风格的配置。支持拦截器、验证器、JSP模板。
+ORM：支持事务模板。自定义SQL。默认DAO实现。支持级联操作。支持ORM映射。支持多数据源同时存在。
+其他：配置文件几乎无需开发者手写，框架自动编写，开发者只需填写参数即可。即使填错了也没有关系，框架支持自动修复，保留备份。日志完备。上述三大模块可开启或关闭。自由选择。整个框架几乎无任何侵入，对开发者代码无任何污染。框架当前版本已较成熟。可以使用来开发应用了。
+
+1.b.6.1
+UpdateDAO的 
+int[] update(T... ts)方法修改为
+int[] batchUpdate(T... ts)
+并且添加了一个
+int update(T t)方法
+
+1.b.6.2
+当使用跳转页面形式来显示验证错误消息时，支持重定向和服务端跳转两种，当使用重定向时，错误消息保存在session中，当使用服务端跳转时，错误消息保存在request中。前者能够有效防止刷新重复提交的问题。
+重定向：showValErr="redirect:xxx.jsp"
+服务端跳转：showValErr="forward:xxx.jsp"或者"xxx.jsp"
+
+1.b.6.4
+DAOFactory.getSelectDAO().selectWhere(Class<T> clazz, String condition) 改为
+DAOFactory.getSelectDAO().selectWhere(String<T> clazz, String condition,Object... args);
+即支持sql占位符？。
+DAOFactory.getDivPageDAO().divPageByWhere(Class<T> clazz,int p, int n,String condition)改为
+DAOFactory.getDivPageDAO().divPageByWhere(Class<T> clazz,int p, int n,String condition,Object... args);即支持sql占位符？；同时修复了这个方法的一个bug（当传入p和n为负数的时候报错，修复为不分页）。
+
+1.b.7 2011-09-19
+(1) Controller支持以下约定：
+action方法不填写注解RequestMapping的时候，默认以方法名为url-mapping值。
+action 方法返回类型为void的时候框架不做任何跳转处理。
+缺省返回值忽略大小写。例如ajax。
+类名如果以“Controller”，“Control”，“Action”结尾的话，可以不用添加@Controller注解，框架也能识别为控制器。
+这里有个最新的例子：
+package test.controller;
+import java.io.PrintWriter;
+import javax.servlet.http.HttpServletRequest;
+import test.po.Pet;
+import com.cfuture08.eweb4j.mvc.annotation.Param;
+
+/**
+ * this is a pojo action test
+ * 
+ * 约定代替配置，可以看到整个action类真正实现0配置！ 方法名——> URL访问映射。 属性名——>URL参数名
+ * 类名以Controller、Control、Action结尾的框架以控制器处理。
+ * 
+ * 并且action类兼容Struts2和SpringMVC3的写法。
+ * 
+ * @author weiwei
+ * 
+ */
+public class ZeroConfigAction {
+
+	/**
+	 * 从当前会话中获取输出对象进行页面打印。 只需要声明即可，框架会自行注入。
+	 * 返回类型为void、返回值为ajax（忽略大小写）、null的时候，访问action后，框架不会做任何跳转。
+	 * 
+	 * @param out
+	 */
+	public void sayHello(PrintWriter out) {
+		out.print("Hello!");
+	}
+
+	/**
+	 * 重定向跳转
+	 * 
+	 * @return
+	 */
+	public String testRedirect() {
+		return "redirect:sayHello";
+	}
+
+	/**
+	 * 服务端跳转
+	 * 
+	 * @return
+	 */
+	public String testForward() {
+		return "index.jsp";// or "forward:index.jsp"
+	}
+
+	/**
+	 * pojo action 的属性与url属性绑定，同时方法参数传递（框架实现）
+	 * 
+	 * @param out
+	 */
+	public void testPojoParam(PrintWriter out) {
+		out.print(info);
+	}
+
+	/**
+	 * 当pojo action 的属性是pojo的时候，支持无限嵌套的参数绑定。 当然，方法的参数是pojo这种情况也是一样的。
+	 * 
+	 * @param out
+	 * @param fuck
+	 */
+	public void testPojoParamAndUrlParam(PrintWriter out,
+			@Param("fuck") String fuck) {
+		out.print("fuck-->" + fuck + "pet.master-->" + pet.getMaster());
+	}
+
+	/**
+	 * pojo action 的属性有四个缺省值，只要声明+setter&getter方法。框架就会在运行时刻实例化它们，并且传入当前会员的上下文。
+	 * 这四个参数是：HttpServletRequest，HttpServletResponse，PrintWriter，HttpSession
+	 */
+	public void testOut() {
+		out.print("out-->" + info);
+	}
+
+	// ------------------------------------------------------
+	private Pet pet;
+	private String info;
+	private HttpServletRequest req;
+	private PrintWriter out;
+	public String getInfo() {return info;}
+	public void setInfo(String info) {this.info = info;}
+	public Pet getPet() {return pet;}
+	public void setPet(Pet pet) {this.pet = pet;}
+	public HttpServletRequest getReq() {return req;}
+	public void setReq(HttpServletRequest req) {this.req = req;}
+	public PrintWriter getOut() {return out;}
+	public void setOut(PrintWriter out) {this.out = out;}
+}
+(1) Controller支持以下约定：
+action方法不填写注解RequestMapping的时候，默认以方法名为url-mapping值。
+action 方法返回类型为void的时候框架不做任何跳转处理。
+缺省返回值忽略大小写。例如ajax。
+类名如果以“Controller”，“Control”，“Action”结尾的话，可以不用添加@Controller注解，框架也能识别为控制器。
+(2)mvc中，为了改进性能，将Class.forName(ActionBeanName)，改为缓存方式调用。这样省去了lookup的过程，效能会提升。当系统需要应对高并发的时候，很有效。
+(3)废除了formBean的配置，框架自动识别pojo参数，并且支持无限嵌套pojo属性。无需任何配置。
+(4)将MVC的@Result(location="")属性改为@Result(value="")
+(5)将ORM的BaseDAO.getOne(Integer id)之类的Integer改为Number
+(6)让MVC Controller 的属性的 setter 方法 和 getter 方法 无法映射到url。前提是这些方法没有使用@RequestMapping注解
+(7)修复 MVC Controller 实例属性与action方法@RequestMapping("xxx/{id}")中的“{}”变量的绑定。 
+(8)当MVC Controller 实例属性绑定的UrlParam的值为null时，不将参数值注入到该属性。
+(9)添加Json支持，MVC的@Result(type="json")，被注解的方法，返回值会被JsonConverter.convert(re),接着被写入到响应流。
+(10)所有的注解都被加上@Inherited，允许类、public方法上的注解被子类继承。
+(11)框架使用的反射工具类范围调整至涵盖父类。原先取得某个类的属性，是不能获取到它的父类的属性的（同理，方法也是），现在父类的也会被获取，主要考虑到MVC的Controller、ORM的POJO等对象需要使用继承来复用代码。
+(12)修复MVC的Controller无法实例化的时候框架报致命错误导致程序中断，现在为跳过该类，将其认为非控制器，且继续处理下一个类。
+(13)修复MVC的Controller属性绑定到UrlParam过程中，pojo属性互相调用导致的循环递归异常。
+(14)ORM的CascadeDAO @One 关系中的级联更新操作，对新更新的关联对象如果在数据库中找不到记录就不被更新的规则修改为当关联对象为null或者其主键值为null的时候不级联更新。例如更新某个菜单的父菜单为空这种情况。
+(16)重新调整了MVC的Validator有关的注解。去掉了冗余。举个实例：
+
+这是修改之前的写法：
+@Validator({"int","required","length"})
+@ValField(index={0,1,2},field={"id","name","name"},value={"id必须为数字","name必填","name长度4-6位"})
+@ValParam(index={2,2},name={"minLength","maxLength"},value={"4","6"})
+public void doActoin(){}
+
+这是修改之后的写法：
+@Validator({"int","required","length"})
+@ValField({"id","name"})
+@ValMess(validator={0,1,2},field={0,1,1},value={"id必须为数字","name必填","name长度4-6位"})
+@ValParamName("minLength","maxLength")
+@ValParam(valMess={2,2},name={0,1},value={"4","6"})
+public void doActoin(){}
+
+可以看到，原来的ValField对要验证的field会产生冗余，例如上例中的“name”，修改后是将这些field写到另外一个@ValField注解中，然后在@ValMess中进行引用，注意那些数字引用表表示的是数组下标。
+同样道理，对于@ValParam来说也是这样，为了去掉冗余。
+
+备注：说去掉冗余是不严谨的说法，实际上应该是将语言文字的冗余转化为数字的冗余，后者相对而言是降低了冗余。思路也更清晰。
+
+(17)IOC增加@Ioc注解，只能用在Action类属性上，且需要setter方法才能注入。具体用法：
+@Controller
+class TestAction{
+        @Ioc("这里填写在IOC配置文件里的BeanID，不填的话默认是简单类名TestDAO")
+	private TestService testService;
+	public void setTestService(TestService testService){
+		this.testService = testService;
+	}
+}
+
+(18)添加 DAOFactory.getSelectDAO().selectCount(Class<?> clazz,String condition,Object... args);用来查询表的记录数。给定where条件，允许有？占位符。
+(19)修复了当被扫描的包里含有.svn或者其他非.class文件的时候，框架启动失败的一个bug
+(20)改善了MVC.Action的ParamUtil进行URL参数绑定到Aciton属性的时候，如果是属性为pojo，例如：
+private Pet pet;
+那么绑定参数的时候，优先找到 pet.name绑定到pet里面的name属性。
+如果找不到pet.name 参数，则找name参数绑定。如果还找不到，就不进行任何绑定。 
+可以看到跟属性名字“pet”有关，可以理解为参数的一个scope，这样解决了不同pojo但相同属性名字的参数绑定。
+url：/testPojoParamAndUrlParam?name=thisName&pet.name=xiaohei&master.name=weiwei
+支持深层次。例如：
+url：/testPojoParamAndUrlParam?name=thisName&pet.master.name=masterName&pet.name=petName
+
+(21)MVC Action URL变量支持多个。例如：
+@RequestMapping("test/{cate}/{name}/edit")
+public void testParamArg(){
+
+}
+要注意不要连续写两个变量，例如："test/{cate}{name}/edit"这是不合法的。"test/{cate}at{name}/edit"这是合法的。
+(22)ORM 持久化类属性 添加了@Ignore 注解，表示该属性不映射到表字段中。
+
+1.b.8 2011-10-18
+(1)修复classes目录下包含.class文件时框架启动失败的bug
+(2)将@RequestMapping(value="reqUri",method="POST",showValErr="alert") 改为 @Path="reqUri" @POST @GET @PUT @DELETE @ShowValMess("alert")下面是实例：
+原来的：
+@RequestMapping(value="/{id}",method="DELETE",showValErr="dwzJson")
+改为：
+@Path("/{id}")
+@DELETE
+@ShowValMess("dwzJson")
+(3)SelectDAO添加getOneById(Class<T> cls, Number id) 和 getOneById(T t)方法
+1.b.8.1 2011-11-04
+修复bug：
+(1)MVC验证器，当@ValParam或@ValParamValue注解没有的时候失效了。
+(2)IOC，当scope不是singleton的时候，无法获取到实例。
+(3)MVC Action 若在类中有@Path("users") 访问方法中@Path("xxx")和@Path("/xxx")效果改为一样，都为"users/xxx"
+
+1.b.8.2 2011-12-02
+(1)ORM.DAO, 按查询字段进行值注入
+(2)添加新的验证器注解配置
+(3)重构MVC大部分代码
+(4)添加对ORACLE数据的分页支持
+(5)添加新的DAO操作接口,可以完全按照自己的意愿拼写sql语句.
+1.b.8.4 2011-12-05
+(1)fixed 验证器扫描循环递归错误
+1.b.8.6 2011-12-07
+(1)添加properties配置文件支持,在启动培植文件中添加节点:
+	<propPath>test1.properties</propPath>
+	<propPath>test2.properties</propPath>
+	
+	文件里使用键值对即可.
+	key = value
+	
+	程序里调用方式:
+	String value = Props.get("key");
+(2)Action 添加专用Properties文件支持.在相应的Control类文件目录里,类名.properties
+
+           方法名.path=xxx.do
+           方法名.method=GET|POST|PUT|DELETE
+           方法名.showValMess=dwzJson
+           方法名.return=redirect:xxx.do
+    key1=value1
+    key2=value2
+(3)将配置文件目录移至 WEB-INF\classes 目录下,不再放到 WEB-INF下
+(4)支持对jar包的遍历,例如将一个包含Action和POJO注解配置的jar包放在classpath中,框架也能识别.
+(5)ORM.RowMapping 中添加对@One属性的自动设值
+(6)重构properties配置文件模块
+(7)重构了MVC模块，提升了性能
+(8)修复Action属性类型为基本数据类型数组时，页面传值失败的bug
+(9)增加了ORM的超级通用DAO接口和其实现类，提供非常方便强大的Sql生成和执行的功能。
+(10)增加了新的MVC模块拦截器的配置参数：能够拦截取非集合。
+(11)将所有验证器注解命名添加了Val后缀，@Required-->@RequiredVal
+(12)MVC.Action添加返回类型action，例如：
+  
+    public String hello1() {
+        return "action:hello2";
+    }
+    
+    public void hello2(PrintWriter out) {
+        out.print("this is hello2 action");
+    }
+(13)MVC添加了几个参数，在web.xml中启动的时候配置：
+       <init-param>
+			<param-name>StartFileName</param-name>
+			<param-value>eweb.start.xml</param-value>
+		</init-param>
+		
+		<init-param>
+			<param-name>ConfigBasePath</param-name>
+			<param-value>${RootPath}/WEB-INF/</param-value>
+		</init-param>
+		
+		<init-param>
+			<param-name>ForwardBasePath</param-name>
+			<param-value>/WEB-INF/</param-value>
+		</init-param>
+		需要注意的是，ForwardBasePath参数的设置，它是针对Action的服务端跳转的。例如：
+		@Path("hello")
+		public String forward(){
+		
+		    return "xxx.jsp";//实际上框架处理后，会跳转到${ForwardBasePath}xxx.jsp
+		    //如果是上面的例子，也就是： WEB-INF/xxx.jsp
+		}
+		
+(14)MVC.Action修改默认action方法的规则。之前是凡是*Action结尾的类的所有非
+   setter getter方法都会被认为是action方法，现在在此基础上加上一个限定条件：要以do开头，例如
+   public void helloWorld()//不会识别为action方法
+   public void doHelloWorld(){}//会识别为action方法
+   
+   此外，如果方法名中时驼峰式的命名，最终的uri将会变成‘-’连接，例如
+   public void doHelloWorld(){}
+   那么其uri为：hello-world
+   
+(15)为了贴近JAX-RS规范，调整MVC.Action的@Param注解，拆分为@QueryParam和@PathParam
+(16)JAX-RS，使@Path注解支持正则表达式，格式：@Path("/{id:\\d+}")
+(17)JAX-RS，添加注解@Consumes使被注解的方法只能接受指定的MIME类型的HTTP请求@Produces使被注解的方法返回响应的时候指定MIME格式。
+ 	例如：
+ 		@Produces("application/json")//或@Produces("json")
+ 		@GET
+ 		public Map<String,Object> doHelloJson(){
+ 		    Map<String,Object> map = new HashMap<String,Object>();
+ 		    map.put("name", "weiwei");
+ 		    map.put("age", 23);
+ 		    return map;
+ 		}//注意，方法可以返回任何类型，这里为了方便演示，返回了Map类型
+ 		
+ 		效果：访问URI GET /hello-json 将会得到响应： {"name":"weiwei", "age":23}
+(18)MVC.Action添加注解 @ActionLevel(int)，给标注的action指定一个优先级别，数字越大表示优先级越高。
+ 
+ 	解决的问题是：两个相同url-mapping的action冲突问题。优先级高的会被加载。
+ 	
+(19)修复ORM.JDBC事务模板嵌套失去事务一致性的bug，被嵌套的事务要在最外层才能被提交，回滚，关闭资源。
+ 
+(20)将包名 com.cfuture08.eweb4j 修改为 org.eweb4j
+(21)试用了下GAE，发现EWebFilter的拦截效果没有，于是Copy了一个EWebServlet出来。以后部署EWebMVC的时候可以多一种方式了:
+   <servlet-mapping>
+		<servlet-name>HelloEWeb4J</servlet-name>
+		<url-pattern>/helloeweb4j</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>eweb</servlet-name>
+		<servlet-class>org.eweb4j.mvc.EWebServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>eweb</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
+
+(22)使配置文件中的xmlBean属性可以省略，让配置文件更加简洁。by重构util.BeanXMLReader和util.BeanXMLWriter，重构eweb框架所有的config部分.
+
+(23)添加对.properties中变量参数的引用功能，同一个文件中${xxx}来引用之前定义好的变量。在Action的注解配置中@Path("${propId.xxx}")的方式来引用具体某个文件的参数，${global.xxx}来引用全局的参数。
+
+(24)MVC，每次request范围的请求参数都会被重新包装到一个map中，若使用forward跳转，可以使用如下格式取出数据
+    ${ReqParamMap['paramName'][0]}//数据以数组的形式保存，另外 "ReqParamMap"可以在启动Filter或Servlet的启动参数中配置
+    <!-- eweb4j -->
+	<filter>
+		<filter-name>EWebFilter</filter-name>
+		<filter-class>org.eweb4j.mvc.EWebFilter</filter-class>
+		<init-param>
+			<param-name>StartFileName</param-name>
+			<param-value>start.xml</param-value>
+		</init-param>
+		
+		<init-param>
+			<param-name>ConfigBasePath</param-name>
+			<param-value>${RootPath}/WEB-INF/classes/</param-value>
+		</init-param>
+		
+		<init-param>
+			<param-name>BaseURLKey</param-name>
+			<param-value>BaseURL</param-value>
+		</init-param>
+		
+		<init-param>
+			<param-name>ReqParamMapKey</param-name>
+			<param-value>ReqParamMap</param-value>
+		</init-param>
+		
+		<init-param>
+			<param-name>ForwardBasePath</param-name>
+			<param-value>/WEB-INF/classes/</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>EWebFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<!-- eweb4j -->
+	
+1.9 2012-03-13
+(1)13:23 将SQL生成的select * 全改为 select xxx,xxx,xxx。 受影响类：org.eweb4j.orm.dao.DAOImpl,org.eweb4j.orm.sql.SelectSqlCreator,org.eweb4j.orm.config.ORMConfigBeanUtil
+(2)2012-03-22 DAO添加方法：paging(int pageNum, int numPerPage)
+(3)2012-03-22 SelectSqlCreator添加对Map的支持，map.put("table", "t_demo"),map.put("idColumn", "id"),map.put("columns", new String[]{"id","name"})
+(4)2012-03-23 InsertSqlCreator添加对Map的支持
+(5)2012-03-23 UpdateSqlCreator添加对Map的支持
+(6)2012-03-23 DeleteSqlCreator添加对Map的支持
+(7)MVC增加8个默认action，约定视图和URI-Mapping
+(8)控制器属性若提供getter方法，则会作为视图渲染的一个数据模型。类似Struts2的ModelDriven?但不需要继承来获得。只需要提供一个getter方法。
+(9)除了使用属性getter方法作为视图模型数据外，还可以在Action方法参数里声明一个没有任何注解的Map<String,Object> model，它可可以作为视图模型数据，往里面放数据就相当于request.setAttribute一样的效果。
+(10)2012-03-23 修改uri格式：xxx@POST => xxx#POST, 即符号 '@' 改成 '#'
+(11)2012-03-23 改善Action跳转：return "action:xxx"，之前是使用response.sendRedirect来实现的，
+但是这样的方式使得HTTP请求只能是GET方式的，如果要重定向到一个HTTP方法为POST或者PUT或者DELETE的话，
+显然这样是无法满足需求的。于是，对 return "action:xxx"的处理方式改成：
+return "action:xxx@PUT?name=weiwei&age=5"，符号@只能出现一次，
+框架不再采用response.sendRedirect的方式来处理，而是构建一个form表单：
+<form id="form_id" action="xxx" method="post">
+  <input type="hidden" name="_method" value="PUT" />
+  <input type="submit" />
+</form>
+<script>document.getElementById('form_id').submit();</script>
+然后使用response.getWriter().print打印上面这段内容，从而实现模拟客户端的请求，这样就支持GET之外的请求了，还可以带参数
+
+(12)2012-03-24 Action方法参数增加对DAO的声明使用：
+public String doAction(DAO dao, DivPageDAO dpDao, SelectDAO sDao, SearchDAO searchDao, UpdateDAO uDao, InsertDAO iDao, DeleteDAO dDao, CascadeDAO cascadeDao ... )
+(13)2012-03-24 Action方法名新的约定格式：
+  doUri1BindIdAndNameJoinUri2AtPostOrGetOrPutOrDelete(int id, String name)
+  关键词：do, Bind, Join, And, At, Or
+  其中每个的意义是：
+  do:一直到Bind或者At为止的单词都会被解析为 URI
+  Bind:一直到At或者末尾为止的单词都会被解析为URI中的变量部分/{id}(多个arg用And连接)
+  Join:一定要跟在Bind之后，例如 doHelloBindNameJoinWorldAtGet = /hello-world/{name} GET
+  At:一直到末尾为止的单词都会被解析为Http Method（多个method用 Or 连接）
+For Example1:
+  public void doRemoveBindIdAtDelete(int id){
+  }
+  解析后：
+  uri => remove/{id}
+  http => DELETE
+  访问例子：
+  DELETE /remove/3  
+  
+For Example2:
+  private String name;
+  public void setName(String name){this.name = name}
+  
+  public void doHelloBindNameAtGet(){
+  }
+  解析后：
+  uri => hello/{name}
+  http => GET
+  访问例子：
+  DELETE /hello/weiwei  
+  
+For Example3:
+public class PetsControl{
+  public String doBindIdJoinEditAtGet(int id){
+      return "fmt:pets/view/edit.html";
+  }
+}
+解析后：
+  uri => pets/{id}/edit 
+  http => GET
+访问例子：
+  GET /pets/3/edit
+   
+(14) 将CascadeDAO的 "select *" 修改为 "select xxx,xxx,xxx"
+(15) MVC.Action增加XML的视图响应。@Produces(MimeType.XML)
+(16) MVC.Action增加对FreeMarker模板的支持
+(17) 各个模块改善日志功能，提供多日志配置。控制台打印开关等。
+(18) 各个模块的sacnPackage增加绝对路径，必须以"AP:"开头。主要用于测试
+(19) DAO增加分页，DAOFactory.getDAO(Pet.class).selectAll().query(1, 5);
+(20) MVC.Action增加ActiveRecord支持。
+@Entity
+@Table(name="t_pet")
+public class Pet extends Model{
+    public final static Pet instance = new Pet();
+    private String name;
+    private int age;
+    public Pet(){}
+    public Pet(String name, int age){
+        this.name = name;
+        this.age = age;
+    }
+    //setter and getter
+}
+
+//使用
+new Pet("xiaohei", 5).create();//insert
+new Pet("xiaohei", 5).save();//当没有ID值的时候是insert
+Pet pet = new Pet("xiaobai",4);
+pet.create();//insert这时候pet.id已经被注入了
+pet.setName("test");
+pet.save();//这时候因为pet.id有值，所以是update
+
+pet = new Pet();
+pet.setId(2);
+pet.load();//这个时候会通过id值去查询数据库，并将数据注入到pet实例中。
+
+List<Pet> pets = Pet.instance.findAll();
+/* 分页 */
+List<Pet> page = Pet.instance.find().fetch(10);
+page = Pet.instance.find().fetch(2, 5);
+/* 条件查询 */
+List<Pet> pets = Pet.instance.find("byName", "xiaohei").fetch();
+pets = Pet.instance.find("byNameAndAge", "xiaohei", 5).fietch();
+pets = Pet.instance.find("name = ?", "xiaohei").fetch();
+Pet p = Pet.instance.find("name = ?", "xiaohei").first();
+p = Pet.instance.findById(3);
+p = Pet.instance.find("byNameAndAge", "xiaohei", 5).first();
+/* 删除 */
+Pet.instance.delete("byName", "xiaohei");
+Pet.instance.deleteAll();
+/* 计算 */
+long rows = Pet.instance.count();/* select count(*) */
+rows = Pet.instance.count("byName", "xiaohei");/* count(*) ... where name='xoapjeo' */
+
+(21)抛弃旧版的验证器一检测到错误就截断Action的继续执行行为, 抛弃默认的验证行为。具体修改为：
+1.验证分为两部分，一个是验证规则，一个是每个Action都需要声明需要验证的参数名。
+2.框架在检测到验证失败时，不会强制截断Action的往下执行。而是会把验证错误信息封装到一个对象中去，然后提供给执行的那个Action进行处理。
+这样的方式大大的增加了验证行为的灵活性，以后扩展起来也方便。
+
+class Controller{
+    @Required
+    private String message;
+    
+    private Pet pet;
+    
+    @Validate({"mess", "pet.name"})
+    public String doHelloWorld(Validation val){
+        
+        /* 这样就拿到了所有被@Required标注的验证失败信息 */
+        Map<String,String> requiredErrors = val.getErrors().get(Validators.REQUIRED_VAL);
+        
+        if (!requiredErrors.isEmpty()){
+            String mess = requiredErrors.get("message");       
+            
+            return "验证器required验证到message参数值没有通过，错误信息为：" + mess;
+        }
+        
+        /* 更好的做法是遍历 */
+		StringBuilder info = new StringBuilder();
+		Map<String, Map<String,String>> errors = val.getErrors();
+		for (Iterator<Entry<String,Map<String,String>>> it = errors.entrySet().iterator(); it.hasNext(); ){
+			Entry<String,Map<String,String>> en = it.next();
+			/* 验证器类型 */
+			String validatorName = en.getKey();
+			info.append(validatorName);
+			Map<String,String> error = en.getValue();
+			for (Iterator<Entry<String,String>> it2 = error.entrySet().iterator(); it2.hasNext(); ){
+				Entry<String,String> entry = it2.next();
+				/* 参数名 */
+				String paramName = entry.getKey();
+				/* 验证输出信息 */
+				String message = entry.getValue();
+				
+				info.append("\t\n").append(paramName).append(", ").append(message);
+				LogFactory.getMVCLogger(PetsControl.class).info(info.toString());
+			}
+		}
+		
+		return info.toString();
+	}
+	
+	//setters and getters
+}
+(22) fixed a bug.当Action return 的字符串为 "" 的时候报错。
+(23) 继续完善对JPA的支持（@MappedSuperclass 、@ManyToOne）
+(24) 修改CascadeDAO的update操作，更改为对主对象主键进行修改-带动关联对象外键级联修改。
+(25) 修复BeanXMLWriter 在写一个循环引用的Bean时会出现无限循环递归导致堆栈溢出的问题。
+(26) 纠正之前对JPA的mappedBy误解为@JoinColumn 。
+(27) 添加国际化支持
+(27) @OneToMany 级联操作 persist(insert)、merge(select)、refresh(update)、remove(delete)全部重构完成，并且本地MySql数据库环境测试通过
+(28) @ToOne 级联操作重构
+(29) 添加Models自动生成建表sql脚本（暂时仅支持mysql）
+(30) 修改 ModelDriven 的优先级比 action 方法的 model.put("", "") 要低。即如果某个 action 方法里往 model.put("name, "a")，那么控制类的属性尽管有name并且提供了getter方法，也不会覆盖掉 model里的name值
+(31) 拦截器无需继承父类，纯POJO。增加注解配置，@Interceptor,增加优先级
+(32) 增加文件上传下载支持，仅需要声明File或UploadFile变量即可。
+(33) fix Model.find(query, params)中query出现的模型类属性名无法正确转换为表字段名的bug
+(34) 完善Model.find(query, params)对query的支持，包括byFieldIsNull，byFieldIsNotNull，byFieldLike，byFieldNotLike等等

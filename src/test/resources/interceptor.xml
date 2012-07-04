@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans>
+  <interceptor name="" type="before" policy="and" priority="0" class="" method="">
+    <uri value="" type=""/>
+    <except></except>
+  </interceptor>
+</beans>

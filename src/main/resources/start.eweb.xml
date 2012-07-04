@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans>
+	<eweb4j>
+		<reload>0</reload>
+		<debug>1</debug>
+		<locales>
+			<locale language="en" country="US" />
+			<locale language="zh" country="CN" />
+		</locales>
+		<properties>
+			<file path="global.properties" global="true" />
+		</properties>
+		<ioc>
+			<open>1</open>
+			<logs>
+				<log console="1" level="info" file="" size="5" />
+	      	</logs>
+			<iocXmlFiles>
+				<path></path>
+			</iocXmlFiles>
+		</ioc>
+		<orm>
+			<open>1</open>
+			<logs>
+				<log console="0" level="info" file="" size="5" />
+	      	</logs>
+			<dataSource>com.mchange.v2.c3p0.ComboPooledDataSource</dataSource>
+			<scanPojoPackage>
+				<path>test.po</path>
+			</scanPojoPackage>
+			<ormXmlFiles />
+			<dbInfoXmlFiles>
+				<path>mysql.xml</path>
+			</dbInfoXmlFiles>
+		</orm>
+		<mvc>
+			<open>1</open>
+			<logs>
+				<log console="1" level="info" file="" size="5" />
+	      	</logs>
+			<scanActionPackage>
+				<path>.</path>
+				<path>AP:/D:/Java/JEE/EclipseWorkSpace/eweb4j-all/target/classes</path>
+			</scanActionPackage>
+			<scanInterceptorPackage>
+	        	<path>.</path>
+	      	</scanInterceptorPackage>
+			<actionXmlFiles />
+			<interXmlFiles />
+		</mvc>
+	</eweb4j>
+</beans>
