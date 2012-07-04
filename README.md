@@ -26,59 +26,46 @@
     讨厌 _Struts_ 的 Action 配置？ 讨厌 _SpringMVC_ 的 @RequestMapping 注解？ 讨厌 _JAX-RS_ 的 @Path @GET @POST @DELETE 注解？
   
     如果你的回答都是 yes 的话，恭喜你， EWeb4J 是你的菜。不妨看看下面这段代码：
-{{{
-public class HelloAction{
-
-    public String doHelloWorld(){
-
-        return "uri: /hello-world , http: GET|POST|PUT|DELETE";
+    public class HelloAction{
+        public String doHelloWorld(){
+            return "uri: /hello-world , http: GET|POST|PUT|DELETE";
+        }
     }
 
-}
-}}}
     从上面这个简单的例子可以直接看出，类名以 Action 结尾，方法名字以 do 开头，do 后面的 HelloWorld 就会映射为 /hello-world 。
 
     我们先不着急仔细研究它，继续看下面的例子。
-{{{
-public class PetsControl{
-
-    public String doAtGet(){
-
-        return "uri: /pets , http: GET";
-    }
-
-    public String doBindIdAtGet(long id){
     
-        return "uri: /pets/{id} , http: GET";
-    }
+    public class PetsControl{
+    	public String doAtGet(){
+        	return "uri: /pets , http: GET";
+    	}
 
-    public String doBindIdJoinEditAtGet(long id){
+    	public String doBindIdAtGet(long id){
+        	return "uri: /pets/{id} , http: GET";
+    	}
 
-        return "uri: /pets/{id}/edit , http: GET";
-    }
+    	public String doBindIdJoinEditAtGet(long id){
+        	return "uri: /pets/{id}/edit , http: GET";
+    	}
 
-    public String doBindIdAtDelete(long id){
+    	public String doBindIdAtDelete(long id){
+        	return "uri: /pets/{id} , http: DELETE";
+    	}
+    
+    	public String doBindIdAtPut(long id){
+        	return "uri: /pets/{id} , http: PUT";
+    	}
 
-        return "uri: /pets/{id} , http: DELETE";
+    	public String doAtPost(){
+        	return "uri: /pets , http: POST";
+    	}
+
+    	public String doNewAtGet(){
+        	return "uri: /pets/new , http: GET";
+    	}
     }
     
-    public String doBindIdAtPut(long id){
-
-        return "uri: /pets/{id} , http: PUT";
-    }
-
-    public String doAtPost(){
-    
-        return "uri: /pets , http: POST";
-    }
-
-    public String doNewAtGet(){
-        
-        return "uri: /pets/new , http: GET";
-    }
-
-}
-}}}
     可以明显的看到这个类和上个类有些不一样，它是以 Control 结尾的，上一个是 Action 结尾的。那么这二者有什么区别呢？通过对比，可以发现，以 Control 结尾的类，它所有的方法名字映射到 uri 的时候，都会在前面多出一个前缀，比如上面的 PetsControl 类的所有方法 uri 前面都多出了 /pets/ 前缀。但是 HelloAction 这个类却没有多出 /hello/ 这样的前缀。这就是以 Action 结尾和 Control 结尾的不同之处。
 
     另外，可以看到方法是通过 At 来配置 HTTP method 的。
