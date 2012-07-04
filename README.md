@@ -40,27 +40,21 @@
     	public String doAtGet(){
         	return "uri: /pets , http: GET";
     	}
-
     	public String doBindIdAtGet(long id){
         	return "uri: /pets/{id} , http: GET";
     	}
-
     	public String doBindIdJoinEditAtGet(long id){
         	return "uri: /pets/{id}/edit , http: GET";
     	}
-
     	public String doBindIdAtDelete(long id){
         	return "uri: /pets/{id} , http: DELETE";
     	}
-    
     	public String doBindIdAtPut(long id){
         	return "uri: /pets/{id} , http: PUT";
     	}
-
     	public String doAtPost(){
         	return "uri: /pets , http: POST";
     	}
-
     	public String doNewAtGet(){
         	return "uri: /pets/new , http: GET";
     	}
@@ -71,12 +65,10 @@
     另外，可以看到方法是通过 At 来配置 HTTP method 的。
     
     总结一下，EWeb4J 框架的 HTTP 路由配置其实就是一套简单的 "命名规范"，也就是 "约定"。
-{{{
-public String doUri1BindParam1AndParam2JoinUri2AtGetOrPostOrPutOrDelete(String param1, String param2){
-
-    return "uri: /uri1/{param1}/{param2}/uri2, http: GET|POST|PUT|DELETE";
-}
-}}}
+    
+    public String doUri1BindParam1AndParam2JoinUri2AtGetOrPostOrPutOrDelete(String param1, String param2){
+    	return "uri: /uri1/{param1}/{param2}/uri2, http: GET|POST|PUT|DELETE";
+    }
 
     如果上述方法所在的类命名以 Control 或 Controller 结尾, 那需要在上述 uri 前面增加该名字去除 Control 或 Controller 后的前缀。例如：PetsControl -> /pets/ 。
     
@@ -90,88 +82,62 @@ public String doUri1BindParam1AndParam2JoinUri2AtGetOrPostOrPutOrDelete(String p
     你可以将 HTTP 参数绑定到 Java 类成员变量上，也可以绑定到 Java 方法参数上。不管你的参数是基本数据类型还是 POJO 。
 
     如果你希望将参数绑定到类成员变量上，那么为该变量写上一个 setter 方法即可。
-{{{
-public class HelloAction{
-
-    private String name;
-
-    public String doHello(){
     
-        return "hello, " + name;
+    public class HelloAction{
+    	private String name;
+    	public String doHello(){
+        	return "hello, " + name;
+    	}
+    	public void setName(String name){
+        	this.name = name;
+    	}
     }
-
-    public void setName(String name){
-        this.name = name;
-    }
-}
-}}}
+    
     还可以将类成员变量封装到一个 POJO 上。
-{{{
-public class Pet{
-
-    private String name;
     
-    // setter and getter
-
-}
-
-public class HelloAction{
-
-    private Pet pet;
-
-    public String doHello(){
+    public class Pet{
+    	private String name;
+    	// setter and getter
+    }
     
-        return "hello, " + pet.getName();
+    public class HelloAction{
+    	private Pet pet;
+    	public String doHello(){
+        	return "hello, " + pet.getName();
+    	}
+    	public void setPet(Pet pet){
+        	this.pet = pet;
+    	}
     }
-
-    public void setPet(Pet pet){
-        this.pet = pet;
-    }
-}
-}}}
+    
     这时候传递过来的参数应该是  pet.name ，如果有更多层次的嵌套，照写即可，例如 pet.master.name 。
 
     如果你希望将参数绑定到方法参数上，此时代码将是：
-{{{
-public class HelloAction{
-
-    public String doHello(@QueryParam("name")String name){
     
-        return "hello, " + name;
+    public class HelloAction{
+    	public String doHello(@QueryParam("name")String name){
+        	return "hello, " + name;
+    	}
     }
-
-}
-}}}
-{{{
-public class Pet{
-
-    private String name;
     
-    // setter and getter
-
-}
-
-public class HelloAction{
-
-    public String doHello(@QueryParam("pet")Pet pet){
-    
-        return "hello, " + pet.getName();
+    public class Pet{
+    	private String name;
+    	// setter and getter
     }
-
-}
-}}}
+    
+    public class HelloAction{
+    	public String doHello(@QueryParam("pet")Pet pet){
+        	return "hello, " + pet.getName();
+    	}
+    }
+    
     如果不希望绑定到任何“东西”上，那么也可以这么做：
-{{{
-public class HelloAction{
-
-    public String doHello(QueryParams params){
     
-        return "hello, " + params.toStr("name");//or params.toStrs("name")[0]
+    public class HelloAction{
+    	public String doHello(QueryParams params){
+        	return "hello, " + params.toStr("name");//or params.toStrs("name")[0]
+    	}
     }
-
-}
-}}}
-
 
 == 4. 灵活可控的 HTTP 参数验证 ==
 ----
@@ -180,36 +146,24 @@ public class HelloAction{
     #  在任何 Action 方法上给定需验证的参数集合，触发验证行为。
     #  在 Action 方法体内进行验证结果的处理，你有最大的控制权。
     不妨看看代码：
-{{{
-public class HelloAction{
-    
-    @Required(mess="名字必填")
-    @Length(min=2, max=6, mess="名字{min}到{max}位")
-    private String name;
-    
-    @Validate({"name"})
-    public String doHelloBindName(Validation val){
-        if (val.hasErr())
-            return JsonConverter.convert(val.getAllErr());
+    public class HelloAction{
+    	@Required(mess="名字必填")
+    	@Length(min=2, max=6, mess="名字{min}到{max}位")
+    	private String name;
+    	@Validate({"name"})
+    	public String doHelloBindName(Validation val){
+        	if (val.hasErr())
+            	return JsonConverter.convert(val.getAllErr());
         
-        return "Hello, " + this.name;
-    }    
+        	return "Hello, " + this.name;
+    	}    
+    	//setter and getter
+    }
+    
+    val.getAllErr() 其实是一个 Map<String, List<String>>
+    大概结构是：{参数名：[信息1, 信息2, 信息3...]}
+    例如：{name:[名字必填，名字2到6位]}
 
-    //setter and getter
-}
-}}}
-    val.getAllErr() 其实是一个 
-{{{
-Map<String, List<String>>
-}}}
-    大概结构是：
-{{{
-{参数名：[信息1, 信息2, 信息3...]}
-}}}
-    例如：
-{{{
-{name:[名字必填，名字2到6位]}
-}}}
 == 5. 超级方便的视图数据传递 ==
 ----
     在不使用继承的前提下，EWeb4J 框架也能让视图数据传递变得非常简单。你只需要在 Action 方法参数里多添加一个 Map 即可。
