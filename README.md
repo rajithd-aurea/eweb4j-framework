@@ -1,7 +1,6 @@
 = 为什么要用 EWeb4J ？ =
 ----
     EWeb4J 是一个基于 Servlet/Jdbc 构建的轻量级 Java Web 开发框架。它可以代替 SSH  来开发一个完整的 Web 应用程序。它专注于 少侵入、少配置、松耦合、RESTful架构风格的 Web 应用程序开发。
-  
     EWeb4J 的目标是让 Java Web 开发更加简单。
   
   *  独具特色的 RESTful 路由
