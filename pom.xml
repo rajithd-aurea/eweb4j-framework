@@ -7,7 +7,7 @@
 	<packaging>jar</packaging>
 
 	<name>eweb4j-all</name>
-	<url>http://eweb4j.org</url>
+	<url>http://code.google.com/p/eweb4j</url>
 	<description>easy web framework for java, full-stack</description>
 	<properties>
 		<junit.version>4.7</junit.version>
@@ -31,6 +31,10 @@
 			<timezone>8</timezone>
 		</developer>
 	</developers>
+	<issueManagement>
+		<system>Github Issue</system>
+		<url>https://github.com/laiweiwei/eweb4j-framework/issues</url>
+	</issueManagement>
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
@@ -38,9 +42,8 @@
 		</license>
 	</licenses>
 	<scm>
-		<url>scm:svn:https://eweb4j.googlecode.com/svn/tags/eweb4j-all-1.9</url>
-		<connection>scm:svn:https://eweb4j.googlecode.com/svn/tags/eweb4j-all-1.9</connection>
-		<developerConnection>scm:svn:https://eweb4j.googlecode.com/svn/tags/eweb4j-all-1.9</developerConnection>
+		<connection>git@github.com:laiweiwei/eweb4j-framework.git</connection>
+		<url>https://github.com/laiweiwei/eweb4j-framework.git</url>
 	</scm>
 	<reporting>
 		<plugins>
@@ -52,11 +55,6 @@
 		</plugins>
 	</reporting>
 	<dependencies>
-		<!--<dependency>
-			<groupId>jboss</groupId>
-			<artifactId>javassist</artifactId>
-			<version>3.4.ga</version>
-		</dependency>-->
 		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
@@ -138,7 +136,7 @@
 	</distributionManagement>
 	<build>
 		<plugins>
-			 <plugin>
+			 <!--plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-gpg-plugin</artifactId>
 					<version>1.4</version>
@@ -147,16 +145,11 @@
 									<id>sign-artifacts</id>
 									<phase>verify</phase>
 									<goals>
-											<goal>sign</goal>
+										<goal>sign</goal>
 									</goals>
 							</execution>
 					</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-site-plugin</artifactId>
-				<version>3.0-beta-3</version>
-			</plugin>
+			</plugin-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
