@@ -616,3 +616,19 @@ class Controller{
 (33) fix Model.find(query, params)中query出现的模型类属性名无法正确转换为表字段名的bug
 (34) 完善Model.find(query, params)对query的支持，包括byFieldIsNull，byFieldIsNotNull，byFieldLike，byFieldNotLike等等
 (35) 完善生成建表脚本（使其支持多对多的第三方表）
+
+1.9.1 2012-08-27
+(1) bug fixed: IOC.createBean 当使用构造器方法注入依赖时，必须要提供一个无参构造器方法进行初始化，否则会报错。修复为无需提供无参构造器方法。
+package test;
+public class Pojo{
+    public Pojo(String name){
+        System.out.println(name);
+    }
+    
+    /*public Pojo(){} 这个无参构造方法上个版本是必须提供的，这个版本修复为不需要。*/
+}
+ioc.xml
+<ioc id="Pojo" scope="singleton" class="test.Pojo">
+    <inject ref="Const" name="" type="string" value="weiwei"/>
+</ioc>
+(2) feature: 为IOCConfig添加IOCConfig.createIOCXml("ioc.xml", icb);方法用来创建配置文件。

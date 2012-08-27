@@ -118,4 +118,11 @@ public class IOCConfig {
 
 		return error;
 	}
+	
+	public static void createIOCXml(String path, List<IOCConfigBean> icbs) throws Exception{
+		XMLWriter writer = BeanXMLUtil.getBeanXMLWriter(new File(ConfigConstant.CONFIG_BASE_PATH()+path), icbs);
+		writer.setBeanName("ioc");
+		writer.setClass("ioc", IOCConfigBean.class);
+		writer.write();
+	}
 }

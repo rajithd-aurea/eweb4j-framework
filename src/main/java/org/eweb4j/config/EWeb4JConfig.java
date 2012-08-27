@@ -275,7 +275,7 @@ public class EWeb4JConfig {
 
 	public static void createStartXml(String path, ConfigBean cb)
 			throws Exception {
-		XMLWriter writer = BeanXMLUtil.getBeanXMLWriter(new File(path), cb);
+		XMLWriter writer = BeanXMLUtil.getBeanXMLWriter(new File(ConfigConstant.CONFIG_BASE_PATH()+path), cb);
 		writer.setBeanName("eweb4j");
 		writer.setClass("eweb4j", ConfigBean.class);
 		writer.write();
