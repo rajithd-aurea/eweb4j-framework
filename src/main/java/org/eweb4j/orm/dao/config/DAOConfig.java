@@ -119,4 +119,11 @@ public class DAOConfig {
 		}
 		return error;
 	}
+	
+	public static void createDBXml(String path, DBInfoConfigBean db) throws Exception{
+		XMLWriter writer = BeanXMLUtil.getBeanXMLWriter(new File(ConfigConstant.CONFIG_BASE_PATH()+path), db);
+		writer.setBeanName("dataSource");
+		writer.setClass("dataSource", DBInfoConfigBean.class);
+		writer.write();
+	}
 }

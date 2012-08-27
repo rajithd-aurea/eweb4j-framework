@@ -24,8 +24,7 @@ public class DataSourceCreator {
 	public static DataSource create(final DBInfoConfigBean dbInfo)
 			throws Exception {
 
-		ConfigBean cb = (ConfigBean) SingleBeanCache
-				.get(ConfigConstant.CONFIGBEAN_ID);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigConstant.CONFIGBEAN_ID);
 		Class<?> cls = Class.forName(cb.getOrm().getDataSource());
 		DataSource ds = (DataSource) cls.newInstance();
 
@@ -35,6 +34,12 @@ public class DataSourceCreator {
 		for (Property property : properties) {
 			String name = property.getKey();
 			String value = property.getValue();
+			if (null == name || name.trim().length() == 0)
+				continue;
+			
+			if (null == value || value.trim().length() == 0)
+				continue;
+			
 			ReflectUtil ru2 = new ReflectUtil(ds);
 			Method m2 = ru2.getSetter(name);
 			if (m2 == null)
