@@ -1,6 +1,7 @@
 = 为什么要用 EWeb4J ？ =
 ----
-    EWeb4J 是一个基于 Servlet/Jdbc 构建的轻量级 Java Web 开发框架。它可以代替 SSH  来开发一个完整的 Web 应用程序。它专注于 少侵入、少配置、松耦合、RESTful架构风格的 Web 应用程序开发。
+    EWeb4J 是一个基于 Servlet/Jdbc 构建的轻量级 Java Web 开发框架。它可以代替 SSH  来开发一个完整的 Web 应用程序。
+    它专注于 少侵入、少配置、松耦合、RESTful架构风格的 Web 应用程序开发。
     EWeb4J 的目标是让 Java Web 开发更加简单。
   
   *  独具特色的 RESTful 路由
@@ -22,7 +23,8 @@
  
 == 1. 独具特色的 RESTful 路由 ==
 ----
-    讨厌 _Struts_ 的 Action 配置？ 讨厌 _SpringMVC_ 的 @RequestMapping 注解？ 讨厌 _JAX-RS_ 的 @Path @GET @POST @DELETE 注解？
+    讨厌 _Struts_ 的 Action 配置？ 讨厌 _SpringMVC_ 的 @RequestMapping 注解？ 
+    讨厌 _JAX-RS_ 的 @Path @GET @POST @DELETE 注解？
   
     如果你的回答都是 yes 的话，恭喜你， EWeb4J 是你的菜。不妨看看下面这段代码：
     public class HelloAction{
@@ -31,7 +33,8 @@
         }
     }
 
-    从上面这个简单的例子可以直接看出，类名以 Action 结尾，方法名字以 do 开头，do 后面的 HelloWorld 就会映射为 /hello-world 。
+    从上面这个简单的例子可以直接看出，类名以 Action 结尾，方法名字以 do 开头，
+    do 后面的 HelloWorld 就会映射为 /hello-world 。
 
     我们先不着急仔细研究它，继续看下面的例子。
     
@@ -59,7 +62,10 @@
     	}
     }
     
-    可以明显的看到这个类和上个类有些不一样，它是以 Control 结尾的，上一个是 Action 结尾的。那么这二者有什么区别呢？通过对比，可以发现，以 Control 结尾的类，它所有的方法名字映射到 uri 的时候，都会在前面多出一个前缀，比如上面的 PetsControl 类的所有方法 uri 前面都多出了 /pets/ 前缀。但是 HelloAction 这个类却没有多出 /hello/ 这样的前缀。这就是以 Action 结尾和 Control 结尾的不同之处。
+    可以明显的看到这个类和上个类有些不一样，它是以 Control 结尾的，上一个是 Action 结尾的。那么这二者有什么区别呢？
+    通过对比，可以发现，以 Control 结尾的类，它所有的方法名字映射到 uri 的时候，都会在前面多出一个前缀，
+    比如上面的 PetsControl 类的所有方法 uri 前面都多出了 /pets/ 前缀。
+    但是 HelloAction 这个类却没有多出 /hello/ 这样的前缀。这就是以 Action 结尾和 Control 结尾的不同之处。
 
     另外，可以看到方法是通过 At 来配置 HTTP method 的。
     
@@ -68,7 +74,8 @@
     	return "uri: /uri1/{param1}/{param2}/uri2, http: GET|POST|PUT|DELETE";
     }
 
-    如果上述方法所在的类命名以 Control 或 Controller 结尾, 那需要在上述 uri 前面增加该名字去除 Control 或 Controller 后的前缀。例如：PetsControl -> /pets/ 。
+    如果上述方法所在的类命名以 Control 或 Controller 结尾, 那需要在上述 uri 前面增加该名字去除 Control 
+    或 Controller 后的前缀。例如：PetsControl -> /pets/ 。
     
     控制器类的命名约定以 Action 或 Control 或 Controller 结尾。
 
@@ -173,7 +180,8 @@
     然后在 index.html 模板文件中取出即可 
     <h1>${name !}, Welcome to EWeb4J framework.</h1>
 
-    如果你喜欢 Struts2 的 ModelDriven 的话，嘿嘿，EWeb4J 一样也有，不过，比起 Struts2 需要继承，EWeb4J 应该会更加优雅。你所需要做的就只是为你的类成员变量提供一个 getter 方法即可。
+    如果你喜欢 Struts2 的 ModelDriven 的话，嘿嘿，EWeb4J 一样也有，不过，比起 Struts2 需要继承，
+    EWeb4J 应该会更加优雅。你所需要做的就只是为你的类成员变量提供一个 getter 方法即可。
 
     还是上面那个例子，如果是 ModelDriven 的话，代码将会是：
     public class HelloAction{
@@ -188,11 +196,13 @@
     }
 
     不管你的视图模板是 JSP、Freemarker 还是 Velocity， 你的这些代码都不需要修改。 
-    看到了吗？它是如此的简单！再也不需要 Servlet Request 了，Action 方法的测试也变得很简单了。最重要的是，没有继承！没有实现任何接口，如此松耦合，还不合您胃口么？: )
+    看到了吗？它是如此的简单！再也不需要 Servlet Request 了，Action 方法的测试也变得很简单了。最重要的是，
+    没有继承！没有实现任何接口，如此松耦合，还不合您胃口么？: )
 
 == 6. 超级方便的文件上传下载 ==
 ----
-    文件上传下载？这要涉及到文件IO流吧。或者，用第三方组件？例如Apache 的common-upload, 不不不，咱都不用，咱直接在控制器里声明一个 File 对象就行了。什么？这么简单？先看看代码吧~
+    文件上传下载？这要涉及到文件IO流吧。或者，用第三方组件？例如Apache 的common-upload, 不不不，咱都不用，
+    咱直接在控制器里声明一个 File 对象就行了。什么？这么简单？先看看代码吧~
     public class UploadControl{
     	private File file;
     	public String doAtPost(){
@@ -210,7 +220,9 @@
     </form>
     PS：注意表单文件input的name要和控制器声明的File对象名一致（实质上是和setter方法名相关）。另外注意 enctype
 
-    就这么简单，在一个Action方法执行前，框架会自动接收所有的文件上传请求，并将其作为一个临时文件保存到临时目录里，然后Action方法执行之后，框架会自动清空这些临时文件。因此，我们只要在Action方法体中，将临时文件拷贝到另外一个目录即可。下面有一个更加全面的例子：
+    就这么简单，在一个Action方法执行前，框架会自动接收所有的文件上传请求，并将其作为一个临时文件保存到临时目录里，
+    然后Action方法执行之后，框架会自动清空这些临时文件。因此，我们只要在Action方法体中，
+    将临时文件拷贝到另外一个目录即可。下面有一个更加全面的例子：
     //文件上传
     public class UploadControl {
     	final static String path = ConfigConstant.ROOT_PATH + "/WEB-INF/uploads/";
@@ -254,7 +266,8 @@
     	<input type="submit" value="上传" />
     </form>
 
-    文件上传这么简单，我想聪明的你应该猜到，文件下载大概怎么做了吧！没错，仅需要在Action方法里返回一个File对象即可！如果有多个文件，那么请返回文件数组吧！框架会自动将其打包成zip。
+    文件上传这么简单，我想聪明的你应该猜到，文件下载大概怎么做了吧！没错，仅需要在Action方法里返回一个File对象即可！
+    如果有多个文件，那么请返回文件数组吧！框架会自动将其打包成zip。
     public class DownloadControl {
     	final static String path = ConfigConstant.ROOT_PATH + "/WEB-INF/uploads/";
     	final File file = new File(path+"just4download.jpg"); 
@@ -275,7 +288,8 @@
 ----
     尽管实现充血模型需要继承这种强耦合方式，但是这对于敏捷的web开发来说是好处很多的。它已经被 Play、ROR 这些框架证明了。
     EWeb4J 一直在坚持无继承、无接口实现的松耦合开发。但是还有另外一个原则：用户掌控一切。
-    因此，EWeb4J 在这方面做了一个折中，既提供无继承、无接口实现的松耦合方案，也提供继承来实现充血模型的方案。最终选择权在用户手里。
+    因此，EWeb4J 在这方面做了一个折中，既提供无继承、无接口实现的松耦合方案，也提供继承来实现充血模型的方案。
+    最终选择权在用户手里。
     尽管如此，在使用 EWeb4J 框架做 web 开发时，我个人还是比较喜欢：
   *  实体模型类使用继承获得一些基本的持久化功能
   *  其他地方尽量使用松耦合，无继承、无实现接口，多使用组合。
