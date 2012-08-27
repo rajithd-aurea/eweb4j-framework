@@ -2,8 +2,11 @@ package org.eweb4j.ioc;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eweb4j.cache.IOCConfigBeanCache;
 import org.eweb4j.cache.SingleBeanCache;
@@ -13,7 +16,6 @@ import org.eweb4j.ioc.config.IOCConfigConstant;
 import org.eweb4j.ioc.config.bean.IOCConfigBean;
 import org.eweb4j.ioc.config.bean.Injection;
 import org.eweb4j.util.ReflectUtil;
-import org.eweb4j.util.StringUtil;
 
 /**
  * IOC Bean工厂，负责生产出各种各样的bean 按照配置文件配置信息进行bean的生产 服从依赖注入
@@ -150,14 +152,17 @@ public class IOC {
 			Class<?>[] args = null;
 			List<Object> initargList = new ArrayList<Object>();
 			List<Class<?>> argList = new ArrayList<Class<?>>();
+			
+			// setters cache
+			Map<String, Object> properties = new Hashtable<String, Object>();
+			
 			// 遍历配置文件，找出beanID的bean
 			if (IOCConfigBeanCache.containsKey(beanID)) {
 				IOCConfigBean iocBean = IOCConfigBeanCache.get(beanID);
 				// 取出该bean的类型，便于最后使用反射调用构造方法实例化
 				Class<T> clazz = (Class<T>) Class.forName(iocBean.getClazz());
 				// 判断该bean的生命周期
-				if (IOCConfigConstant.SINGLETON_SCOPE.equalsIgnoreCase(iocBean
-						.getScope())) {
+				if (IOCConfigConstant.SINGLETON_SCOPE.equalsIgnoreCase(iocBean.getScope())) {
 					// 如果是单件，就从单件缓存池中取
 					if (SingleBeanCache.containsKey(beanID)) {
 						t = (T) SingleBeanCache.get(beanID);
@@ -166,8 +171,7 @@ public class IOC {
 				}
 
 				// 遍历每个bean的注入配置
-				for (Iterator<Injection> it = iocBean.getInject().iterator(); it
-						.hasNext();) {
+				for (Iterator<Injection> it = iocBean.getInject().iterator(); it.hasNext();) {
 					Injection inj = it.next();
 					if (inj == null)
 						continue;
@@ -177,14 +181,7 @@ public class IOC {
 						String name = inj.getName();
 						if (name != null && !"".equals(name)) {
 							// 如果属性名字不为空，说明使用的是setter注入方式
-							// 使用setter注入的时候，需要提供一个无参构造方法
-							if (t == null)
-								t = clazz.newInstance();
-
-							ReflectUtil ru = new ReflectUtil(t);
-							Method m = ru.getSetter(name);
-							if (m != null)
-								m.invoke(t, getBean(ref));
+							properties.put(name, getBean(ref));
 
 						} else {
 							// 如果属性名字为空，说明使用的是构造器注入方式
@@ -197,128 +194,85 @@ public class IOC {
 						// 注入基本类型
 						String type = inj.getType();
 						String value = inj.getValue();
-						if (value == null) {
+						if (value == null) 
 							value = "";
-						}
+						
 						String name = inj.getName();
 						if (name != null && !"".equals(name)) {
 							// 如果属性名字不为空，说明使用的是setter注入方式
-							// 使用setter注入的时候，需要提供一个无参构造方法
-							if (t == null)
-								t = clazz.newInstance();
+							if (IOCConfigConstant.INT_ARGTYPE.equalsIgnoreCase(type)|| "java.lang.Integer".equalsIgnoreCase(type)) {
+								if ("".equals(value.trim()))
+									value = "0";
 
-							ReflectUtil ru = new ReflectUtil(t);
-							Method m = ru.getMethod("set"
-									+ StringUtil.toUpCaseFirst(name));
-							if (m != null) {
-								if (IOCConfigConstant.INT_ARGTYPE
-										.equalsIgnoreCase(type)
-										|| "java.lang.Integer"
-												.equalsIgnoreCase(type)) {
-									if ("".equals(value.trim()))
-										value = "0";
+								// int
+								properties.put(name, Integer.parseInt(value));
+							} else if (IOCConfigConstant.STRING_ARGTYPE.equalsIgnoreCase(type) || "java.lang.String".equalsIgnoreCase(type)) {
+								// String
+								properties.put(name, value);
+							} else if (IOCConfigConstant.LONG_ARGTYPE.equalsIgnoreCase(type) || "java.lang.Long".equalsIgnoreCase(type)) {
+								// long
+								if ("".equals(value.trim()))
+									value = "0";
 
-									// int
-									m.invoke(t, Integer.parseInt(value));
-								} else if (IOCConfigConstant.STRING_ARGTYPE
-										.equalsIgnoreCase(type)
-										|| "java.lang.String"
-												.equalsIgnoreCase(type)) {
-									// String
-									m.invoke(t, value);
-								} else if (IOCConfigConstant.LONG_ARGTYPE
-										.equalsIgnoreCase(type)
-										|| "java.lang.Long"
-												.equalsIgnoreCase(type)) {
-									// long
-									if ("".equals(value.trim()))
-										value = "0";
+								properties.put(name, Long.parseLong(value));
+							} else if (IOCConfigConstant.FLOAT_ARGTYPE.equalsIgnoreCase(type) || "java.lang.Float".equalsIgnoreCase(type)) {
+								// float
+								if ("".equals(value.trim()))
+									value = "0.0";
 
-									m.invoke(t, Long.parseLong(value));
-								} else if (IOCConfigConstant.FLOAT_ARGTYPE
-										.equalsIgnoreCase(type)
-										|| "java.lang.Float"
-												.equalsIgnoreCase(type)) {
-									// float
-									if ("".equals(value.trim()))
-										value = "0.0";
-
-									m.invoke(t, Float.parseFloat(value));
-								} else if (IOCConfigConstant.BOOLEAN_ARGTYPE
-										.equalsIgnoreCase(type)
-										|| "java.lang.Boolean"
-												.equalsIgnoreCase(type)) {
-									// boolean
-									if ("".equals(value.trim())) {
-										value = "false";
-									}
-									m.invoke(t, Boolean.parseBoolean(value));
-								} else if (IOCConfigConstant.DOUBLE_ARGTYPE
-										.equalsIgnoreCase(type)
-										|| "java.lang.Double"
-												.equalsIgnoreCase(type)) {
-									// double
-									if ("".equals(value.trim())) {
-										value = "0.0";
-									}
-									m.invoke(t, Double.parseDouble(value));
-								}
+								properties.put(name, Float.parseFloat(value));
+							} else if (IOCConfigConstant.BOOLEAN_ARGTYPE.equalsIgnoreCase(type) || "java.lang.Boolean".equalsIgnoreCase(type)) {
+								// boolean
+								if ("".equals(value.trim())) 
+									value = "false";
+								
+								properties.put(name, Boolean.parseBoolean(value));
+							} else if (IOCConfigConstant.DOUBLE_ARGTYPE.equalsIgnoreCase(type) || "java.lang.Double".equalsIgnoreCase(type)) {
+								// double
+								if ("".equals(value.trim())) 
+									value = "0.0";
+								
+								properties.put(name, Double.parseDouble(value));
 							}
 						} else {
 							// 如果属性名字为空，说明使用的是构造器注入方式
 							// 使用构造器注入的时候，需要按照构造器参数列表顺序实例化
-							if (IOCConfigConstant.INT_ARGTYPE
-									.equalsIgnoreCase(type)
-									|| "java.lang.Integer"
-											.equalsIgnoreCase(type)) {
+							if (IOCConfigConstant.INT_ARGTYPE.equalsIgnoreCase(type)|| "java.lang.Integer".equalsIgnoreCase(type)) {
 								// int
-								if ("".equals(value.trim())) {
+								if ("".equals(value.trim())) 
 									value = "0";
-								}
+								
 								argList.add(int.class);
 								initargList.add(Integer.parseInt(value));
-							} else if (IOCConfigConstant.LONG_ARGTYPE
-									.equalsIgnoreCase(type)
-									|| "java.lang.Long".equalsIgnoreCase(type)) {
+							} else if (IOCConfigConstant.LONG_ARGTYPE.equalsIgnoreCase(type) || "java.lang.Long".equalsIgnoreCase(type)) {
 								// long
-								if ("".equals(value.trim())) {
+								if ("".equals(value.trim())) 
 									value = "0";
-								}
+								
 								argList.add(long.class);
 								initargList.add(Long.parseLong(value));
-							} else if (IOCConfigConstant.FLOAT_ARGTYPE
-									.equalsIgnoreCase(type)
-									|| "java.lang.Float".equalsIgnoreCase(type)) {
+							} else if (IOCConfigConstant.FLOAT_ARGTYPE.equalsIgnoreCase(type) || "java.lang.Float".equalsIgnoreCase(type)) {
 								// float
-								if ("".equals(value.trim())) {
+								if ("".equals(value.trim())) 
 									value = "0.0";
-								}
+								
 								argList.add(float.class);
 								initargList.add(Float.parseFloat(value));
-							} else if (IOCConfigConstant.BOOLEAN_ARGTYPE
-									.equalsIgnoreCase(type)
-									|| "java.lang.Boolean"
-											.equalsIgnoreCase(type)) {
+							} else if (IOCConfigConstant.BOOLEAN_ARGTYPE.equalsIgnoreCase(type) || "java.lang.Boolean".equalsIgnoreCase(type)) {
 								// boolean
-								if ("".equals(value.trim())) {
+								if ("".equals(value.trim())) 
 									value = "false";
-								}
+								
 								argList.add(boolean.class);
 								initargList.add(Boolean.parseBoolean(value));
-							} else if (IOCConfigConstant.DOUBLE_ARGTYPE
-									.equalsIgnoreCase(type)
-									|| "java.lang.Double"
-											.equalsIgnoreCase(type)) {
+							} else if (IOCConfigConstant.DOUBLE_ARGTYPE.equalsIgnoreCase(type) || "java.lang.Double".equalsIgnoreCase(type)) {
 								// double
-								if ("".equals(value.trim())) {
+								if ("".equals(value.trim())) 
 									value = "0.0";
-								}
+								
 								argList.add(double.class);
 								initargList.add(Double.parseDouble(value));
-							} else if (IOCConfigConstant.STRING_ARGTYPE
-									.equalsIgnoreCase(type)
-									|| "java.lang.String"
-											.equalsIgnoreCase(type)) {
+							} else if (IOCConfigConstant.STRING_ARGTYPE.equalsIgnoreCase(type) || "java.lang.String".equalsIgnoreCase(type)) {
 								// String
 								argList.add(String.class);
 								initargList.add(value);
@@ -335,10 +289,27 @@ public class IOC {
 						initargs[i] = initargList.get(i);
 					}
 
-					t = clazz.getDeclaredConstructor(args)
-							.newInstance(initargs);
-				} else {
+					t = clazz.getDeclaredConstructor(args).newInstance(initargs);
+				} else if (t == null){
 					t = clazz.newInstance();
+					for (Iterator<Entry<String, Object>> it = properties.entrySet().iterator(); it.hasNext();) {
+						Entry<String, Object> e = it.next();
+						final String name = e.getKey();
+						ReflectUtil ru = new ReflectUtil(t);
+						Method m = ru.getSetter(name);
+						if (m == null)
+							continue;
+						
+						m.invoke(t, e.getValue());
+					}
+				}
+				
+				// 判断该bean的生命周期
+				if (IOCConfigConstant.SINGLETON_SCOPE.equalsIgnoreCase(iocBean.getScope())) {
+					// 如果是单件，就从单件缓存池中取
+					if (!SingleBeanCache.containsKey(beanID)) {
+						SingleBeanCache.add(beanID, t);
+					}
 				}
 			}
 		} catch (Exception e) {
