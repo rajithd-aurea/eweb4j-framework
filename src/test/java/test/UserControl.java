@@ -1,5 +1,6 @@
 package test;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eweb4j.cache.ActionConfigBeanCache;
@@ -60,7 +61,7 @@ public class UserControl {
 		
 		List<User> users = User.inst.findAll();
 		/* 分页 */
-		List<User> page = User.inst.find().fetch(10);
+		Collection<User> page = User.inst.find().fetch(10);
 		page = User.inst.find().fetch(2, 5);
 		User u = User.inst.find("account = ?", "test").first();
 		u = User.inst.findById(3);

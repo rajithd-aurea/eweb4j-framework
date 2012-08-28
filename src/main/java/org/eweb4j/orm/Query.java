@@ -1,5 +1,6 @@
 package org.eweb4j.orm;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface Query {
@@ -10,7 +11,7 @@ public interface Query {
 	 * @param <T>
 	 * @return
 	 */
-	<T> List<T> fetch();
+	<T> Collection<T> fetch();
 
 	/**
 	 * Retrieve results of query.
@@ -19,7 +20,7 @@ public interface Query {
 	 * @param max
 	 * @return
 	 */
-	<T> List<T> fetch(int max);
+	<T> Collection<T> fetch(int max);
 
 	/**
 	 * Retrieve a page of result.
@@ -29,7 +30,7 @@ public interface Query {
 	 * @param length
 	 * @return
 	 */
-	<T> List<T> fetch(int page, int length);
+	<T> Collection<T> fetch(int page, int length);
 
 	/**
 	 * 

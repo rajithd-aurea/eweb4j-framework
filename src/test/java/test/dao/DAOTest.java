@@ -1,10 +1,8 @@
 package test.dao;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import junit.framework.Assert;
 
 import org.eweb4j.config.ConfigConstant;
 import org.eweb4j.config.EWeb4JConfig;
@@ -61,7 +59,7 @@ public class DAOTest {
 	@Test
 	public void testDAO(){
 		DAO dao = DAOFactory.getDAO(Pet.class);
-		List<Pet> pets = dao.clear().selectAll().query(1,4);
+		Collection<Pet> pets = dao.clear().selectAll().query(1,4);
 		System.out.println(pets);
 	}
 }

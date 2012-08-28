@@ -1,6 +1,6 @@
 package org.eweb4j.orm.dao;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -433,11 +433,11 @@ public interface DAO {
 	 * @param <T>
 	 * @return
 	 */
-	public <T> List<T> query();
+	public <T> Collection<T> query();
 	
-	public <T> List<T> query(int max);
+	public <T> Collection<T> query(int max);
 	
-	public <T> List<T> query(int page, int length);
+	public <T> Collection<T> query(int page, int length);
 
 	/**
 	 * 执行查询操作使用，返回第一个结果
