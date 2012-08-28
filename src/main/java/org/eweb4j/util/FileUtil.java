@@ -80,6 +80,7 @@ public class FileUtil {
 		try {
 			urls = FileUtil.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
 			classpath.add(getTopClassPath(FileUtil.class));
+			classpath.add(getJarPath());
 			while (urls.hasMoreElements()) {
 	            URL url = (URL) urls.nextElement();
 	            String path = url.getFile().replace("file:/", "").replace("!/META-INF/MANIFEST.MF", "");
