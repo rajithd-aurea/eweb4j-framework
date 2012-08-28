@@ -330,7 +330,10 @@ public class PojoAnnotationConfig extends ScanPackage {
 			return null;
 		} catch (Exception e) {
 			return null;
+		} catch (Throwable e) {
+			return null;
 		}
+		
 		return clazz;
 	}
 }
