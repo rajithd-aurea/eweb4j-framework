@@ -6,6 +6,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashSet;
 
 /**
  * 文件操作工具类
@@ -58,8 +62,34 @@ public class FileUtil {
 	 * @return
 	 */
 	public static String getJarPath() {
-		return FileUtil.getParent(FileUtil.getTopClassPath(FileUtil.class), 1)
-				+ File.separator + "lib";
+		return FileUtil.getParent(FileUtil.getTopClassPath(FileUtil.class), 1) + File.separator + "lib";
+	}
+	
+	public static String[] getChildrenPath(File parent){
+		File[] files = parent.listFiles();
+		String[] result = new String[files.length];
+		for (int i = 0; i < files.length; i++)
+			result[i] = StringUtil.uriDecoding(files[i].getAbsolutePath());
+		
+		return result;
+	}
+	
+	public static Collection<String> getClassPath(){
+		Collection<String> classpath = new HashSet<String>();
+		Enumeration<URL> urls;
+		try {
+			urls = FileUtil.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
+			classpath.add(getTopClassPath(FileUtil.class));
+			while (urls.hasMoreElements()) {
+	            URL url = (URL) urls.nextElement();
+	            String path = url.getFile().replace("file:/", "").replace("!/META-INF/MANIFEST.MF", "");
+	            classpath.add(StringUtil.uriDecoding(path));
+	        }
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return classpath;
 	}
 
 	public static String getClassPath(String folderName) {

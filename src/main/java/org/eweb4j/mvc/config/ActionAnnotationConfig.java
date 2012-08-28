@@ -35,8 +35,7 @@ public class ActionAnnotationConfig extends ScanPackage{
 
 	
 	public ActionAnnotationConfig() {
-		super();
-		log = LogFactory.getMVCLogger(getClass());
+		super(LogFactory.getMVCLogger(ActionAnnotationConfig.class));
 	}
 
 	/**

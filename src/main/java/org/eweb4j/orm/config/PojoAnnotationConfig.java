@@ -19,6 +19,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.eweb4j.cache.ORMConfigBeanCache;
+import org.eweb4j.config.Log;
+import org.eweb4j.config.LogFactory;
 import org.eweb4j.config.ScanPackage;
 import org.eweb4j.orm.PropType;
 import org.eweb4j.orm.annotation.Ignore;
@@ -35,6 +37,10 @@ import org.eweb4j.util.ReflectUtil;
  */
 public class PojoAnnotationConfig extends ScanPackage {
 
+	public PojoAnnotationConfig() {
+		super(LogFactory.getMVCLogger(PojoAnnotationConfig.class));
+	}
+
 	/**
 	 * 
 	 * @param clsName
@@ -45,7 +51,10 @@ public class PojoAnnotationConfig extends ScanPackage {
 
 		if (clazz == null)
 			return false;
-
+		
+		if (clazz.isInterface())
+			return false;
+		
 		Entity entity = clazz.getAnnotation(Entity.class);
 		if (entity == null && !clsName.endsWith("PO")
 				&& !clsName.endsWith("POJO") && !clsName.endsWith("Entity")
@@ -57,36 +66,40 @@ public class PojoAnnotationConfig extends ScanPackage {
 		table = "".equals(table.trim()) ? clazz.getSimpleName()
 				.replace("PO", "").replace("POJO", "").replace("Entity", "")
 				.replace("Model", "") : table;
-		ORMConfigBean ormBean = new ORMConfigBean();
-		ormBean.setClazz(clazz.getName());
-		ormBean.setId(clazz.getSimpleName());
-		ormBean.setTable(table);
-
-		List<Property> pList = getProperties(clazz, null, false);
-		List<Property> superList = new ArrayList<Property>();
-		Class<?> superClazz = clazz.getSuperclass();
+		if (table == null || table.trim().length() == 0)
+			return false;
+		
 		try {
+			List<Property> pList = getProperties(clazz, null, false, log);
+			List<Property> superList = new ArrayList<Property>();
+			Class<?> superClazz = clazz.getSuperclass();
+		
 			for (; superClazz != Object.class && superClazz != null; superClazz = superClazz
 					.getSuperclass()) {
 				if (!superClazz.isAnnotationPresent(MappedSuperclass.class))
 					continue;
-				List<Property> list = getProperties(superClazz, pList, true);
+				List<Property> list = getProperties(superClazz, pList, true, log);
 				if (list != null)
 					superList.addAll(list);
 			}
+		
+			List<Property> properties = new ArrayList<Property>(superList);
+			properties.addAll(pList);
+	
+			ORMConfigBean ormBean = new ORMConfigBean();
+			ormBean.setClazz(clazz.getName());
+			ormBean.setId(clazz.getSimpleName());
+			ormBean.setTable(table);
+			ormBean.setProperty(properties);
+			ORMConfigBeanCache.add(clazz, ormBean);
 		} catch (Error er) {
-			log.debug("the action class new instance failued -> " + clsName + " | " + er.toString());
+			log.warn("the action class new instance failued -> " + clsName + " | " + er.toString());
 			return false;
 		} catch (Exception e) {
-			log.debug("the action class new instance failued -> " + clsName + " | " + e.toString());
+			log.warn("the action class new instance failued -> " + clsName + " | " + e.toString());
 			return false;
 		}
-		List<Property> properties = new ArrayList<Property>(superList);
-		properties.addAll(pList);
-
-		ormBean.setProperty(properties);
-		ORMConfigBeanCache.add(clazz, ormBean);
-
+		
 		return true;
 	}
 
@@ -100,19 +113,20 @@ public class PojoAnnotationConfig extends ScanPackage {
 		return false;
 	}
 
-	private static List<Property> getProperties(Class<?> clazz,
-			final List<Property> pList, final boolean requireSuper) {
+	private static List<Property> getProperties(Class<?> clazz, final List<Property> pList, final boolean requireSuper, Log log) throws Exception {
+		List<Property> result = new ArrayList<Property>();
 		ReflectUtil ru;
 		try {
 			ru = new ReflectUtil(clazz);
 			ru.setRequiredSuper(requireSuper);
 		} catch (Error e) {
-			return null;
+			log.warn(e.toString());
+			throw e;
 		} catch (Exception e) {
-			return null;
+			log.warn(e.toString());
+			throw e;
 		}
 
-		List<Property> result = new ArrayList<Property>();
 		for (Field f : ru.getFields()) {
 			if (Collection.class.isAssignableFrom(f.getType()))
 				continue;

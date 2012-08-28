@@ -46,8 +46,8 @@ public class Model2Table {
 			sql.append( "\n-- ----------------------------" +
 						"\n-- Created by "+ EWeb4JConfig.about() + 
 						"\n-- at "+ StringUtil.getNowTime()  +
-						"\n-- Models of "+ ocb.getClazz()  +
-						"\n-- Records of "+ table +
+						"\n-- Model "+ ocb.getClazz()  +
+						"\n-- Record "+ table +
 						"\n-- ----------------------------\n");
 			
 			List<Property> properties = ocb.getProperty();
@@ -172,7 +172,7 @@ public class Model2Table {
 					}
 				}
 			} catch (Exception e1) {
-				e1.printStackTrace();
+				continue;
 			} 
 		}
 		
@@ -193,7 +193,6 @@ public class Model2Table {
 			LogFactory.getConfigLogger(Model2Table.class).debug("create models sql script file success -> " + file.getAbsoluteFile());
 			
 		} catch (IOException e1) {
-			e1.printStackTrace();
 			return StringUtil.getExceptionString(e1);
 		} 
 		

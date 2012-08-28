@@ -2,11 +2,11 @@ package org.eweb4j.config;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.eweb4j.mvc.config.ActionAnnotationConfig;
 import org.eweb4j.util.FileUtil;
 import org.eweb4j.util.StringUtil;
 
@@ -14,17 +14,29 @@ public abstract class ScanPackage {
 	
 	public Log log ;
 	
-	public ScanPackage(){
-		log = LogFactory.getConfigLogger(getClass());
+	public ScanPackage(Log log){
+		this.log = log;
 	}
 	
-	public String readAnnotation(List<String> scans) {
+	public String readAnnotation(Collection<String> scans) {
 		String error = null;
 
 		try {
 			if (scans == null)
 				return error;
 
+			Collection<String> classpaths = new HashSet<String>();
+			Collection<File> jars = new HashSet<File>();
+			Collection<String> paths = FileUtil.getClassPath();
+			for (String path : paths){
+				File f = new File(path);
+				if (path.endsWith(".jar")){
+					jars.add(f);
+				}else{
+					classpaths.add(path);
+				}
+			}
+			
 			for (String scan : scans) {
 
 				if (scan == null || scan.length() == 0)
@@ -32,16 +44,17 @@ public abstract class ScanPackage {
 
 				/* 扫描绝对路径 */
 				if (scan.startsWith("AP:")) {
-					scanDir(".", scan.replace("AP:", ""));
-				} else {
-					// 扫描jar包
-					String jarPath = FileUtil.getJarPath();
-					scanJar(scan, jarPath);
-
-					// 扫描ClassPath中的*.class
-					String classDir = FileUtil.getTopClassPath(ActionAnnotationConfig.class);
-					scanDir(scan, classDir);
-				}
+					classpaths.add(scan.replace("AP:", ""));
+					scan = ".";
+				} 
+				
+				// 扫描ClassPath中的*.class
+				for (String classpath : classpaths)
+					scanDir(scan, classpath, jars);
+				
+				// 扫描jar包
+				scanJar(scan, jars);
+				
 			}
 
 		} catch (Exception e) {
@@ -52,7 +65,7 @@ public abstract class ScanPackage {
 		return error;
 	}
 
-	private void scanDir(String scanPackage, String classDir) throws Exception {
+	private void scanDir(String scanPackage, String classDir, final Collection<File> jarCollect) throws Exception {
 		File dir = null;
 		if (".".equals(scanPackage)) {
 			scanPackage = "";
@@ -63,7 +76,7 @@ public abstract class ScanPackage {
 		log.debug("scan dir -> " + dir);
 		// 递归文件目录
 		if (dir.isDirectory())
-			scanPackage(dir, scanPackage);
+			scanPackage(dir, scanPackage, jarCollect);
 	}
 
 	/**
@@ -73,7 +86,7 @@ public abstract class ScanPackage {
 	 * @param actionPackage
 	 * @throws Exception
 	 */
-	private void scanPackage(File dir, String actionPackage) throws Exception {
+	private void scanPackage(File dir, String actionPackage, final Collection<File> jarCollect) throws Exception {
 		if (!dir.isDirectory())
 			return;
 
@@ -84,13 +97,18 @@ public abstract class ScanPackage {
 
 			if (f.isDirectory())
 				if (actionPackage.length() == 0)
-					scanPackage(f, f.getName());
+					scanPackage(f, f.getName(), jarCollect);
 				else
-					scanPackage(f, actionPackage + "." + f.getName());
+					scanPackage(f, actionPackage + "." + f.getName(), jarCollect);
 
 			else if (f.isFile()) {
-				if (!f.getName().endsWith(".class"))
+				if (!f.getName().endsWith(".class")){
+					if (f.getName().endsWith(".jar")){
+						jarCollect.add(f);
+					}
+					
 					continue;
+				}
 
 				StringBuilder sb = new StringBuilder(actionPackage);
 				int endIndex = f.getName().lastIndexOf(".");
@@ -116,10 +134,7 @@ public abstract class ScanPackage {
 	 * @param packageName
 	 * @throws Exception
 	 */
-	private void scanJar(String packageName, String jarsParentDirPath) {
-		String path = jarsParentDirPath;
-		log.debug("scan " + path + " for jars");
-		File[] ff = new File(path).listFiles();
+	private void scanJar(String packageName, Collection<File> ff) {
 		if (ff == null)
 			return;
 
@@ -135,6 +150,9 @@ public abstract class ScanPackage {
 					
 					String entryName = entry.getName().replace('/', '.');
 					if (".".equals(packageName)|| entryName.startsWith(packageName)){
+						if (!entryName.endsWith(".class"))
+							continue;
+						
 						final String className = entryName.replace(".class", "");
 						if (className == null || className.trim().length() == 0)
 							continue;
@@ -149,7 +167,6 @@ public abstract class ScanPackage {
 					}
 
 					zin.closeEntry();
-
 				}
 				zin.close();
 			} catch (Error e) {

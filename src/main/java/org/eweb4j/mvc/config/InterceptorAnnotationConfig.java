@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eweb4j.cache.InterConfigBeanCache;
+import org.eweb4j.config.LogFactory;
 import org.eweb4j.config.ScanPackage;
 import org.eweb4j.mvc.action.annotation.Singleton;
 import org.eweb4j.mvc.config.bean.InterConfigBean;
@@ -13,6 +14,10 @@ import org.eweb4j.mvc.interceptor.Uri;
 
 public class InterceptorAnnotationConfig extends ScanPackage{
 	
+
+	public InterceptorAnnotationConfig() {
+		super(LogFactory.getMVCLogger(InterceptorAnnotationConfig.class));
+	}
 
 	/**
 	 * handle class
@@ -65,10 +70,10 @@ public class InterceptorAnnotationConfig extends ScanPackage{
 			inter.setUri(uriList);
 			InterConfigBeanCache.add(inter);
 		}  catch (Error er) {
-			log.debug("the interceptor class new instance failued -> " + clsName + " | " + er.toString());
+			log.warn("the interceptor class new instance failued -> " + clsName + " | " + er.toString());
 			return false;
 		} catch (Exception e) {
-			log.debug("the terceptor class new instance failued -> " + clsName + " | " + e.toString());
+			log.warn("the interceptor class new instance failued -> " + clsName + " | " + e.toString());
 			return false;
 		}
 		

@@ -282,8 +282,7 @@ public class EWeb4JConfig {
 	}
 	
 	public static String about(){
-		
-		return "EWeb4J Framework 1.9-SNAPSHOT";
+		return "EWeb4J Framework 1.9.1-SNAPSHOT";
 	}
 	
 	public static void setSTART_FILE_NAME(String START_FILE_NAME) {

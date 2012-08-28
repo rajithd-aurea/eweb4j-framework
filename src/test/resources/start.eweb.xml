@@ -15,7 +15,7 @@
 		<ioc>
 			<open>1</open>
 			<logs>
-				<log console="0" level="info" file="" size="5" />
+				<log console="1" level="debug" file="" size="5" />
 	      	</logs>
 			<iocXmlFiles>
 				<path>ioc.xml</path>
@@ -24,12 +24,12 @@
 		<orm>
 			<open>1</open>
 			<logs>
-				<log console="0" level="info" file="" size="5" />
+				<log console="1" level="debug" file="" size="5" />
 	      	</logs>
 			<dataSource>com.mchange.v2.c3p0.ComboPooledDataSource</dataSource>
 			<scanPojoPackage>
 				<path>test.po</path>
-				<path>AP:/D:/Java/JEE/EclipseWorkSpace/eweb4j-all/target/classes</path>
+				<path>AP:/D:/Java/JEE/EclipseWorkSpace/eweb4j/target/classes</path>
 			</scanPojoPackage>
 			<ormXmlFiles />
 			<dbInfoXmlFiles>
@@ -39,12 +39,12 @@
 		<mvc>
 			<open>1</open>
 			<logs>
-				<log console="0" level="info" file="" size="5" />
+				<log console="1" level="debug" file="" size="5" />
 	      	</logs>
 	      	<upload tmp="${RootPath}\WEB-INF/tmp" maxMemorySize="4M" maxRequestSize="4M" />
 			<scanActionPackage>
 				<path>.</path>
-				<path>AP:/D:/Java/JEE/EclipseWorkSpace/eweb4j-all/target/classes</path>
+				<path>AP:/D:/Java/JEE/EclipseWorkSpace/eweb4j/target/classes</path>
 			</scanActionPackage>
 			<scanInterceptorPackage>
 	        	<path>.</path>
