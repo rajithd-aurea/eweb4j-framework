@@ -14,7 +14,6 @@ import javax.ws.rs.Produces;
 
 import org.eweb4j.cache.ActionConfigBeanCache;
 import org.eweb4j.cache.SingleBeanCache;
-import org.eweb4j.config.LogFactory;
 import org.eweb4j.config.ScanPackage;
 import org.eweb4j.mvc.ActionMethod;
 import org.eweb4j.mvc.action.RenderType;
@@ -35,7 +34,7 @@ public class ActionAnnotationConfig extends ScanPackage{
 
 	
 	public ActionAnnotationConfig() {
-		super(LogFactory.getMVCLogger(ActionAnnotationConfig.class));
+		super();
 	}
 
 	/**
@@ -68,10 +67,10 @@ public class ActionAnnotationConfig extends ScanPackage{
 			Object obj = null;
 			try {
 				if (cls.getAnnotation(Singleton.class) != null) {
-					obj = SingleBeanCache.get(cls);
+					obj = SingleBeanCache.get(cls.getName());
 					if (obj == null) {
 						obj = cls.newInstance();
-						SingleBeanCache.add(cls, obj);
+						SingleBeanCache.add(cls.getName(), obj);
 					}
 				} else
 					obj = cls.newInstance();

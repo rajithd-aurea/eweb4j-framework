@@ -16,8 +16,7 @@ import org.eweb4j.orm.dao.config.bean.DBInfoConfigBean;
  */
 public class DBInfoConfigBeanCache {
 
-	private static Log log = LogFactory
-			.getConfigLogger(DBInfoConfigBeanCache.class);
+	private static Log log = LogFactory.getConfigLogger(DBInfoConfigBeanCache.class);
 
 	private static final HashMap<String, DBInfoConfigBean> ht = new HashMap<String, DBInfoConfigBean>();
 

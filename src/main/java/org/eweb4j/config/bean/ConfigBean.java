@@ -25,7 +25,7 @@ public class ConfigBean {
 	private ConfigMVC mvc;
 
 	public static ConfigBean get(){
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 		return cb;
 	}
 	

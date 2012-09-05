@@ -22,9 +22,10 @@ public class SingleBeanCache {
 		return ht.containsKey(beanID);
 	}
 
+	/*
 	public static boolean containsKey(Class<?> clazz) {
 		return ht.containsKey(clazz);
-	}
+	}*/
 
 	public static void add(String beanID, Object o) {
 		if (beanID != null && o != null) {
@@ -37,19 +38,21 @@ public class SingleBeanCache {
 		}
 	}
 
+	/*
 	public static void add(Class<?> clazz, Object o) {
 		if (!ht.containsKey(clazz))
 			ht.put(clazz, o);
 
-	}
+	}*/
 
 	public static Object get(String beanID) {
 		return ht.get(beanID);
 	}
 
+	/*
 	public static Object get(Class<?> clazz) {
 		return ht.get(clazz);
-	}
+	}*/
 
 	public static void clear() {
 		if (!ht.isEmpty())

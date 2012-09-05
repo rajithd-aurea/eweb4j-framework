@@ -38,28 +38,6 @@ public class IOC {
 	}
 
 	/**
-	 * 查找clazz类型的bean是否存在
-	 * 
-	 * @param clazz
-	 * @return
-	 */
-	public static boolean containsBean(Class<?> clazz) {
-		return IOCConfigBeanCache.containsKey(clazz);
-	}
-
-	/**
-	 * 生产出指定Class类型的bean
-	 * 
-	 * @param <T>
-	 * @param requiredType
-	 * @return
-	 * @throws Exception
-	 */
-	public <T> T getBean(Class<T> requiredType) throws Exception {
-		return (T) getBean(IOCConfigBeanCache.get(requiredType).getId());
-	}
-
-	/**
 	 * 查看beanID的bean是什么类型
 	 * 
 	 * @param beanID
@@ -92,30 +70,6 @@ public class IOC {
 	public boolean isSingleton(String beanID) throws Exception {
 		return IOCConfigConstant.SINGLETON_SCOPE.equals(IOCConfigBeanCache.get(
 				beanID).getScope());
-	}
-
-	/**
-	 * 查看beanID的bean生命周期是否是原型
-	 * 
-	 * @param clazz
-	 * @return
-	 * @throws Exception
-	 */
-	public boolean isPrototype(Class<?> clazz) throws Exception {
-		return IOCConfigConstant.PROTOTYPE_SCOPE.equals(IOCConfigBeanCache.get(
-				clazz).getScope());
-	}
-
-	/**
-	 * 查看beanID的生命周期是否是单件
-	 * 
-	 * @param clazz
-	 * @return
-	 * @throws Exception
-	 */
-	public boolean isSingleton(Class<?> clazz) throws Exception {
-		return IOCConfigConstant.SINGLETON_SCOPE.equals(IOCConfigBeanCache.get(
-				clazz).getScope());
 	}
 
 	/**

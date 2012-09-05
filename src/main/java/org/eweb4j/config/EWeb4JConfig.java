@@ -49,7 +49,7 @@ public class EWeb4JConfig {
 		File file = null; 
 		boolean readXml = true;
 		if (ConfigConstant.SUCCESS_START.equals(String.valueOf(SingleBeanCache.get(ConfigConstant.SUCCESS_START)))) {
-			ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigConstant.CONFIGBEAN_ID);
+			ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 
 			String reload = (cb == null ? "true" : cb.getReload());
 			if ("true".equals(reload) || "1".equals(reload)) {
@@ -141,8 +141,7 @@ public class EWeb4JConfig {
 
 					if (error == null) {
 						// 验证通过，将读取到的信息放入缓存池中
-						SingleBeanCache.add(ConfigConstant.CONFIGBEAN_ID, cb);
-						SingleBeanCache.add(cb.getClass(), cb);
+						SingleBeanCache.add(ConfigBean.class.getName(), cb);
 						// ------log-------
 						String info = "EWeb4J start configuration info have bean validated and pushed to the cache. ";
 						log.debug(info);
@@ -161,6 +160,7 @@ public class EWeb4JConfig {
 										error += error13;
 							}
 						} catch (Exception e) {
+							e.printStackTrace();
 							log.warn(e.toString());
 							if (error == null)
 								error = e.toString();
@@ -265,8 +265,7 @@ public class EWeb4JConfig {
 
 				log.error(error);
 			} else {
-				SingleBeanCache.add(ConfigConstant.SUCCESS_START,
-						ConfigConstant.SUCCESS_START);
+				SingleBeanCache.add(ConfigConstant.SUCCESS_START,ConfigConstant.SUCCESS_START);
 			}
 		}
 

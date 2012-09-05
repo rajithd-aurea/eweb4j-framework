@@ -26,12 +26,13 @@ public class IOCConfigBeanCache {
 		return ht.containsKey(beanID);
 	}
 
+	/*
 	public static boolean containsKey(Class<?> clazz) {
 		if (clazz == null)
 			return false;
 		
 		return ht.containsKey(clazz);
-	}
+	}*/
 
 	public static void add(String beanID, IOCConfigBean o) {
 		String info = null;
@@ -42,6 +43,7 @@ public class IOCConfigBeanCache {
 		}
 	}
 
+	/*
 	public static void add(Class<?> clazz, IOCConfigBean o) {
 		String info = null;
 		if (!ht.containsKey(clazz)) {
@@ -49,7 +51,7 @@ public class IOCConfigBeanCache {
 			info = "IOCConfigBeanCache:add...finished..." + o;
 			log.debug(info);
 		}
-	}
+	}*/
 
 	public static IOCConfigBean get(String beanID) {
 		IOCConfigBean o = null;
@@ -58,14 +60,15 @@ public class IOCConfigBeanCache {
 
 		return o;
 	}
-
+	
+	/*
 	public static IOCConfigBean get(Class<?> clazz) {
 		IOCConfigBean o = null;
 		if (ht.containsKey(clazz))
 			o = ht.get(clazz);
 
 		return o;
-	}
+	}*/
 
 	public static void clear() {
 		if (!ht.isEmpty())

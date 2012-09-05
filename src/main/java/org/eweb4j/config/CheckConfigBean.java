@@ -356,7 +356,7 @@ public class CheckConfigBean {
 	 */
 	public static String checkIOC(IOCConfigBean ioc, String xmlFile) {
 		String error = null;
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 		if ("true".equalsIgnoreCase(cb.getIoc().getOpen())
 				|| "1".equals(cb.getIoc().getOpen())) {
 			StringBuilder sb = new StringBuilder();
@@ -392,7 +392,7 @@ public class CheckConfigBean {
 	public static String checkMVCInterceptor(InterConfigBean inter,
 			String xmlFile) {
 		String error = null;
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 		if ("true".equalsIgnoreCase(cb.getMvc().getOpen())
 				|| "1".equals(cb.getMvc().getOpen())) {
 			StringBuilder sb = new StringBuilder();
@@ -464,7 +464,7 @@ public class CheckConfigBean {
 	public static String checkIOCJnject(List<Injection> inject,
 			List<IOCConfigBean> iocList, String beanID, String xmlFile) {
 		String error = null;
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 		if ("true".equalsIgnoreCase(cb.getIoc().getOpen())
 				|| "1".equals(cb.getIoc().getOpen())) {
 			StringBuilder sb = new StringBuilder();
@@ -522,7 +522,7 @@ public class CheckConfigBean {
 	 */
 	public static String checkORMDBInfo(DBInfoConfigBean dcb, String filePath) {
 		String error = null;
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 		if ("true".equals(cb.getOrm().getOpen())
 				|| "1".equals(cb.getOrm().getOpen())) {
 			StringBuilder sb = new StringBuilder();
@@ -559,7 +559,7 @@ public class CheckConfigBean {
 	 */
 	public static String checkORM(ORMConfigBean orm, String xmlFile) {
 		String error = null;
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 		if ("true".equalsIgnoreCase(cb.getOrm().getOpen())
 				|| "1".equals(cb.getOrm().getOpen())) {
 			StringBuilder sb = new StringBuilder();
@@ -594,7 +594,7 @@ public class CheckConfigBean {
 	public static String checkORMProperty(List<Property> pList,
 			List<ORMConfigBean> ormList, String beanID, String xmlFile) {
 		String error = null;
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 		if ("true".equalsIgnoreCase(cb.getOrm().getOpen())
 				|| "1".equals(cb.getOrm().getOpen())) {
 			StringBuilder sb = new StringBuilder();
@@ -620,7 +620,7 @@ public class CheckConfigBean {
 	 */
 	public static String checkMVCAction(ActionConfigBean mvc, String xmlFile) {
 		String error = null;
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 		if ("true".equalsIgnoreCase(cb.getMvc().getOpen())
 				|| "1".equals(cb.getMvc().getOpen())) {
 			StringBuilder sb = new StringBuilder();
@@ -672,7 +672,7 @@ public class CheckConfigBean {
 	public static String checkMVCResultPart(List<ResultConfigBean> rList,
 			String beanID, String xmlFile) {
 		String error = null;
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 		if ("true".equalsIgnoreCase(cb.getMvc().getOpen())
 				|| "1".equals(cb.getMvc().getOpen())) {
 			StringBuilder sb = new StringBuilder();
@@ -709,7 +709,7 @@ public class CheckConfigBean {
 	public static String checkMVCValidator(List<ValidatorConfigBean> vList,
 			String beanID, String xmlFile) {
 		String error = null;
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 		if ("true".equals(cb.getMvc().getOpen())
 				|| "1".equals(cb.getMvc().getOpen())) {
 			if (vList != null && !vList.isEmpty()) {

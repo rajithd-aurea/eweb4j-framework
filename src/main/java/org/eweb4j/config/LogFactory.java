@@ -7,7 +7,7 @@ import org.eweb4j.config.bean.LogsConfigBean;
 
 public class LogFactory {
 	public static Log getIOCLogger(Class<?> clazz) {
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigConstant.CONFIGBEAN_ID);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 
 		LogsConfigBean logs = cb == null ? new LogsConfigBean() : cb.getIoc().getLogs();
 
@@ -15,7 +15,7 @@ public class LogFactory {
 	}
 
 	public static Log getMVCLogger(Class<?> clazz) {
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigConstant.CONFIGBEAN_ID);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 
 		LogsConfigBean logs = cb == null ? new LogsConfigBean() : cb.getMvc().getLogs();
 
@@ -23,7 +23,7 @@ public class LogFactory {
 	}
 
 	public static Log getORMLogger(Class<?> clazz) {
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigConstant.CONFIGBEAN_ID);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 
 		LogsConfigBean logs = cb == null ? new LogsConfigBean() : cb.getOrm().getLogs();
 
@@ -31,7 +31,7 @@ public class LogFactory {
 	}
 
 	public static Log getConfigLogger(Class<?> clazz) {
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigConstant.CONFIGBEAN_ID);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 
 		LogConfigBean log = new LogConfigBean();
 		log.setLevel("debug");

@@ -26,6 +26,5 @@ public class ConfigConstant {
 		return CONFIG_BASE_PATH + START_FILE_NAME;
 	}
 	
-	public final static String CONFIGBEAN_ID = "ConfigBeanID";
 	public final static String SUCCESS_START = "successStart";
 }

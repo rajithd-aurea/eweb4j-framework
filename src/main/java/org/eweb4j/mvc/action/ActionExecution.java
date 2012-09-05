@@ -151,10 +151,10 @@ public class ActionExecution {
 		Class<?> clazz = ActionClassCache.get(this.context.getActionConfigBean().getClazz());
 		Annotation singletonAnn = clazz.getAnnotation(Singleton.class);
 		if (singletonAnn != null) {
-			this.actionObject = SingleBeanCache.get(clazz);
+			this.actionObject = SingleBeanCache.get(clazz.getName());
 			if (this.actionObject == null) {
 				this.actionObject = clazz.newInstance();
-				SingleBeanCache.add(clazz, this.actionObject);
+				SingleBeanCache.add(clazz.getName(), this.actionObject);
 			}
 		} else
 			this.actionObject = clazz.newInstance();
@@ -836,7 +836,7 @@ public class ActionExecution {
 	}
 
 	private void handleUpload() throws Exception{
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigConstant.CONFIGBEAN_ID);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 		
 		Upload upload = method.getAnnotation(Upload.class);
 		UploadConfigBean ucb = cb.getMvc().getUpload();

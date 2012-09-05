@@ -28,7 +28,7 @@ public class DAOConfig {
 
 	public synchronized static String check() {
 		String error = null;
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigConstant.CONFIGBEAN_ID);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 		if (cb == null)
 			return null;
 

@@ -62,7 +62,7 @@ public class FileUtil {
 	 * @return
 	 */
 	public static String getJarPath() {
-		return FileUtil.getParent(FileUtil.getTopClassPath(FileUtil.class), 1) + File.separator + "lib";
+		return FileUtil.getParent(FileUtil.getTopClassPath(FileUtil.class), 1) + "lib";
 	}
 	
 	public static String[] getChildrenPath(File parent){

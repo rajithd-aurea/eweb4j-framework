@@ -47,7 +47,7 @@ public class DeleteSqlCreator<T> {
 	}
 
 	private String makeSQL(T t, String condition) {
-		ORMConfigBean ormBean = ORMConfigBeanCache.get(t.getClass());
+		ORMConfigBean ormBean = ORMConfigBeanCache.get(t.getClass().getName());
 		String table = ormBean != null ? ormBean.getTable() : t.getClass()
 				.getSimpleName();
 		return String.format("DELETE FROM %s WHERE %s ;", table, condition);

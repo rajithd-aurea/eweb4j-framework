@@ -29,7 +29,7 @@ public class IOCConfig {
 
 	public synchronized static String check() {
 		String error = null;
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigConstant.CONFIGBEAN_ID);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 		if (cb == null)
 			return null;
 
@@ -67,8 +67,6 @@ public class IOCConfig {
 					if (error == null) {
 						for (IOCConfigBean ioc : iocList)
 							if (!"".equals(ioc.getClazz())) {
-								String clazz = ioc.getClazz();
-								IOCConfigBeanCache.add(Class.forName(clazz), ioc);
 								if (!"".equals(ioc.getId()))
 									IOCConfigBeanCache.add(ioc.getId(), ioc);
 

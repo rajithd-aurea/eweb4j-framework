@@ -12,50 +12,50 @@ import org.eweb4j.util.StringUtil;
 
 public abstract class ScanPackage {
 	
-	public Log log ;
+	public final static Log log = LogFactory.getConfigLogger(ScanPackage.class);
 	
-	public ScanPackage(Log log){
-		this.log = log;
-	}
+	private Collection<String> packages = new HashSet<String>();
+	private Collection<String> jars = new HashSet<String>();
+	private String currentClassPath = null;
 	
 	public String readAnnotation(Collection<String> scans) {
 		String error = null;
-
+		
 		try {
 			if (scans == null)
 				return error;
-
+			
 			Collection<String> classpaths = new HashSet<String>();
-			Collection<File> jars = new HashSet<File>();
+			
+			for (String scan : scans){
+				if (scan.startsWith("AP:")){
+					classpaths.add(scan.replace("AP:", ""));
+				}else if (scan.startsWith("JAR:")){
+					
+				}else{
+					packages.add(scan);
+				}
+			}
+			
 			Collection<String> paths = FileUtil.getClassPath();
 			for (String path : paths){
-				File f = new File(path);
 				if (path.endsWith(".jar")){
-					jars.add(f);
+					final String name = "JAR:" + new File(path).getName().replace(".jar", "");
+					if (scans.contains(name)){
+						jars.add(path);
+					}
 				}else{
 					classpaths.add(path);
 				}
 			}
 			
-			for (String scan : scans) {
-
-				if (scan == null || scan.length() == 0)
-					continue;
-
-				/* 扫描绝对路径 */
-				if (scan.startsWith("AP:")) {
-					classpaths.add(scan.replace("AP:", ""));
-					scan = ".";
-				} 
-				
-				// 扫描ClassPath中的*.class
-				for (String classpath : classpaths)
-					scanDir(scan, classpath, jars);
-				
-				// 扫描jar包
-				scanJar(scan, jars);
-				
+			// 扫描ClassPath中的*.class
+			for (String classpath : classpaths){
+				scanDir(classpath);
 			}
+			
+			// 扫描jar包
+			scanJar();
 
 		} catch (Exception e) {
 			error = StringUtil.getExceptionString(e);
@@ -65,18 +65,15 @@ public abstract class ScanPackage {
 		return error;
 	}
 
-	private void scanDir(String scanPackage, String classDir, final Collection<File> jarCollect) throws Exception {
+	private void scanDir(String classDir) throws Exception {
 		File dir = null;
-		if (".".equals(scanPackage)) {
-			scanPackage = "";
-			dir = new File(classDir);
-		} else
-			dir = new File(classDir + File.separator + scanPackage.replace(".", File.separator));
-
+		dir = new File(classDir);
 		log.debug("scan dir -> " + dir);
 		// 递归文件目录
-		if (dir.isDirectory())
-			scanPackage(dir, scanPackage, jarCollect);
+		if (dir.isDirectory()){
+			this.currentClassPath = dir.getAbsolutePath();
+			scanFile(dir);
+		}
 	}
 
 	/**
@@ -86,41 +83,39 @@ public abstract class ScanPackage {
 	 * @param actionPackage
 	 * @throws Exception
 	 */
-	private void scanPackage(File dir, String actionPackage, final Collection<File> jarCollect) throws Exception {
+	private void scanFile(File dir) throws Exception {
 		if (!dir.isDirectory())
 			return;
 
 		File[] files = dir.listFiles();
 		if (files == null || files.length == 0)
 			return;
+		
 		for (File f : files) {
-
 			if (f.isDirectory())
-				if (actionPackage.length() == 0)
-					scanPackage(f, f.getName(), jarCollect);
-				else
-					scanPackage(f, actionPackage + "." + f.getName(), jarCollect);
-
+				scanFile(f);
 			else if (f.isFile()) {
 				if (!f.getName().endsWith(".class")){
 					if (f.getName().endsWith(".jar")){
-						jarCollect.add(f);
+						final String jarName = f.getAbsolutePath();
+						jars.add(jarName);
+						log.debug(" jar add -> " + jarName);
 					}
-					
 					continue;
 				}
 
-				StringBuilder sb = new StringBuilder(actionPackage);
-				int endIndex = f.getName().lastIndexOf(".");
-
-				String clsName = sb.append(".").append(f.getName().subSequence(0, endIndex)).toString();
-
-				if (clsName == null || "".equals(clsName))
+				String clsName = f.getAbsolutePath().replace(this.currentClassPath, "").replace(File.separator, ".").replace(".class", "").substring(1);
+				boolean isPkg = false;
+				for (String pkg : packages){
+					if (".".equals(pkg) || clsName.startsWith(pkg)){
+						isPkg = true;
+						break;
+					}
+				}
+				
+				if (!isPkg)
 					continue;
-
-				if (clsName.startsWith("."))
-					clsName = clsName.substring(1);
-
+				
 				if (!handleClass(clsName))
 					continue;
 			}
@@ -134,11 +129,12 @@ public abstract class ScanPackage {
 	 * @param packageName
 	 * @throws Exception
 	 */
-	private void scanJar(String packageName, Collection<File> ff) {
-		if (ff == null)
+	private void scanJar() {
+		if (jars == null)
 			return;
 
-		for (File f : ff) {
+		for (String p : jars) {
+			File f = new File(p);
 			ZipInputStream zin = null;
 			ZipEntry entry = null;
 			try {
@@ -149,13 +145,19 @@ public abstract class ScanPackage {
 				while ((entry = zin.getNextEntry()) != null) {
 					
 					String entryName = entry.getName().replace('/', '.');
-					if (".".equals(packageName)|| entryName.startsWith(packageName)){
+					boolean isPkg = false;
+					for (String pkg : packages){
+						if (".".equals(pkg) || entryName.startsWith(pkg)){
+							isPkg = true;
+							break;
+						}
+					}
+					
+					if (isPkg){
 						if (!entryName.endsWith(".class"))
 							continue;
 						
 						final String className = entryName.replace(".class", "");
-						if (className == null || className.trim().length() == 0)
-							continue;
 						try {
 							if (!handleClass(className))
 								continue;

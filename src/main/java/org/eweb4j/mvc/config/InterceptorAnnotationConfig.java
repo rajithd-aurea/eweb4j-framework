@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eweb4j.cache.InterConfigBeanCache;
-import org.eweb4j.config.LogFactory;
 import org.eweb4j.config.ScanPackage;
 import org.eweb4j.mvc.action.annotation.Singleton;
 import org.eweb4j.mvc.config.bean.InterConfigBean;
@@ -16,7 +15,7 @@ public class InterceptorAnnotationConfig extends ScanPackage{
 	
 
 	public InterceptorAnnotationConfig() {
-		super(LogFactory.getMVCLogger(InterceptorAnnotationConfig.class));
+		super();
 	}
 
 	/**

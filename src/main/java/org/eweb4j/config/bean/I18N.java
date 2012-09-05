@@ -17,7 +17,7 @@ public class I18N {
 	}
 
 	public static I18N get() {
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 		org.eweb4j.config.bean.I18N i18n = cb.getLocales();
 
 		return i18n;

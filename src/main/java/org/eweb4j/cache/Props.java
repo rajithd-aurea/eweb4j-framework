@@ -150,7 +150,7 @@ public class Props {
 
 		String id = f.getId();
 		String path = f.getPath();
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 		I18N i18n = cb.getLocales();
 
 		final String sufPro = ".properties";
@@ -244,7 +244,7 @@ public class Props {
 		if (propId == null)
 			return;
 
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 		List<Prop> files = cb.getProperties().getFile();
 		for (Prop f : files) {
 			if (propId.equals(f.getId())) {

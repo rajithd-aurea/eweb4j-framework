@@ -29,7 +29,7 @@ public class ORMConfig {
 
 	public synchronized static String check() {
 		String error = null;
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigConstant.CONFIGBEAN_ID);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 		if (cb == null)
 			return null;
 
@@ -66,7 +66,7 @@ public class ORMConfig {
 					if (error == null){
 						for (ORMConfigBean orm : ormList) {
 							if (!"".equals(orm.getClazz()))
-								ORMConfigBeanCache.add(Class.forName(orm.getClazz()), orm);
+								ORMConfigBeanCache.add(orm.getClazz(), orm);
 						}
 					}
 				}

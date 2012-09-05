@@ -20,7 +20,6 @@ import javax.persistence.Transient;
 
 import org.eweb4j.cache.ORMConfigBeanCache;
 import org.eweb4j.config.Log;
-import org.eweb4j.config.LogFactory;
 import org.eweb4j.config.ScanPackage;
 import org.eweb4j.orm.PropType;
 import org.eweb4j.orm.annotation.Ignore;
@@ -38,7 +37,7 @@ import org.eweb4j.util.ReflectUtil;
 public class PojoAnnotationConfig extends ScanPackage {
 
 	public PojoAnnotationConfig() {
-		super(LogFactory.getMVCLogger(PojoAnnotationConfig.class));
+		super();
 	}
 
 	/**
@@ -91,7 +90,7 @@ public class PojoAnnotationConfig extends ScanPackage {
 			ormBean.setId(clazz.getSimpleName());
 			ormBean.setTable(table);
 			ormBean.setProperty(properties);
-			ORMConfigBeanCache.add(clazz, ormBean);
+			ORMConfigBeanCache.add(clazz.getName(), ormBean);
 		} catch (Error er) {
 			log.warn("the action class new instance failued -> " + clsName + " | " + er.toString());
 			return false;

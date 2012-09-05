@@ -61,7 +61,7 @@ public class RowMapping {
 				while (rs.next()) {
 					t = cls.newInstance();
 					ReflectUtil ru = new ReflectUtil(t);
-					ORMConfigBean ormBean = ORMConfigBeanCache.get(cls);
+					ORMConfigBean ormBean = ORMConfigBeanCache.get(cls.getName());
 
 					for (Iterator<Property> it = ormBean.getProperty()
 							.iterator(); it.hasNext();) {

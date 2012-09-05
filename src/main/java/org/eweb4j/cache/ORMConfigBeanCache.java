@@ -25,9 +25,10 @@ public class ORMConfigBeanCache {
 		return ht.containsKey(beanID);
 	}
 
+	/*
 	public static boolean containsKey(Class<?> clazz) {
 		return ht.containsKey(clazz);
-	}
+	}*/
 
 	public static void add(String beanID, ORMConfigBean o) {
 		if (beanID != null && o != null) {
@@ -40,6 +41,7 @@ public class ORMConfigBeanCache {
 		}
 	}
 
+	/*
 	public static void add(Class<?> clazz, ORMConfigBean o) {
 		if (clazz != null && o != null) {
 			String info = null;
@@ -49,17 +51,18 @@ public class ORMConfigBeanCache {
 				log.debug(info);
 			}
 		}
-	}
+	}*/
 
 	public static ORMConfigBean get(String beanID) {
 
 		return ht.get(beanID);
 	}
 
+	/*
 	public static ORMConfigBean get(Class<?> clazz) {
 
 		return ht.get(clazz);
-	}
+	}*/
 
 	public static void clear() {
 		if (!ht.isEmpty())

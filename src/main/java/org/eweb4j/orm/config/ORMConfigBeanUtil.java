@@ -19,7 +19,7 @@ import org.eweb4j.util.StringUtil;
 public class ORMConfigBeanUtil {
 
 	public static String[] getToOneField(Class<?> clazz){
-		ORMConfigBean ormBean = ORMConfigBeanCache.get(clazz);
+		ORMConfigBean ormBean = ORMConfigBeanCache.get(clazz.getName());
 		if (ormBean == null)
 			return null;
 		
@@ -145,7 +145,7 @@ public class ORMConfigBeanUtil {
 		}
 
 		String pk = "id";
-		ORMConfigBean ormBean = ORMConfigBeanCache.get(clazz);
+		ORMConfigBean ormBean = ORMConfigBeanCache.get(clazz.getName());
 		if (ormBean == null)
 			return pk;
 
@@ -185,7 +185,7 @@ public class ORMConfigBeanUtil {
 			return (String) map.get("table");
 		}
 
-		ORMConfigBean ormBean = ORMConfigBeanCache.get(clazz);
+		ORMConfigBean ormBean = ORMConfigBeanCache.get(clazz.getName());
 		String table = ormBean == null ? clazz.getSimpleName() : ormBean
 				.getTable();
 		return table;
@@ -310,7 +310,7 @@ public class ORMConfigBeanUtil {
 		String[] result = strs.clone();
 		List<String> list = new ArrayList<String>();
 
-		ORMConfigBean ormBean = ORMConfigBeanCache.get(clazz);
+		ORMConfigBean ormBean = ORMConfigBeanCache.get(clazz.getName());
 		if (ormBean != null) {
 			// String idColumn = getIdColumn(clazz);
 			for (int i = 0; i < strs.length; i++) {

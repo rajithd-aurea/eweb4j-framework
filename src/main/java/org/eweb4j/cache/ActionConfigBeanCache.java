@@ -25,8 +25,7 @@ import org.eweb4j.util.RegexList;
  */
 public final class ActionConfigBeanCache {
 
-	private static Log log = LogFactory
-			.getConfigLogger(ActionConfigBeanCache.class);
+	private static Log log = LogFactory.getConfigLogger(ActionConfigBeanCache.class);
 
 	/**
 	 * This is a map for save the action_config_bean
@@ -43,8 +42,7 @@ public final class ActionConfigBeanCache {
 		return ACTION_CFG_BEAN.containsKey(beanID);
 	}
 
-	public static Map<String, List<?>> getByMatches(final String aUri,
-			final String reqMethod) {
+	public static Map<String, List<?>> getByMatches(final String aUri,final String reqMethod) {
 		String uri = new String(aUri);
 		Map<String, List<?>> result = null;
 		for (Iterator<Entry<Object, ActionConfigBean>> it = ACTION_CFG_BEAN
@@ -122,9 +120,10 @@ public final class ActionConfigBeanCache {
 		return result;
 	}
 
+	/*
 	public static boolean containsKey(Class<?> clazz) {
 		return ACTION_CFG_BEAN.containsKey(clazz);
-	}
+	}*/
 
 	public static void add(String beanID, ActionConfigBean o) {
 		if (beanID != null && o != null) {
@@ -175,6 +174,7 @@ public final class ActionConfigBeanCache {
 		}
 	}
 
+	/*
 	public static void add(Class<?> clazz, ActionConfigBean o) {
 		if (clazz != null && o != null) {
 			String info = null;
@@ -216,7 +216,7 @@ public final class ActionConfigBeanCache {
 
 			log.debug(info);
 		}
-	}
+	}*/
 
 	public static ActionConfigBean get(String beanID) {
 		ActionConfigBean o = null;
@@ -227,6 +227,7 @@ public final class ActionConfigBeanCache {
 		return o;
 	}
 
+	/*
 	public static ActionConfigBean get(Class<?> clazz) {
 		ActionConfigBean o = null;
 		if (clazz != null)
@@ -234,7 +235,7 @@ public final class ActionConfigBeanCache {
 				o = ACTION_CFG_BEAN.get(clazz);
 
 		return o;
-	}
+	}*/
 
 	public static void clear() {
 		if (!ACTION_CFG_BEAN.isEmpty())

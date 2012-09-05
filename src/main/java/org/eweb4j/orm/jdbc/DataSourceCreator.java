@@ -24,7 +24,7 @@ public class DataSourceCreator {
 	public static DataSource create(final DBInfoConfigBean dbInfo)
 			throws Exception {
 
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigConstant.CONFIGBEAN_ID);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 		Class<?> cls = Class.forName(cb.getOrm().getDataSource());
 		DataSource ds = (DataSource) cls.newInstance();
 

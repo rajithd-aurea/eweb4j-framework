@@ -28,7 +28,8 @@
 	      	</logs>
 			<dataSource>com.mchange.v2.c3p0.ComboPooledDataSource</dataSource>
 			<scanPojoPackage>
-				<path>test.po</path>
+				<path>.</path>
+				<path>JAR:persistence-api-1.0</path>
 				<path>AP:/D:/Java/JEE/EclipseWorkSpace/eweb4j/target/classes</path>
 			</scanPojoPackage>
 			<ormXmlFiles />
@@ -37,7 +38,7 @@
 			</dbInfoXmlFiles>
 		</orm>
 		<mvc>
-			<open>1</open>
+			<open>0</open>
 			<logs>
 				<log console="1" level="debug" file="" size="5" />
 	      	</logs>

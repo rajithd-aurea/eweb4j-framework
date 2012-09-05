@@ -31,7 +31,7 @@ public class ActionConfig {
 	/** 涉及到文件IO，需要同步保证正确性 */
 	public synchronized static String check() {
 		String error = null;
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigConstant.CONFIGBEAN_ID);
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
 
 		if (cb == null)
 			return null;
