@@ -89,4 +89,11 @@ public class TestDAOSql {
 	    Assert.assertEquals(" WHERE ", sql);
 	}
 	
+	@Test
+	public void testWhereNotIn() {
+		dao.clear();
+		String sql = dao.where().field("id").notIn(1,2).toSql();
+		Assert.assertEquals(" WHERE  id  not in('1', '2') ", sql);
+	}
+	
 }
