@@ -230,7 +230,15 @@ public class DAOImpl implements DAO {
 		final int oType = (Integer) buffer.get("orderType");
 		final String query = this.condition.toString().replace("'?'", "?");
 		try {
-			sql = SqlFactory.getSelectSql(clazz.newInstance(), dbType).divPage(page, length, orderField, oType, query.replace("WHERE", ""));
+			Object obj = null;
+			if (Map.class.isAssignableFrom(clazz)){
+				obj = new HashMap<String, Object>();
+				((Map<String, Object>)obj).put("table", this.table);
+			}else {
+				obj = clazz.newInstance();
+			}
+			
+			sql = SqlFactory.getSelectSql(obj, dbType).divPage(page, length, orderField, oType, query.replace("WHERE", ""));
 		} catch (Exception e) {
 			e.printStackTrace();
 			sql = this.sql.append(orderStr).append(" LIMIT ").append((page - 1) * length).append(", ").append(length).toString().replace("${_where_}", query);
