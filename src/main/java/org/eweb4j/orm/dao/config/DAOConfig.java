@@ -2,8 +2,6 @@ package org.eweb4j.orm.dao.config;
 
 import java.io.File;
 
-import javax.sql.DataSource;
-
 import org.eweb4j.cache.DBInfoConfigBeanCache;
 import org.eweb4j.cache.SingleBeanCache;
 import org.eweb4j.config.CheckConfigBean;
@@ -51,10 +49,22 @@ public class DAOConfig {
 				} else {
 					String error1 = CheckConfigBean.checkORMDBInfo(dcb,filePath);
 					if (error1 == null) {
-						DBInfoConfigBeanCache.add(dcb.getDsName(), dcb);
-						DataSource ds = DataSourceCreator.create(dcb);
-						DataSourceWrap dsw = new DataSourceWrap(dcb.getDsName(), ds);
-
+						if (DBInfoConfigBeanCache.get(dcb.getDsName()) == null){
+							DBInfoConfigBeanCache.add(dcb.getDsName(), dcb);
+						}
+						DataSourceWrap dsw = null;
+						if (DataSourceWrapCache.containsKey(dcb.getDsName())){
+							dsw = (DataSourceWrap) DataSourceWrapCache.get(dcb.getDsName());
+							if (dsw == null)
+								DataSourceWrapCache.remove(dcb.getDsName());
+							else
+								log.debug("DataSource -> " + dcb.getDsName() + " is alive !");
+						}
+						
+						if (dsw == null){
+							dsw = new DataSourceWrap(dcb.getDsName(), DataSourceCreator.create(dcb));
+						}
+						
 						String error2 = dsw.getConnection() == null ? ConfigInfoCons.CANNOT_GET_DB_CON : null;
 
 						if (error2 != null)
@@ -69,7 +79,8 @@ public class DAOConfig {
 							// ------log-------
 							// 将数据源放入缓存，它可是个重量级对象
 							// 此步也是为了共存多个数据源
-							DataSourceWrapCache.put(dcb.getDsName(), dsw);
+							if (!DataSourceWrapCache.containsKey(dcb.getDsName()))
+								DataSourceWrapCache.put(dcb.getDsName(), dsw);
 						}
 					} else if (error == null)
 						error = error1;

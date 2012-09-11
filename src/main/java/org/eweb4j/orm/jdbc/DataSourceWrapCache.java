@@ -25,6 +25,7 @@ public class DataSourceWrapCache {
 	private static Hashtable<String, DataSource> ht = new Hashtable<String, DataSource>();
 
 	public static void put(String key, DataSource ds) {
+		log.debug("DataSource -> " + key + " has put into the cache success !");
 		ht.put(key, ds);
 	}
 

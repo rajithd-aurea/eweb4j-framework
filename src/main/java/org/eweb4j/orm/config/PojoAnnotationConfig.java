@@ -208,10 +208,10 @@ public class PojoAnnotationConfig extends ScanPackage {
 			p.setName(name);
 			p.setColumn(column);
 			p.setType(f.getType().getName());
-			p.setNotNull("true");
+			p.setNotNull("false");
 			if (colAnn != null) {
 				// int size = colAnn.length();
-				p.setNotNull(String.valueOf(colAnn.nullable()));
+				p.setNotNull(String.valueOf(!colAnn.nullable()));
 				p.setUnique(String.valueOf(colAnn.unique()));
 			}
 
