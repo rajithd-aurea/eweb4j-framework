@@ -8,6 +8,7 @@ import org.eweb4j.config.bean.ConfigIOC;
 import org.eweb4j.config.bean.ConfigMVC;
 import org.eweb4j.config.bean.ConfigORM;
 import org.eweb4j.config.bean.DBInfoXmlFiles;
+import org.eweb4j.config.bean.Ddl;
 import org.eweb4j.config.bean.I18N;
 import org.eweb4j.config.bean.IOCXmlFiles;
 import org.eweb4j.config.bean.InterXmlFile;
@@ -78,6 +79,8 @@ public class ConfigBeanCreator {
 		configBean.setIoc(ioc);
 
 		ConfigORM orm = new ConfigORM();
+		Ddl ddl = new Ddl();
+		orm.setDdl(ddl);
 		ORMXmlFiles ormXmlFiles = new ORMXmlFiles();
 		orm.setOrmXmlFiles(ormXmlFiles);
 		ScanPojoPackage spp = new ScanPojoPackage();

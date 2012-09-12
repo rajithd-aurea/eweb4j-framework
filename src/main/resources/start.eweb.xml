@@ -25,6 +25,7 @@
 			<logs>
 				<log console="0" level="info" file="" size="5" />
 	      	</logs>
+	      	<ddl generate="true" run="false" ds="myDBInfo"/>
 			<dataSource>com.mchange.v2.c3p0.ComboPooledDataSource</dataSource>
 			<scanPojoPackage>
 				<path>test.po</path>

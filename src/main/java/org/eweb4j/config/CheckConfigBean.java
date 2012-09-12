@@ -11,6 +11,7 @@ import org.eweb4j.config.bean.ConfigIOC;
 import org.eweb4j.config.bean.ConfigMVC;
 import org.eweb4j.config.bean.ConfigORM;
 import org.eweb4j.config.bean.DBInfoXmlFiles;
+import org.eweb4j.config.bean.Ddl;
 import org.eweb4j.config.bean.I18N;
 import org.eweb4j.config.bean.IOCXmlFiles;
 import org.eweb4j.config.bean.InterXmlFile;
@@ -242,6 +243,22 @@ public class CheckConfigBean {
 				} catch (ClassNotFoundException e) {
 					sb.append("当前您填写的( dataSource=").append(dataSource)
 							.append(" )是错误的！它必须是一个有效的类 ;\n");
+				}
+			}
+			Ddl ddl = orm.getDdl();
+			if (null != ddl) {
+				if (null != ddl.getGenerate() && ddl.getGenerate().trim().length() > 0){
+					if (!"true".equalsIgnoreCase(ddl.getGenerate()) && !"false".equalsIgnoreCase(ddl.getGenerate()) && !"1".equals(ddl.getGenerate()) && !"0".equals(ddl.getGenerate()))
+						sb.append("当前您填写的：( ddl>generate=").append(ddl.getGenerate()).append(" )是错误的！它只能填写为：true|false|1|0 中的一种 ;").append("\n");
+				}
+				
+				if (null != ddl.getRun() && ddl.getRun().trim().length() > 0){
+					if (!"true".equalsIgnoreCase(ddl.getRun()) && !"false".equalsIgnoreCase(ddl.getRun()) && !"1".equals(ddl.getRun()) && !"0".equals(ddl.getRun()))
+						sb.append("当前您填写的：( ddl>run=").append(ddl.getRun()).append(" )是错误的！它只能填写为：true|false|1|0 中的一种 ;").append("\n");
+				}
+				
+				if (null == ddl.getDs() && ddl.getDs().trim().length() == 0){
+					sb.append("当前您填写的：( ddl>ds=").append(ddl.getDs()).append(" )是错误的！它不能留空  ; 请填写存在的DataSourceName").append("\n");
 				}
 			}
 		}

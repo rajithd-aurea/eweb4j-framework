@@ -12,6 +12,8 @@ public class ConfigORM {
 
 	private LogsConfigBean logs;
 
+	private Ddl ddl;
+	
 	/* 数据源类完整路径，默认c3p0 */
 	private String dataSource = "com.mchange.v2.c3p0.ComboPooledDataSource";
 
@@ -27,6 +29,14 @@ public class ConfigORM {
 
 	public void setOpen(String open) {
 		this.open = open;
+	}
+
+	public Ddl getDdl() {
+		return ddl;
+	}
+
+	public void setDdl(Ddl ddl) {
+		this.ddl = ddl;
 	}
 
 	public String getDataSource() {

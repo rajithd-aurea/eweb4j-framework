@@ -15,7 +15,6 @@ import javax.persistence.ManyToMany;
 
 import org.eweb4j.cache.ORMConfigBeanCache;
 import org.eweb4j.config.ConfigConstant;
-import org.eweb4j.config.EWeb4JConfig;
 import org.eweb4j.config.LogFactory;
 import org.eweb4j.orm.PropType;
 import org.eweb4j.orm.config.ORMConfigBeanUtil;
@@ -33,7 +32,7 @@ import org.eweb4j.util.StringUtil;
  */
 public class Model2Table {
 
-	final static String create_table_script = "DROP TABLE IF EXISTS %s;\nCREATE TABLE %s(\n%s \n) ENGINE=InnoDB DEFAULT CHARSET=utf8;\n"; 
+	final static String create_table_script = "\nDROP TABLE IF EXISTS %s;\nCREATE TABLE %s(\n%s \n) ENGINE=InnoDB DEFAULT CHARSET=utf8;\n"; 
 	
 	public static String write(String dataBase) {
 		StringBuilder sql = new StringBuilder();
@@ -43,12 +42,12 @@ public class Model2Table {
 			ORMConfigBean ocb = e.getValue();
 			String table = ocb.getTable();
 			
-			sql.append( "\n-- ----------------------------" +
-						"\n-- Created by "+ EWeb4JConfig.about() + 
-						"\n-- at "+ StringUtil.getNowTime()  +
-						"\n-- Model "+ ocb.getClazz()  +
-						"\n-- Record "+ table +
-						"\n-- ----------------------------\n");
+//			sql.append( "\n-- ----------------------------" +
+//						"\n-- Created by "+ EWeb4JConfig.about() + 
+//						"\n-- at "+ StringUtil.getNowTime()  +
+//						"\n-- Model "+ ocb.getClazz()  +
+//						"\n-- Record "+ table +
+//						"\n-- ----------------------------\n");
 			
 			List<Property> properties = ocb.getProperty();
 			StringBuilder sb = new StringBuilder();
@@ -146,12 +145,12 @@ public class Model2Table {
 						final String relTo = tos[0].name();
 						final Class<?> targetClass = ClassUtil.getGenericType(f);
 						
-						manyMany.append( "\n-- ----------------------------" +
-								"\n-- Created by "+ EWeb4JConfig.about() + 
-								"\n-- at "+ StringUtil.getNowTime()  +
-								"\n-- Records of "+ relTable +
-								"\n-- ----------------------------\n");
-						
+//						manyMany.append( "\n-- ----------------------------" +
+//								"\n-- Created by "+ EWeb4JConfig.about() + 
+//								"\n-- at "+ StringUtil.getNowTime()  +
+//								"\n-- Records of "+ relTable +
+//								"\n-- ----------------------------\n");
+//						
 						StringBuilder manyManyField = new StringBuilder();
 						//handle the many to many 
 						manyManyField.append("\tid ").append(getType("long")).append(" (20) NOT NULL AUTO_INCREMENT,");
@@ -177,15 +176,16 @@ public class Model2Table {
 		
 		sql.append(manyMany.toString());
 		
-		File file = new File(ConfigConstant.CONFIG_BASE_PATH()+ "mysql-create.sql");
+		File file = new File(ConfigConstant.CONFIG_BASE_PATH()+ dataBase + "-create.sql");
 		try {
 			boolean flag = FileUtil.createFile(file, true);
 			if (!flag)
 				return "can not create file -> " + file.getAbsolutePath();
 			
 			FileWriter writer = new FileWriter(file);
-			String script = "DROP DATABASE IF EXISTS %s;\nCREATE DATABASE %s DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;\nSET FOREIGN_KEY_CHECKS=0;\nUSE %s;\n%s";
-			writer.write(String.format(script, dataBase, dataBase, dataBase, sql.toString()));
+			// "DROP DATABASE IF EXISTS %s;\nCREATE DATABASE %s DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;\n"
+			String script = "SET FOREIGN_KEY_CHECKS=0;\n%s";
+			writer.write(String.format(script, sql.toString()));
 			writer.flush();
 			writer.close();
 			
@@ -196,7 +196,6 @@ public class Model2Table {
 		} 
 		
 		return null;
-
 	}
 
 	private static String getType(String type) {

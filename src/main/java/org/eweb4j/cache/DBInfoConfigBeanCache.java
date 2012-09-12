@@ -44,6 +44,7 @@ public class DBInfoConfigBeanCache {
 		return dcb;
 	}
 
+	// get the default datasource
 	public static DBInfoConfigBean get() {
 		return ht.get(DAOConfigConstant.MYDBINFO);
 	}
