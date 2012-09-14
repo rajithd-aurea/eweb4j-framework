@@ -15,7 +15,7 @@ import test.User;
 
 @Entity
 @Table(name = "t_pet")
-public class Pet extends Model {
+public class Pet extends Model<Pet> {
 	
 	public final static Pet inst = new Pet();
 	

@@ -9,7 +9,7 @@ import org.eweb4j.orm.Model;
 
 @Entity
 @Table(name = "t_user")
-public class User extends Model {
+public class User extends Model<User> {
 	
 	public final static User inst = new User();
 	

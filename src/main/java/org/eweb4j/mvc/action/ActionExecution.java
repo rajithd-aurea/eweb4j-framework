@@ -390,7 +390,13 @@ public class ActionExecution {
 					params[i] = ClassUtil.getParamVal(paramClass, paramValue[0]);
             } else {
 				// 如果是基本数据类型，则按照排序进行注入
-				paramValue = this.getPathParamValue(this.context.getActionConfigBean().getPathParams()[pathParamIndex]);
+            	String[] pathParams = this.context.getActionConfigBean().getPathParams();
+            	if (pathParams == null){
+            		log.warn("QueryParam not found and PathParam not found too");
+            		continue;
+            	}
+            	
+				paramValue = this.getPathParamValue(pathParams[pathParamIndex]);
 				params[i] = ClassUtil.getParamVal(paramClass, paramValue[0]);
 				pathParamIndex++;
 				continue;

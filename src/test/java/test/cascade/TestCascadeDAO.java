@@ -239,19 +239,24 @@ public class TestCascadeDAO {
 		// TestCascadeDAO.testManyManySelect();
 		// TestCascadeDAO.testManyManyDelete();
 		// TestCascadeDAO.testManyManyUpdate();
-		Master master = new Master().findById(1012);
+		Master master = new Master().findById(1);
 		System.out.println("=============== " + master);
-		//master.cascade().merge("pets");
+		master.cascade().merge("pets");
 		System.out.println("===after=="+master);
 		
-		master.cascade().refresh(6, "pets");
+//		master.cascade().refresh(2, "pets");
 		
-		//master.setId(1001);
-		//master.cascade().persist("pets");
-//		Pet pet = new Pet().find().first();
-//		pet.setId(0L);
-//		pet.save();
-//		System.out.println(pet);
+//		master = new Master();
+//		master.setId(1);
+//		Pet pet = new Pet();
+//		pet.setName("edit_fuck_name");
+//		pet.setNumber("testnumber");
+//		master.getPets().add(pet);
+//		master.cascade().persist("pets");
+		Pet pet = new Pet().find().first();
+		pet.setName("change_" + pet.getName());
+		pet.save();
+		System.out.println(pet);
 		
 		//master.cascade().remove("pets");
 	}

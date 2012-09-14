@@ -1,35 +1,45 @@
 package org.eweb4j.orm;
 
-public interface IModel {
+import java.util.List;
 
-	void setDataSourceName(String dsName);
+import org.eweb4j.orm.dao.DAO;
 
-	/**
-	 * 将当前实体的状态插入数据库，并将ID值注入当前实体。 若当前实体本身已含有ID值，不执行操作。
-	 * 
-	 * @return
-	 */
-	boolean create();
+public interface IModel<T> {
 
-	/**
-	 * 将当前实体的存入数据库（若ID值没有，则插入，否则执行更新）
-	 * 
-	 * @return
-	 */
-	Model save();
+	public void setDataSourceName(String dsName) ;
+
+	public DAO dao() ;
+	
+	public boolean create(String... field) ;
+
+	public T save(String... field);
 
 	/**
-	 * 删除实体 by id
-	 * 
-	 * @return 删除
+	 * 根据当前实体的ID值来删除自己
 	 */
-	boolean delete();
+	public boolean delete() ;
 
 	/**
-	 * 通过当前实体的ID值加载实体数据，默认从缓存中获取，若找不到，则取数据库取
-	 * 
-	 * @return
+	 * 根据当前实体ID值去查询数据库
 	 */
-	Model load();
+	public T load() ;
+
+	public int delete(String query, Object... params) ;
+
+	public int deleteAll() ;
+
+	public T findById(long id) ;
+
+	public Query find() ;
+
+	public Query find(String query, Object... params) ;
+
+	public List<T> findAll() ;
+
+	public long count() ;
+
+	public long count(String query, Object... params) ;
+	
+	public Cascade cascade() ;
 
 }

@@ -6,22 +6,8 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
-import org.eweb4j.orm.dao.DAO;
-class Test{
-	
-}
 public class ClassUtil {
-	private List<Test> test;
-	public static List<DAO> xxx(){
-		return null;
-	}
-	
-	public static void main(String[] args) throws Exception{
-		System.out.println(getGenericType(ClassUtil.class.getDeclaredField("test")));
-	}
-	
 	public static Class<?> getPojoClass(Method method) {
 		Type type = method.getGenericReturnType();
 		String clsName = type.toString();
@@ -152,39 +138,57 @@ public class ClassUtil {
 					|| Integer.class.isAssignableFrom(clazz)) {
 				if ("".equals(v.trim()))
 					v = "0";
-
-				return Integer.parseInt(v);
+				
+				try {
+					return Integer.parseInt(v);
+				} catch (Exception e){
+					return 0;
+				}
 			} else if (long.class.isAssignableFrom(clazz)
 					|| Long.class.isAssignableFrom(clazz)) {
 				if ("".equals(v.trim()))
-					v = "0";
-
-				return Long.parseLong(v);
+					v = "0L";
+				try {
+					return Long.parseLong(v);
+				}catch(Exception e){
+					return 0L;
+				}
 			} else if (double.class.isAssignableFrom(clazz)
 					|| Double.class.isAssignableFrom(clazz)) {
 				if ("".equals(v.trim()))
-					v = "0.0";
+					v = "0.0D";
 
-				return Double.parseDouble(v);
+				try {
+					return Double.parseDouble(v);
+				}catch(Exception e){
+					return 0.0D;
+				}
 			} else if (float.class.isAssignableFrom(clazz)
 					|| Float.class.isAssignableFrom(clazz)) {
 				if ("".equals(v.trim()))
-					v = "0.0";
+					v = "0.0F";
 
-				return Float.parseFloat(v);
+				try {
+					return Float.parseFloat(v);
+				}catch(Exception e){
+					return 0.0F;
+				}
 			} else if (boolean.class.isAssignableFrom(clazz)
 					|| Boolean.class.isAssignableFrom(clazz)) {
 				if ("".equals(v.trim()))
 					v = "false";
-
-				return Boolean.parseBoolean(v);
+				try {
+					return Boolean.parseBoolean(v);
+				}catch(Exception e){
+					return false;
+				}
 			} else if (String.class.isAssignableFrom(clazz)) {
 				return v;
 			} 
 		} catch (Exception e) {
-			return 0;
+			e.printStackTrace();
 		} catch (Error e) {
-			return 0;
+			e.printStackTrace();
 		}
 
 		return null;
@@ -202,7 +206,11 @@ public class ClassUtil {
 				for (int i = 0; i < vs.length; i++) {
 					if ("".equals(vs[i].trim()))
 						vs[i] = "0";
-					args[i] = Integer.parseInt(vs[i]);
+					try {
+						args[i] = Integer.parseInt(vs[i]);
+					} catch (Exception e){
+						args[i] = 0;
+					}
 				}
 
 				return args;
@@ -211,7 +219,11 @@ public class ClassUtil {
 				for (int i = 0; i < vs.length; i++) {
 					if ("".equals(vs[i].trim()))
 						vs[i] = "0";
+					try{
 					args[i] = Integer.parseInt(vs[i]);
+					} catch (Exception e){
+						args[i] = 0;
+					}
 				}
 
 				return args;
@@ -220,7 +232,11 @@ public class ClassUtil {
 				for (int i = 0; i < vs.length; i++) {
 					if ("".equals(vs[i].trim()))
 						vs[i] = "0";
-					args[i] = Long.parseLong(vs[i]);
+					try{
+						args[i] = Long.parseLong(vs[i]);
+					} catch (Exception e){
+						args[i] = 0L;
+					}
 				}
 
 				return args;
@@ -229,7 +245,11 @@ public class ClassUtil {
 				for (int i = 0; i < vs.length; i++) {
 					if ("".equals(vs[i].trim()))
 						vs[i] = "0";
-					args[i] = Long.parseLong(vs[i]);
+					try{
+						args[i] = Long.parseLong(vs[i]);
+					} catch (Exception e){
+						args[i] = 0L;
+					}
 				}
 
 				return args;
@@ -238,7 +258,11 @@ public class ClassUtil {
 				for (int i = 0; i < vs.length; i++) {
 					if ("".equals(vs[i].trim()))
 						vs[i] = "0.0";
-					args[i] = Double.parseDouble(vs[i]);
+					try{
+						args[i] = Double.parseDouble(vs[i]);
+					} catch (Exception e){
+						args[i] = 0.0D;
+					}
 				}
 
 				return args;
@@ -247,7 +271,11 @@ public class ClassUtil {
 				for (int i = 0; i < vs.length; i++) {
 					if ("".equals(vs[i].trim()))
 						vs[i] = "0.0";
-					args[i] = Double.parseDouble(vs[i]);
+					try{
+						args[i] = Double.parseDouble(vs[i]);
+					} catch (Exception e){
+						args[i] = 0.0D;
+					}
 				}
 
 				return args;
@@ -257,7 +285,11 @@ public class ClassUtil {
 					if ("".equals(vs[i].trim()))
 						vs[i] = "0.0";
 
-					args[i] = Float.parseFloat(vs[i]);
+					try{
+						args[i] = Float.parseFloat(vs[i]);
+					} catch (Exception e){
+						args[i] = 0.0F;
+					}
 				}
 
 				return args;
@@ -266,7 +298,11 @@ public class ClassUtil {
 				for (int i = 0; i < vs.length; i++) {
 					if ("".equals(vs[i].trim()))
 						vs[i] = "0.0";
-					args[i] = Float.parseFloat(vs[i]);
+					try{
+						args[i] = Float.parseFloat(vs[i]);
+					} catch (Exception e){
+						args[i] = 0.0F;
+					}
 				}
 
 				return args;
@@ -276,7 +312,11 @@ public class ClassUtil {
 					if ("".equals(vs[i].trim()))
 						vs[i] = "false";
 
-					args[i] = Boolean.parseBoolean(vs[i]);
+					try{
+						args[i] = Boolean.parseBoolean(vs[i]);
+					} catch (Exception e){
+						args[i] = false;
+					}
 				}
 
 				return args;
@@ -285,7 +325,11 @@ public class ClassUtil {
 				for (int i = 0; i < vs.length; i++) {
 					if ("".equals(vs[i].trim()))
 						vs[i] = "false";
-					args[i] = Boolean.parseBoolean(vs[i]);
+					try{
+						args[i] = Boolean.parseBoolean(vs[i]);
+					} catch (Exception e){
+						args[i] = false;
+					}
 				}
 
 				return args;

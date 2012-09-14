@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -24,7 +21,7 @@ import org.eweb4j.orm.Model;
  */
 @Entity
 @Table(name = "t_master")
-public class Master extends Model {
+public class Master extends Model<Master> {
 
 	@Required(mess = "姓名必填")
 	@Length(min = 2, max = 32, mess = "姓名2-32位")

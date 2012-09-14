@@ -2,12 +2,12 @@ package org.eweb4j.orm;
 
 import org.eweb4j.orm.dao.cascade.CascadeDAO;
 
-public class CascadeImpl implements Cascade{
+public class CascadeImpl<T> implements Cascade{
 
 	private CascadeDAO cascadeDAO;
-	private Model model;
+	private T model;
 	
-	CascadeImpl(CascadeDAO cascadeDAO, Model model){
+	CascadeImpl(CascadeDAO cascadeDAO, T model){
 		this.cascadeDAO = cascadeDAO;
 		this.model = model;
 	}
