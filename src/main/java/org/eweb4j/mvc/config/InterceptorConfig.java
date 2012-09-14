@@ -13,7 +13,7 @@ import org.eweb4j.config.LogFactory;
 import org.eweb4j.config.bean.ConfigBean;
 import org.eweb4j.mvc.config.bean.InterConfigBean;
 import org.eweb4j.util.FileUtil;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.xml.BeanXMLUtil;
 import org.eweb4j.util.xml.XMLReader;
 import org.eweb4j.util.xml.XMLWriter;
@@ -65,7 +65,7 @@ public class InterceptorConfig {
 					} catch (Exception e) {
 						e.printStackTrace();
 						error = rebuildXmlFile(configFile,
-								StringUtil.getExceptionString(e));
+								CommonUtil.getExceptionString(e));
 					}
 				}
 			}
@@ -81,7 +81,7 @@ public class InterceptorConfig {
 		StringBuilder sb = new StringBuilder(err);
 		try {
 			// 保存为备份文件
-			File tf = new File(configFile.getAbsolutePath() + ".back" + StringUtil.getNowTime("_MMddHHmmss"));
+			File tf = new File(configFile.getAbsolutePath() + ".back" + CommonUtil.getNowTime("_MMddHHmmss"));
 			FileUtil.copy(configFile, tf);
 			log.debug("backup file->" + tf.getAbsolutePath());
 

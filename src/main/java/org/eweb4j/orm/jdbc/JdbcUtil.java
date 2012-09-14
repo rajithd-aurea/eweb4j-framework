@@ -260,7 +260,7 @@ public class JdbcUtil {
 	 * @return
 	 * @throws JdbcUtilException
 	 */
-	private static Map<String, Object> getResultSetAsMap(Connection con,String sql, Object[] args) throws JdbcUtilException {
+	public static Map<String, Object> getResultSetAsMap(Connection con,String sql, Object[] args) throws JdbcUtilException {
 		Map<String, Object> result = null;
 		if (sql == null) {
 			return null;
@@ -326,7 +326,7 @@ public class JdbcUtil {
 	 * @return
 	 * @throws JdbcUtilException
 	 */
-	private static List<Object> getResultSetAsList(Connection con, String sql, Object[] args) throws JdbcUtilException {
+	public static List<Object> getResultSetAsList(Connection con, String sql, Object[] args) throws JdbcUtilException {
 		List<Object> result = null;
 		Map<String, Object> map = getResultSetAsMap(con, sql, args);
 		if (map != null) {

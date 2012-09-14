@@ -1,5 +1,6 @@
 package org.eweb4j.orm.dao;
 
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -12,24 +13,30 @@ import java.util.Map.Entry;
 import javax.sql.DataSource;
 
 import org.eweb4j.cache.DBInfoConfigBeanCache;
+import org.eweb4j.cache.ORMConfigBeanCache;
 import org.eweb4j.config.Log;
 import org.eweb4j.config.LogFactory;
 import org.eweb4j.orm.OrderType;
+import org.eweb4j.orm.Page;
+import org.eweb4j.orm.PageImpl;
 import org.eweb4j.orm.config.ORMConfigBeanUtil;
 import org.eweb4j.orm.dao.config.DAOConfigConstant;
 import org.eweb4j.orm.jdbc.DataSourceWrapCache;
 import org.eweb4j.orm.jdbc.JdbcUtil;
+import org.eweb4j.orm.sql.SelectSqlCreator;
 import org.eweb4j.orm.sql.SqlFactory;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.ClassUtil;
+import org.eweb4j.util.CommonUtil;
+import org.eweb4j.util.ReflectUtil;
 
 public class DAOImpl implements DAO {
 
-	private static Log log = LogFactory.getORMLogger(DAOImpl.class);
+	private static Log log = LogFactory.getORMLogger(DAO.class);
 
 	private Map<String, Object> buffer = new HashMap<String, Object>();
 	
 	private String orderStr = "";
-
+	private boolean express = false;
 	private Map<String, Object> map;
 	private Class<?> clazz;
 	private String dsName;
@@ -38,8 +45,11 @@ public class DAOImpl implements DAO {
 	private List<Object> args = new ArrayList<Object>();;
 	private String dbType;
 	private DataSource ds;
-	private String table;
+	private StringBuilder joins = new StringBuilder();
+	private String table = null;
 	private String selectAllColumn;
+
+	private Map<String, String> aliasMap = new HashMap<String, String>();
 
 	public DAOImpl(String dsName) {
 		this.dsName = dsName;
@@ -62,7 +72,7 @@ public class DAOImpl implements DAO {
 		if (Map.class.isAssignableFrom(clazz)) {
 			if (this.map != null) {
 				selectAllColumn = ORMConfigBeanUtil.getSelectAllColumn(map);
-				table = (String) map.get("table");
+				table = (String) map.get("table") + " map";
 			}
 		} else {
 			this.table = ORMConfigBeanUtil.getTable(clazz);
@@ -94,8 +104,9 @@ public class DAOImpl implements DAO {
 		init(clazz, dsName);
 	}
 
-	public DAOImpl append(String query) {
-		String column = ORMConfigBeanUtil.getColumn(clazz, query);
+	public DAO append(String query) {
+		String _fieldName = handleFieldAlias(query);
+		String column = ORMConfigBeanUtil.getColumn(clazz, _fieldName);
 		if (column == null)
 			column = query;
 
@@ -105,59 +116,168 @@ public class DAOImpl implements DAO {
 		return this;
 	}
 
-	public DAOImpl field(String fieldName) {
-		String column = ORMConfigBeanUtil.getColumn(clazz, fieldName);
+	public static void main(String[] args) {
+		Map<String,String> aliasMap = new HashMap<String,String>();
+		aliasMap.put("l", "likes");
+		aliasMap.put("u", "user");
+		String fieldName = "l.u.name";
+		int dotIndex = fieldName.indexOf(".");
+		if (dotIndex > 0 && dotIndex < fieldName.length() -1){
+			String[] dots = fieldName.split("\\.");
+			StringBuilder builder = new StringBuilder();
+			for (String dot : dots){
+				if (aliasMap.containsKey(dot))
+					dot = aliasMap.get(dot);
+				if (builder.length() > 0)
+					builder.append(".");
+				
+				builder.append(dot);
+			}
+			if (builder.length() > 0)
+				fieldName = builder.toString();
+		}
+		
+		System.out.println(fieldName);
+	}
+	
+	public DAO field(String fieldName) {
+		String _fieldName = handleFieldAlias(fieldName);
+		String column = ORMConfigBeanUtil.getColumn(clazz, _fieldName);
 		this.condition.append(" ").append(column).append(" ");
 		return this;
 	}
 
-	public DAOImpl notLike(Object value) {
-		this.condition.append(" NOT LIKE '").append(value).append("' ");
+	private String handleFieldAlias(String fieldName) {
+		int dotIndex = fieldName.indexOf(".");
+		if (dotIndex > 0 && dotIndex < fieldName.length() -1){
+			String[] dots = fieldName.split("\\.");
+			StringBuilder builder = new StringBuilder();
+			for (String dot : dots){
+				if (aliasMap.containsKey(dot))
+					dot = aliasMap.get(dot);
+				if (builder.length() > 0)
+					builder.append(".");
+				builder.append(dot);
+			}
+			if (builder.length() > 0)
+				fieldName = builder.toString();
+		}
+		return fieldName;
+	}
+
+	public DAO notLike(Object value) {
+		this.condition.append(" NOT LIKE ");
+		
+		if (!this.express)
+			condition.append("'").append(value).append("' ");
+		else
+			condition.append(value);
 		return this;
 	}
 
-	public DAOImpl notEqual(Object value) {
-		this.condition.append(" <> '").append(value).append("' ");
+	public DAO notEqual(Object value) {
+		this.condition.append(" <> ");
+		
+		if (!this.express)
+			condition.append("'").append(value).append("' ");
+		else
+			condition.append(value);
+		
 		return this;
 	}
 
-	public DAOImpl equal(Object value) {
-		this.condition.append(" = '").append(value).append("' ");
+	public DAO equal(Object value) {
+		this.condition.append(" = ");
+		
+		if (!this.express)
+			condition.append("'").append(value).append("' ");
+		else
+			condition.append(value);
+		
 		return this;
 	}
 
-	public DAOImpl moreThan(Object value) {
-		this.condition.append(" > '").append(value).append("' ");
+	public DAO moreThan(Object value) {
+		this.condition.append(" > ");
+		
+		if (!this.express)
+			condition.append("'").append(value).append("' ");
+		else
+			condition.append(value);
+		
 		return this;
 	}
 
-	public DAOImpl lessThan(Object value) {
-		this.condition.append(" < '").append(value).append("' ");
+	public DAO lessThan(Object value) {
+		this.condition.append(" < ");
+		
+		if (!this.express)
+			condition.append("'").append(value).append("' ");
+		else
+			condition.append(value);
+		
 		return this;
 	}
 
-	public DAOImpl or(String fieldName) {
-		String column = ORMConfigBeanUtil.getColumn(clazz, fieldName);
+	public DAO or(String fieldName) {
+		String _fieldName = handleFieldAlias(fieldName);
+		String column = ORMConfigBeanUtil.getColumn(clazz, _fieldName);
 		this.condition.append(" OR ").append(column).append(" ");
 		return this;
 	}
 
-	public DAOImpl and(String fieldName) {
-		String column = ORMConfigBeanUtil.getColumn(clazz, fieldName);
+	public DAO and(String fieldName) {
+		String _fieldName = handleFieldAlias(fieldName);
+		String column = ORMConfigBeanUtil.getColumn(clazz, _fieldName);
 		this.condition.append(" AND ").append(column).append(" ");
 		return this;
 	}
 
-	public DAOImpl desc(String fieldName) {
-		String column = ORMConfigBeanUtil.getColumn(clazz, fieldName);
+	public DAO orderBy(String fieldName) {
+		String _fieldName = handleFieldAlias(fieldName);
+		String column = ORMConfigBeanUtil.getColumn(clazz, _fieldName);
+		this.orderStr = " ORDER BY " + column;
+		this.buffer.put("orderField", column);
+		return this;
+	}
+	
+	public DAO desc(){
+		this.orderStr += " DESC ";
+		this.buffer.put("orderType", OrderType.DESC_ORDER);
+		return this;
+	}
+	
+	public DAO asc(){
+		this.orderStr += " ASC ";
+		this.buffer.put("orderType", OrderType.ASC_ORDER);
+		return this;
+	}
+	
+	public DAO order(String fieldName, String orderType){
+		String _fieldName = handleFieldAlias(fieldName);
+		String column = ORMConfigBeanUtil.getColumn(clazz, _fieldName);
+		this.orderStr = " ORDER BY " + column + " DESC ";
+		this.buffer.put("orderField", column);
+		if ("asc".equalsIgnoreCase(orderType))
+			this.buffer.put("orderType", OrderType.ASC_ORDER);
+		else
+			this.buffer.put("orderType", OrderType.DESC_ORDER);
+		
+		return this;
+	}
+	
+	public DAO desc(String fieldName) {
+		String _fieldName = handleFieldAlias(fieldName);
+		String column = ORMConfigBeanUtil.getColumn(clazz, _fieldName);
 		this.orderStr = " ORDER BY " + column + " DESC ";
 		this.buffer.put("orderField", column);
 		this.buffer.put("orderType", OrderType.DESC_ORDER);
 		return this;
 	}
 
-	public DAOImpl asc(String fieldName) {
-		String column = ORMConfigBeanUtil.getColumn(clazz, fieldName);
+	public DAO asc(String fieldName) {
+		String _fieldName = handleFieldAlias(fieldName);
+		String column = ORMConfigBeanUtil.getColumn(clazz, _fieldName);
 		this.orderStr = " ORDER BY " + column + " ASC ";
 		this.buffer.put("orderField", column);
 		this.buffer.put("orderType", OrderType.ASC_ORDER);
@@ -201,18 +321,29 @@ public class DAOImpl implements DAO {
 			
 			return result;
 		} catch (Exception e) {
-			log.error("sql-->" + sql + "exception:" + StringUtil.getExceptionString(e));
+			log.error("sql-->" + sql + "exception:" + CommonUtil.getExceptionString(e));
 			throw new DAOException(sql + " execute exception", e);
 		}
 	}
 	
 	public long count(){
 		final String query = this.condition.toString().replace("WHERE", "").replace("'?'", "?");
-		if (args != null && args.size() > 0) {
-			return DAOFactory.getSelectDAO(dsName).selectCount(this.clazz, query, args.toArray(new Object[] {}));
+		String _table = this.table;
+		if (this.joins != null && this.joins.length() > 0){
+			_table = this.table + ", " + this.joins;
 		}
 		
-		return DAOFactory.getSelectDAO(dsName).selectCount(this.clazz, query);
+		final String sql = "SELECT COUNT(*) as count FROM " + _table + " WHERE " + ORMConfigBeanUtil.parseQuery(query, clazz);
+		List<Map> maps = null;
+		if (args != null && args.size() > 0) {
+			maps = DAOFactory.getSelectDAO(dsName).selectBySQL(Map.class, sql, args);
+		}else
+			maps = DAOFactory.getSelectDAO(dsName).selectBySQL(Map.class, sql);
+		
+		if (maps == null || maps.isEmpty())
+			return 0;
+		
+		return Long.parseLong(String.valueOf(maps.get(0).get("count")));
 	}
 
 	public <T> List<T> query() {
@@ -238,10 +369,18 @@ public class DAOImpl implements DAO {
 				obj = clazz.newInstance();
 			}
 			
-			sql = SqlFactory.getSelectSql(obj, dbType).divPage(page, length, orderField, oType, query.replace("WHERE", ""));
+			SelectSqlCreator<Object> select =  SqlFactory.getSelectSql(obj, dbType);
+			if (this.joins != null && this.joins.length() > 0){
+				select.setTable(this.table + ", " + this.joins);
+			}
+			sql = select.divPage(page, length, orderField, oType, query.replace("WHERE", ""));
 		} catch (Exception e) {
-			e.printStackTrace();
-			sql = this.sql.append(orderStr).append(" LIMIT ").append((page - 1) * length).append(", ").append(length).toString().replace("${_where_}", query);
+			String _table = this.table;
+			if (this.joins != null && this.joins.length() > 0){
+				_table = this.table + ", " + this.joins;
+			}
+			
+			sql = this.sql.append(orderStr).append(" LIMIT ").append((page - 1) * length).append(", ").append(length).toString().replace("${_TABLES_}", _table).replace("${_where_}", query);
 		}
 		
 		return query(sql);
@@ -258,7 +397,7 @@ public class DAOImpl implements DAO {
 			return this;
 
 		this.sql.append(" SELECT ").append(str).append(" FROM ")
-				.append(table).append(" ");
+				.append(" ${_TABLES_} ").append(" ");
 
 		return this;
 	}
@@ -280,7 +419,7 @@ public class DAOImpl implements DAO {
 			sb.append(col);
 		}
 
-		this.sql.append(" INSERT INTO ").append(table).append("(").append(sb.toString()).append(") ");
+		this.sql.append(" INSERT INTO ").append(table.replace(" "+clazz.getSimpleName().toLowerCase(), "")).append("(").append(sb.toString()).append(") ");
 
 		return this;
 	}
@@ -365,7 +504,7 @@ public class DAOImpl implements DAO {
 			}
 
 		} catch (SQLException e) {
-			log.error("sql-->" + sql + "exception:" + StringUtil.getExceptionString(e));
+			log.error("sql-->" + sql + "exception:" + CommonUtil.getExceptionString(e));
 			throw new DAOException(sql + " execute exception", e);
 		}
 
@@ -377,7 +516,7 @@ public class DAOImpl implements DAO {
 		if (clazz == null)
 			return this;
 
-		this.sql.append(" UPDATE ").append(table).append(" ");
+		this.sql.append(" UPDATE ").append(table.replace(" "+clazz.getSimpleName().toLowerCase(), "")).append(" ");
 
 		return this;
 	}
@@ -422,17 +561,38 @@ public class DAOImpl implements DAO {
 		if (clazz == null)
 			return this;
 
-		this.sql.append(" DELETE FROM ").append(table).append(" ");
+		this.sql.append(" DELETE FROM ").append(table.replace(" "+clazz.getSimpleName().toLowerCase(), "")).append(" ");
 
 		return this;
 	}
 
 	public DAO selectAll() {
 		this.sql.append(" SELECT ").append(selectAllColumn)
-				.append(" FROM ").append(table).append(" ");
+				.append(" FROM ").append(" ${_TABLES_} ").append(" ");
 		return this;
 	}
 
+	public DAO select(Class<?>... classes){
+		if (classes == null || classes.length == 0)
+			return this;
+		
+		this.sql.append(" SELECT ");
+		StringBuilder sb = new StringBuilder();
+		for(Class<?> cls : classes){
+			String _selectAllColumn = ORMConfigBeanUtil.getSelectAllColumn(cls);
+			if (sb.length() > 0)
+				sb.append(", ");
+			sb.append(_selectAllColumn);
+		}
+		
+		if (sb.length() == 0)
+			sb.append(selectAllColumn);
+		
+		sql.append(sb.toString()).append(" FROM ").append(" ${_TABLES_} ").append(" ");
+		
+		return this;
+	}
+	
 	public DAO select(String... fields) {
 		if (fields == null || clazz == null)
 			return this;
@@ -441,17 +601,19 @@ public class DAOImpl implements DAO {
 		for (String field : fields) {
 			if (sb.length() > 0)
 				sb.append(", ");
-			String col = ORMConfigBeanUtil.getColumn(clazz, field);
+			String _field = handleFieldAlias(field);
+			String col = ORMConfigBeanUtil.getColumn(clazz, _field);
 			sb.append(col);
 		}
 		this.sql.append(" SELECT ").append(sb.toString())
-				.append(" FROM ").append(table).append(" ");
+				.append(" FROM ").append(" ${_TABLES_} ").append(" ");
 
 		return this;
 	}
 
 	public DAO likeLeft(Object value) {
 		this.condition.append(" LIKE '").append(value).append("%' ");
+		
 		return this;
 	}
 
@@ -461,7 +623,13 @@ public class DAOImpl implements DAO {
 	}
 
 	public DAO like(Object value) {
-		this.condition.append(" LIKE '%").append(value).append("%' ");
+		this.condition.append(" LIKE ");
+		
+		if (!this.express)
+			condition.append("'%").append(value).append("%' ");
+		else
+			condition.append(value);
+		
 		return this;
 	}
 
@@ -475,6 +643,11 @@ public class DAOImpl implements DAO {
 		this.condition = new StringBuilder();
 		this.args.clear();
 		this.orderStr = "";
+		this.joins = null;
+		this.joins = new StringBuilder();
+		this.express = false;
+		this.aliasMap = null;
+		this.aliasMap = new HashMap<String, String>();
 
 		return this;
 	}
@@ -540,7 +713,12 @@ public class DAOImpl implements DAO {
 	}
 
 	public String toSql() {
-		return sql.toString().replace("${_where_}", condition.toString()).replace("'?'", "?");
+		String _table = this.table;
+		if (this.joins != null && this.joins.length() > 0){
+			_table = this.table + ", " + this.joins;
+		}
+		
+		return sql.append(orderStr).toString().replace("${_TABLES_}", _table).replace("${_where_}", condition.toString()).replace("'?'", "?");
 	}
 
 	public DAO fillArgs(Object... args) {
@@ -583,6 +761,102 @@ public class DAOImpl implements DAO {
 
 	public String getDsName() {
 		return dsName;
+	}
+
+	public <T> Page<T> getPage(int pageIndex, int pageSize) {
+		Page<T> page = new PageImpl<T>(pageIndex, pageSize, this);
+		return page;
+	}
+
+	public DAO leftJoin(String... fieldNames) {
+		
+		return this;
+	}
+
+	public DAO rightJoin(String... fieldNames) {
+		return this;
+	}
+
+	public DAO join(String fieldName){
+		return join(fieldName, fieldName);
+	}
+	
+	public DAO enableExpress(boolean flag){
+		this.express = flag;
+		return this;
+	}
+	
+	public DAO join(String fieldName, String alias) {
+		if (fieldName == null || alias == null)
+			return this;
+		
+		handleJoin(fieldName, alias);
+		
+		return this;
+	}
+	
+	public DAO alias(String alias){
+		if (alias == null || alias.trim().length() == 0)
+			return this;
+		this.aliasMap.put(alias, this.clazz.getSimpleName().toLowerCase());
+		return this;
+	}
+
+	private void handleJoin(String _fieldName, String _alias) {
+		int dotIndex = _fieldName.indexOf(".");
+		if (dotIndex > 0 && dotIndex < _fieldName.length() -1){
+			String[] fDots = _fieldName.split("\\.");
+			String[] aDots = _alias.split("\\.");
+			Class<?> currentClazz = this.clazz;
+			for (int i = 0; i < fDots.length; i++){
+				String fieldName = fDots[i];
+				String alias = aDots[i];
+			
+				ReflectUtil ru = null;
+				try {
+					ru = new ReflectUtil(currentClazz);
+					Field field = ru.getField(fieldName);
+					if (field == null)
+						throw new Exception("field->"+fieldName+" invalid");
+					Class<?> cls = ClassUtil.getGenericType(field);
+					if (cls == null)
+						throw new Exception("can not get the field->"+fieldName+" class");
+					if (!ORMConfigBeanCache.containsKey(cls.getName()))
+						throw new Exception("field->" + fieldName + cls.getName() + " is not a entity");
+					
+					String table = ORMConfigBeanUtil.getTable(cls);
+					if (joins.length() > 0)
+						joins.append(", ");
+					
+					joins.append(table);
+					aliasMap .put(alias, fieldName);
+					currentClazz = cls;
+				} catch (Exception e){
+					log.error(e.toString());
+				}
+			}
+		}
+	}
+
+	public DAO on() {
+		return null;
+	}
+
+	public DAO groupBy(String... fieldNames) {
+		if (fieldNames == null || fieldNames.length == 0)
+			return this;
+
+		StringBuilder builder = new StringBuilder();
+		for (String field : fieldNames){
+			String _field = handleFieldAlias(field);
+			String col = ORMConfigBeanUtil.getColumn(clazz, _field);
+			if (builder.length() > 0)
+				builder.append(", ");
+			builder.append(col);
+		}
+		this.condition.append(" group by ").append(builder.toString()).append(" ");
+
+		return this;
 	}
 	
 	

@@ -24,7 +24,7 @@ public class TestDAOSql {
 
 		dao.clear();
 		String sql = dao.selectStr("petId, name").toSql();
-		Assert.assertEquals(" SELECT petId, name FROM t_pet ", sql);
+		Assert.assertEquals(" SELECT petId, name FROM  t_pet pet  ", sql);
 	}
 
 	@Test
@@ -32,7 +32,7 @@ public class TestDAOSql {
 		dao.clear();
 		String sql = dao.selectAll().toSql();
 
-		Assert.assertEquals(" SELECT id, num, name, age, cate, master_id FROM t_pet ", sql);
+		Assert.assertEquals(" SELECT pet.id, pet.num, pet.name, pet.age, pet.cate, pet.master_id, pet.user_id FROM  t_pet pet  ", sql);
 	}
 
 	@Test
@@ -40,7 +40,7 @@ public class TestDAOSql {
 		dao.clear();
 		String[] fields = { "petId", "name" };
 		String sql = dao.select(fields).toSql();
-		Assert.assertEquals(" SELECT id, name FROM t_pet ", sql);
+		Assert.assertEquals(" SELECT id, name FROM  t_pet pet  ", sql);
 	}
 	
 	@Test

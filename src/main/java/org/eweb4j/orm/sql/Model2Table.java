@@ -23,7 +23,7 @@ import org.eweb4j.orm.config.bean.Property;
 import org.eweb4j.util.ClassUtil;
 import org.eweb4j.util.FileUtil;
 import org.eweb4j.util.ReflectUtil;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 
 /**
  * 
@@ -68,7 +68,7 @@ public class Model2Table {
 				String type = p.getType();
 				String size = null;
 				
-				if (p.getSize().trim().length() > 0 && StringUtil.isNumeric(p.getSize().trim()))
+				if (p.getSize().trim().length() > 0 && CommonUtil.isNumeric(p.getSize().trim()))
 					size = String.format(" (%s) ", p.getSize());
 				
 				if ("1".equals(p.getUnique()) || "true".equalsIgnoreCase(p.getUnique()))
@@ -192,7 +192,7 @@ public class Model2Table {
 			LogFactory.getConfigLogger(Model2Table.class).debug("create models sql script file success -> " + file.getAbsoluteFile());
 			
 		} catch (IOException e1) {
-			return StringUtil.getExceptionString(e1);
+			return CommonUtil.getExceptionString(e1);
 		} 
 		
 		return null;

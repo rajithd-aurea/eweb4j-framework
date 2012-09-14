@@ -20,7 +20,7 @@ import java.util.HashSet;
 public class FileUtil {
 	
 	public static boolean exists(String filePath){
-		File dir = new File(StringUtil.uriDecoding(filePath));
+		File dir = new File(CommonUtil.uriDecoding(filePath));
 		return dir.exists();
 	}
 	
@@ -31,7 +31,7 @@ public class FileUtil {
 	 * @return
 	 */
 	public static File[] getFiles(String str) {
-		File dir = new File(StringUtil.uriDecoding(str));
+		File dir = new File(CommonUtil.uriDecoding(str));
 		File[] result = null;
 		if (dir.isDirectory()) {
 			result = dir.listFiles();
@@ -47,7 +47,7 @@ public class FileUtil {
 	 * @return
 	 */
 	public static String getTopClassPath(Class<?> clazz) {
-		String path = StringUtil.uriDecoding(clazz.getResource("/").getPath());
+		String path = CommonUtil.uriDecoding(clazz.getResource("/").getPath());
 
 		return path;
 	}
@@ -61,36 +61,41 @@ public class FileUtil {
 	 * 
 	 * @return
 	 */
-	public static String getJarPath() {
-		return FileUtil.getParent(FileUtil.getTopClassPath(FileUtil.class), 1) + "lib";
+	public static String getLib() {
+		return CommonUtil.uriDecoding(FileUtil.getParent(FileUtil.getTopClassPath(FileUtil.class), 1) + "lib");
 	}
 	
 	public static String[] getChildrenPath(File parent){
 		File[] files = parent.listFiles();
 		String[] result = new String[files.length];
 		for (int i = 0; i < files.length; i++)
-			result[i] = StringUtil.uriDecoding(files[i].getAbsolutePath());
+			result[i] = CommonUtil.uriDecoding(files[i].getAbsolutePath());
 		
 		return result;
 	}
 	
-	public static Collection<String> getClassPath(){
-		Collection<String> classpath = new HashSet<String>();
+	public static Collection<String> getJars(){
+		Collection<String> jars = new HashSet<String>();
 		Enumeration<URL> urls;
 		try {
 			urls = FileUtil.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
-			classpath.add(getTopClassPath(FileUtil.class));
-			classpath.add(getJarPath());
+			
 			while (urls.hasMoreElements()) {
 	            URL url = (URL) urls.nextElement();
 	            String path = url.getFile().replace("file:/", "").replace("!/META-INF/MANIFEST.MF", "");
-	            classpath.add(StringUtil.uriDecoding(path));
+	            jars.add(CommonUtil.uriDecoding(path));
 	        }
+			File jarDir= new File(getLib());
+			if (jarDir.isDirectory() && jarDir.exists()){
+				for (File jar : jarDir.listFiles()){
+					jars.add(CommonUtil.uriDecoding(jar.getAbsolutePath()));
+				}
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		return classpath;
+		return jars;
 	}
 
 	public static String getClassPath(String folderName) {
@@ -104,7 +109,7 @@ public class FileUtil {
 	 * @return
 	 */
 	public static String getCurrPath(Class<?> clazz) {
-		return StringUtil.uriDecoding(clazz.getResource("/").getPath()
+		return CommonUtil.uriDecoding(clazz.getResource("/").getPath()
 				+ clazz.getName().replace(".", File.separator));
 	}
 
@@ -116,7 +121,7 @@ public class FileUtil {
 	 */
 	public static boolean createDir(String path) {
 		boolean flag = false;
-		File file = new File(StringUtil.uriDecoding(path));
+		File file = new File(CommonUtil.uriDecoding(path));
 		if (!file.exists()) {
 			if (!file.isDirectory()) {
 				flag = file.mkdir();
@@ -168,7 +173,7 @@ public class FileUtil {
 	 */
 	public static boolean createFile(String path, boolean isDelete)
 			throws IOException {
-		File file = new File(StringUtil.uriDecoding(path));
+		File file = new File(CommonUtil.uriDecoding(path));
 
 		return createFile(file, isDelete);
 	}
@@ -183,7 +188,7 @@ public class FileUtil {
 	public static boolean moveFileTo(File oldFile, String newDir) {
 		StringBuilder sb = new StringBuilder(newDir);
 		sb.append(File.separator).append(oldFile.getName());
-		File toDir = new File(StringUtil.uriDecoding(sb.toString()));
+		File toDir = new File(CommonUtil.uriDecoding(sb.toString()));
 		boolean flag = false;
 		if (!toDir.exists()) {
 			flag = oldFile.renameTo(toDir);
@@ -210,7 +215,7 @@ public class FileUtil {
 			}
 		}
 
-		return StringUtil.uriDecoding(result) + File.separator;
+		return CommonUtil.uriDecoding(result) + File.separator;
 	}
 
 	public static String getParent(String path, int floor) {

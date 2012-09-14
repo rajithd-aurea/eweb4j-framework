@@ -25,7 +25,7 @@ import org.eweb4j.mvc.action.ActionExecution;
 import org.eweb4j.mvc.config.ActionConfig;
 import org.eweb4j.mvc.config.MVCConfigConstant;
 import org.eweb4j.mvc.interceptor.InterExecution;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 
 /**
  * eweb4j.MVC filter
@@ -132,7 +132,7 @@ public class EWebFilter implements Filter, Servlet {
 			chain.doFilter(req, res);// chain
 		} catch (Exception e) {
 			e.printStackTrace();
-			String info = StringUtil.getExceptionString(e);
+			String info = CommonUtil.getExceptionString(e);
 			LogFactory.getMVCLogger(EWebFilter.class).error(info);
 			this.printHtml(info, res.getWriter());
 		}

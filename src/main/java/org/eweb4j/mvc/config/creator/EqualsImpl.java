@@ -5,7 +5,7 @@ import org.eweb4j.mvc.config.bean.ParamConfigBean;
 import org.eweb4j.mvc.config.bean.ValidatorConfigBean;
 import org.eweb4j.mvc.validator.Validators;
 import org.eweb4j.mvc.validator.annotation.Equals;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 
 
 public class EqualsImpl implements ValidatorCreator {
@@ -26,11 +26,11 @@ public class EqualsImpl implements ValidatorCreator {
 
 		FieldConfigBean fcb = new FieldConfigBean();
 		fcb.setName(fieldName);
-		fcb.setMessage(StringUtil.parsePropValue(ann.mess()));
+		fcb.setMessage(CommonUtil.parsePropValue(ann.mess()));
 		ParamConfigBean pcb = new ParamConfigBean();
 		pcb.setName(Validators.EQUALS_TO_PARAM);
 		
-		String value = StringUtil.parsePropValue(ann.to());
+		String value = CommonUtil.parsePropValue(ann.to());
 		value = fieldName.substring(0, fieldName.lastIndexOf(".")+1) + value;
 		pcb.setValue(value);
 		

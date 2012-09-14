@@ -4,7 +4,7 @@ import org.eweb4j.mvc.config.bean.FieldConfigBean;
 import org.eweb4j.mvc.config.bean.ValidatorConfigBean;
 import org.eweb4j.mvc.validator.Validators;
 import org.eweb4j.mvc.validator.annotation.Email;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 
 
 public class EmailImpl implements ValidatorCreator {
@@ -25,7 +25,7 @@ public class EmailImpl implements ValidatorCreator {
 
 		FieldConfigBean fcb = new FieldConfigBean();
 		fcb.setName(fieldName);
-		fcb.setMessage(StringUtil.parsePropValue(ann.mess()));
+		fcb.setMessage(CommonUtil.parsePropValue(ann.mess()));
 
 		val.getField().add(fcb);
 

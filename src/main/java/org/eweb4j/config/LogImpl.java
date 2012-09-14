@@ -8,7 +8,7 @@ import java.io.IOException;
 import org.eweb4j.config.bean.LogConfigBean;
 import org.eweb4j.config.bean.LogsConfigBean;
 import org.eweb4j.util.FileUtil;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 
 public class LogImpl implements Log {
 	private Class<?> clazz;
@@ -39,7 +39,7 @@ public class LogImpl implements Log {
 			sb.append("[");
 			sb.append(LogLevel.level(level).toUpperCase());
 			sb.append("] ");
-			sb.append(StringUtil.getNowTime("HH:mm:ss"));
+			sb.append(CommonUtil.getNowTime("HH:mm:ss"));
 			sb.append(this.module.toLowerCase());
 			sb.append(" ~ ");
 			Exception e = new Exception(this.clazz.getName());
@@ -67,7 +67,7 @@ public class LogImpl implements Log {
 					if (file.length() / (1024 * 1024) >= Integer.parseInt(log
 							.getSize())) {
 						File tf = new File(file.getAbsolutePath() + "."
-								+ StringUtil.getNowTime("_MMddHHmmss"));
+								+ CommonUtil.getNowTime("_MMddHHmmss"));
 						FileUtil.copy(file, tf);
 						file.delete();
 						file = null;

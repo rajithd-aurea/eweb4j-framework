@@ -96,7 +96,7 @@ public class DeleteSqlCreator<T> {
 			idValue = map.get("idValue");
 		} else {
 			idField = ORMConfigBeanUtil.getIdField(clazz);
-			table = ORMConfigBeanUtil.getTable(clazz);
+			table = ORMConfigBeanUtil.getTable(clazz).replace(" "+clazz.getSimpleName().toLowerCase(), "");
 			idColumn = ORMConfigBeanUtil.getIdColumn(clazz);
 			ReflectUtil ru = new ReflectUtil(t);
 			Method method = ru.getGetter(idField);
@@ -123,7 +123,7 @@ public class DeleteSqlCreator<T> {
 	private String makeSQL(T t, String[] fields, String[] values)
 			throws SqlCreateException {
 		Class<?> clazz = t.getClass();
-		String table = ORMConfigBeanUtil.getTable(clazz);
+		String table = ORMConfigBeanUtil.getTable(clazz).replace(" "+clazz.getSimpleName().toLowerCase(), "");
 
 		StringBuilder condition = new StringBuilder();
 		String[] columns = ORMConfigBeanUtil.getColumns(clazz, fields);
@@ -141,7 +141,7 @@ public class DeleteSqlCreator<T> {
 
 	private String makeSQL(T t, String... fields) throws SqlCreateException {
 		Class<?> clazz = t.getClass();
-		String table = ORMConfigBeanUtil.getTable(clazz);
+		String table = ORMConfigBeanUtil.getTable(clazz).replace(" "+clazz.getSimpleName().toLowerCase(), "");
 		StringBuilder condition = new StringBuilder();
 		ReflectUtil ru = new ReflectUtil(t);
 

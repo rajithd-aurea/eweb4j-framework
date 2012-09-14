@@ -61,7 +61,7 @@ public class TestSelectSql {
 		String[] fields = { "master", "name" };
 		String sql = select.selectWhere(fields);
 		Assert.assertEquals(
-				"SELECT id, num, name, age, cate, master_id FROM t_pet WHERE master_id  =  '5'  AND name  =  'xiaobai'  ORDER BY id"
+				"SELECT pet.id, pet.num, pet.name, pet.age, pet.cate, pet.master_id, pet.user_id FROM t_pet pet WHERE master_id  =  '5'  AND name  =  'xiaobai'  ORDER BY id"
 						+ fieldAdd + " DESC ;", sql);
 		String[] values = { "4", "xiaobai" };
 		int likecate = 0;
@@ -75,7 +75,7 @@ public class TestSelectSql {
 		sql = select.selectWhere(fields, values, likecate, isLike, isNot, isOR,
 				orderField, ocate, currentPage, numPerPage);
 		Assert.assertEquals(
-				"SELECT id, num, name, age, cate, master_id FROM t_pet WHERE master_id  NOT LIKE  '%4%'  OR name  NOT LIKE  '%xiaobai%'  ORDER BY id"
+				"SELECT pet.id, pet.num, pet.name, pet.age, pet.cate, pet.master_id, pet.user_id FROM t_pet pet WHERE master_id  NOT LIKE  '%4%'  OR name  NOT LIKE  '%xiaobai%'  ORDER BY id"
 						+ fieldAdd + " DESC ;", sql);
 	}
 
@@ -84,7 +84,7 @@ public class TestSelectSql {
 		pet.setPetId(3L);
 		String sql = select.nextOne();
 		Assert.assertEquals(
-				"SELECT id, num, name, age, cate, master_id FROM t_pet WHERE id"
+				"SELECT pet.id, pet.num, pet.name, pet.age, pet.cate, pet.master_id, pet.user_id FROM t_pet pet WHERE id"
 						+ fieldAdd + " > 3 ORDER BY id" + fieldAdd
 						+ " ASC LIMIT 1;", sql);
 	}
@@ -94,7 +94,7 @@ public class TestSelectSql {
 		pet.setPetId(5L);
 		String sql = select.preOne();
 		Assert.assertEquals(
-				"SELECT id, num, name, age, cate, master_id FROM t_pet WHERE id"
+				"SELECT pet.id, pet.num, pet.name, pet.age, pet.cate, pet.master_id, pet.user_id FROM t_pet pet WHERE id"
 						+ fieldAdd + " < 5 ORDER BY id" + fieldAdd
 						+ " DESC LIMIT 1;", sql);
 	}
@@ -103,7 +103,7 @@ public class TestSelectSql {
 	public void testDivPageByWhere() {
 		String sql = select.divPage(2, 5, "age+0", 1, "xxx = 'ooo'");
 		Assert.assertEquals(
-				"SELECT id, num, name, age, cate, master_id FROM t_pet  WHERE xxx = 'ooo' ORDER BY age"
+				"SELECT pet.id, pet.num, pet.name, pet.age, pet.cate, pet.master_id, pet.user_id FROM t_pet pet  WHERE xxx = 'ooo' ORDER BY age"
 						+ fieldAdd + " ASC LIMIT 5, 5 ;", sql);
 	}
 
@@ -111,7 +111,7 @@ public class TestSelectSql {
 	public void testDivPage() {
 		String sql = select.divPage(1, 5, "age+0", 1);
 		Assert.assertEquals(
-				"SELECT id, num, name, age, cate, master_id FROM t_pet  ORDER BY age"
+				"SELECT pet.id, pet.num, pet.name, pet.age, pet.cate, pet.master_id, pet.user_id FROM t_pet pet  ORDER BY age"
 						+ fieldAdd + " ASC LIMIT 0, 5 ;", sql);
 	}
 
@@ -119,7 +119,7 @@ public class TestSelectSql {
 	public void testDivPageOrderByIdField() {
 		String sql = select.divPage(1, 5, 1);
 		Assert.assertEquals(
-				"SELECT id, num, name, age, cate, master_id FROM t_pet  ORDER BY id"
+				"SELECT pet.id, pet.num, pet.name, pet.age, pet.cate, pet.master_id, pet.user_id FROM t_pet pet  ORDER BY id"
 						+ fieldAdd + " ASC LIMIT 0, 5 ;", sql);
 	}
 
@@ -127,7 +127,7 @@ public class TestSelectSql {
 	public void testDivPageByWhereOrderByIdField() {
 		String sql = select.divPage(1, 5, 1, "ooo = 'xxx'");
 		Assert.assertEquals(
-				"SELECT id, num, name, age, cate, master_id FROM t_pet  WHERE ooo = 'xxx' ORDER BY id"
+				"SELECT pet.id, pet.num, pet.name, pet.age, pet.cate, pet.master_id, pet.user_id FROM t_pet pet  WHERE ooo = 'xxx' ORDER BY id"
 						+ fieldAdd + " ASC LIMIT 0, 5 ;", sql);
 	}
 
@@ -135,7 +135,7 @@ public class TestSelectSql {
 	public void testDivPageOrderByIdFieldDESC() {
 		String sql = select.divPage(1, 2);
 		Assert.assertEquals(
-				"SELECT id, num, name, age, cate, master_id FROM t_pet  ORDER BY id"
+				"SELECT pet.id, pet.num, pet.name, pet.age, pet.cate, pet.master_id, pet.user_id FROM t_pet pet  ORDER BY id"
 						+ fieldAdd + " DESC LIMIT 0, 2 ;", sql);
 	}
 
@@ -143,7 +143,7 @@ public class TestSelectSql {
 	public void testDivPageOrderByIdFieldDESCAndByWhere() {
 		String sql = select.divPage(1, 2, "xxx = 'ooo'");
 		Assert.assertEquals(
-				"SELECT id, num, name, age, cate, master_id FROM t_pet  WHERE xxx = 'ooo' ORDER BY id"
+				"SELECT pet.id, pet.num, pet.name, pet.age, pet.cate, pet.master_id, pet.user_id FROM t_pet pet  WHERE xxx = 'ooo' ORDER BY id"
 						+ fieldAdd + " DESC LIMIT 0, 2 ;", sql);
 	}
 
@@ -154,7 +154,7 @@ public class TestSelectSql {
 
 		String sql = select.selectWhere(fields, values, "age+0", 1, 2, 5);
 		Assert.assertEquals(
-				"SELECT id, num, name, age, cate, master_id FROM t_pet  WHERE name  =  '小黑'  AND age  =  '4'  ORDER BY age"
+				"SELECT pet.id, pet.num, pet.name, pet.age, pet.cate, pet.master_id, pet.user_id FROM t_pet pet  WHERE name  =  '小黑'  AND age  =  '4'  ORDER BY age"
 						+ fieldAdd + " ASC LIMIT 5, 5 ;", sql);
 	}
 
@@ -165,7 +165,7 @@ public class TestSelectSql {
 
 		String sql = select.selectWhereNot(fields, values, "age+0", -1, 1, 2);
 		Assert.assertEquals(
-				"SELECT id, num, name, age, cate, master_id FROM t_pet  WHERE name <> '小黑'  AND age <> '4'  ORDER BY age"
+				"SELECT pet.id, pet.num, pet.name, pet.age, pet.cate, pet.master_id, pet.user_id FROM t_pet pet  WHERE name <> '小黑'  AND age <> '4'  ORDER BY age"
 						+ fieldAdd + " DESC LIMIT 0, 2 ;", sql);
 	}
 
@@ -179,7 +179,7 @@ public class TestSelectSql {
 		pet.setMaster(master);
 		String sql = select.selectWhere(fields, "age+0", 1, 2, 5);
 		Assert.assertEquals(
-				"SELECT id, num, name, age, cate, master_id FROM t_pet  WHERE name  =  '小白'  AND age  =  '19'  AND master_id  =  '8'  ORDER BY age"
+				"SELECT pet.id, pet.num, pet.name, pet.age, pet.cate, pet.master_id, pet.user_id FROM t_pet pet  WHERE name  =  '小白'  AND age  =  '19'  AND master_id  =  '8'  ORDER BY age"
 						+ fieldAdd + " ASC LIMIT 5, 5 ;", sql);
 	}
 
@@ -190,7 +190,7 @@ public class TestSelectSql {
 		pet.setAge(19);
 		String sql = select.selectWhereNot(fields, "age+0", 1, 2, 5);
 		Assert.assertEquals(
-				"SELECT id, num, name, age, cate, master_id FROM t_pet  WHERE name <> '小白'  AND age <> '19'  ORDER BY age"
+				"SELECT pet.id, pet.num, pet.name, pet.age, pet.cate, pet.master_id, pet.user_id FROM t_pet pet  WHERE name <> '小白'  AND age <> '19'  ORDER BY age"
 						+ fieldAdd + " ASC LIMIT 5, 5 ;", sql);
 	}
 
@@ -201,7 +201,7 @@ public class TestSelectSql {
 
 		String sql = select.selectWhere(fields, values, 1, 2, 5);
 		Assert.assertEquals(
-				"SELECT id, num, name, age, cate, master_id FROM t_pet  WHERE name  =  '小黑'  AND age  =  '4'  ORDER BY id"
+				"SELECT pet.id, pet.num, pet.name, pet.age, pet.cate, pet.master_id, pet.user_id FROM t_pet pet  WHERE name  =  '小黑'  AND age  =  '4'  ORDER BY id"
 						+ fieldAdd + " ASC LIMIT 5, 5 ;", sql);
 	}
 
@@ -212,7 +212,7 @@ public class TestSelectSql {
 
 		String sql = select.selectWhereNot(fields, values, -1, 1, 2);
 		Assert.assertEquals(
-				"SELECT id, num, name, age, cate, master_id FROM t_pet  WHERE name <> '小黑'  AND age <> '4'  ORDER BY id"
+				"SELECT pet.id, pet.num, pet.name, pet.age, pet.cate, pet.master_id, pet.user_id FROM t_pet pet  WHERE name <> '小黑'  AND age <> '4'  ORDER BY id"
 						+ fieldAdd + " DESC LIMIT 0, 2 ;", sql);
 	}
 }

@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.eweb4j.mvc.action.annotation.Result;
 import org.eweb4j.mvc.config.bean.ResultConfigBean;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 
 /**
  * MVC.Result注解 工具类
@@ -28,9 +28,9 @@ public class ResultAnnUtil {
 		for (int a = 0; a < name.length; ++a) {
 			ResultConfigBean r = new ResultConfigBean();
 
-			r.setName(StringUtil.parsePropValue(name[a]));
-			r.setType(StringUtil.parsePropValue(type[a]));
-			r.setLocation(StringUtil.parsePropValue(location[a]));
+			r.setName(CommonUtil.parsePropValue(name[a]));
+			r.setType(CommonUtil.parsePropValue(type[a]));
+			r.setLocation(CommonUtil.parsePropValue(location[a]));
 			rList.add(r);
 		}
 

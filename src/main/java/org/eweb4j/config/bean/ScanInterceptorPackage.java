@@ -7,8 +7,11 @@ public class ScanInterceptorPackage {
 	private List<String> path = new ArrayList<String>();
 
 	public List<String> getPath() {
-		if (path.isEmpty())
+		if (path.isEmpty()){
 			path.add(".");
+			path.add("JAR:*");
+			path.add("AP:${RootPath}/target/classes");
+		}
 		return path;
 	}
 

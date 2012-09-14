@@ -352,7 +352,7 @@ public class JsonConverter {
 				format = "\"%s\":%s";
 				for (String name : ru.getFieldsName()) {
 					Method m = ru.getMethod("get"
-							+ StringUtil.toUpCaseFirst(name));
+							+ CommonUtil.toUpCaseFirst(name));
 					if (m != null) {
 						try {
 							json = JsonConverter.convertFromKeyValue(name, m

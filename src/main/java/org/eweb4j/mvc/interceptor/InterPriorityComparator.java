@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.eweb4j.mvc.config.bean.InterConfigBean;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 
 /**
  * 拦截器优先级，数字越大，优先级越低，数字越小，优先级越高。
@@ -20,11 +20,11 @@ public class InterPriorityComparator implements Comparator<InterConfigBean>{
 		String pr1 = ic1.getPriority();
 		String pr2 = ic2.getPriority();
 		int p1 = 0;
-		if (StringUtil.isNumeric(pr1))
+		if (CommonUtil.isNumeric(pr1))
 			p1 = Integer.parseInt(pr1);
 		
 		int p2 = 0;
-		if (StringUtil.isNumeric(pr2))
+		if (CommonUtil.isNumeric(pr2))
 			p2 = Integer.parseInt(pr2);
 		
 		int result = p2 - p1;

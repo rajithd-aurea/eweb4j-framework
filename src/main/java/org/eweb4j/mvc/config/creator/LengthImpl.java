@@ -5,7 +5,7 @@ import org.eweb4j.mvc.config.bean.ParamConfigBean;
 import org.eweb4j.mvc.config.bean.ValidatorConfigBean;
 import org.eweb4j.mvc.validator.Validators;
 import org.eweb4j.mvc.validator.annotation.Length;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 
 
 public class LengthImpl implements ValidatorCreator {
@@ -26,7 +26,7 @@ public class LengthImpl implements ValidatorCreator {
 
 		FieldConfigBean fcb = new FieldConfigBean();
 		fcb.setName(fieldName);
-		fcb.setMessage(StringUtil.parsePropValue(ann.mess()));
+		fcb.setMessage(CommonUtil.parsePropValue(ann.mess()));
 		
 		ParamConfigBean pcb = new ParamConfigBean();
 		pcb.setName(Validators.MIN_LENGTH_PARAM);

@@ -26,7 +26,7 @@ import org.eweb4j.config.bean.Prop;
 import org.eweb4j.i18n.Lang;
 import org.eweb4j.util.FileUtil;
 import org.eweb4j.util.RegexList;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 
 public class Props {
 
@@ -204,8 +204,8 @@ public class Props {
 					property = new String(property.getBytes("ISO-8859-1"), "UTF-8");
 				}
 
-				key = StringUtil.parseSingleProp(key, tmpHt);
-				property = StringUtil.parseSingleProp(property, tmpHt);
+				key = CommonUtil.parseSingleProp(key, tmpHt);
+				property = CommonUtil.parseSingleProp(property, tmpHt);
 				tmpHt.put(key, property);
 			}
 

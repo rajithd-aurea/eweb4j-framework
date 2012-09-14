@@ -36,7 +36,7 @@ import org.eweb4j.orm.config.bean.Property;
 import org.eweb4j.orm.dao.config.bean.DBInfoConfigBean;
 import org.eweb4j.util.ReflectUtil;
 import org.eweb4j.util.RegexList;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 
 /**
  * Check EWeb4J framework startup configuration files. Also included the ORM,
@@ -142,7 +142,7 @@ public class CheckConfigBean {
 					sb.append("当前您填写的：( level=").append(level).append(" )是错误的！它只能填写为：off|info|debug|warn|error|fatal|0|1|2|3|4|5 中的一种 ;").append("\n");
 				}
 
-				if (!StringUtil.isNumeric(log.getSize())) {
+				if (!CommonUtil.isNumeric(log.getSize())) {
 					sb.append("当前您填写的：( size=").append(log.getSize()).append(" )是错误的！它只能填写为数字，注意单位是“兆”（M）;").append("\n");
 				}
 			}
@@ -196,7 +196,7 @@ public class CheckConfigBean {
 					sb.append("当前您填写的：( level=").append(level).append(" )是错误的！它只能填写为：off|info|debug|warn|error|fatal|0|1|2|3|4|5 中的一种 ;").append("\n");
 				}
 
-				if (!StringUtil.isNumeric(log.getSize())) {
+				if (!CommonUtil.isNumeric(log.getSize())) {
 					sb.append("当前您填写的：( size=").append(log.getSize()).append(" )是错误的！它只能填写为数字，注意单位是“兆”（M）;").append("\n");
 				}
 			}
@@ -318,7 +318,7 @@ public class CheckConfigBean {
 							.append("\n");
 				}
 
-				if (!StringUtil.isNumeric(log.getSize())) {
+				if (!CommonUtil.isNumeric(log.getSize())) {
 					sb.append("当前您填写的：( size=").append(log.getSize())
 							.append(" )是错误的！它只能填写为数字，注意单位是“兆”（M）;")
 							.append("\n");

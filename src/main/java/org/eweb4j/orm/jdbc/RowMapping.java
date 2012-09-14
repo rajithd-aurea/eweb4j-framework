@@ -31,8 +31,7 @@ public class RowMapping {
 		return mapOneRow(rs, null, cls);
 	}
 
-	public static <T> List<T> mapRows(ResultSet rs, Class<T> cls)
-			throws Exception {
+	public static <T> List<T> mapRows(ResultSet rs, Class<T> cls) throws Exception {
 		List<T> list = new ArrayList<T>();
 		ResultSetMetaData rsmd = null;
 		T t = null;
@@ -51,7 +50,9 @@ public class RowMapping {
 					for (int i = 1; i <= columns.size(); ++i) {
 						String name = columns.get(i - 1);
 						name = name.toLowerCase();
-						map.put(name, rs.getObject(name));
+						Object obj = rs.getObject(name);
+						//System.out.println("rs->"+columns.get(i - 1)+"=>"+obj);
+						map.put(name, obj);
 					}
 					_list.add(map);
 				}

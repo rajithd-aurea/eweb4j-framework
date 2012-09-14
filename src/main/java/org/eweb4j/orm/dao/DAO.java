@@ -3,6 +3,8 @@ package org.eweb4j.orm.dao;
 import java.util.Collection;
 import java.util.Map;
 
+import org.eweb4j.orm.Page;
+
 /**
  * 这是一个通用的非常灵活的数据库操作接口。 使用方法： <code>
  *     <pre>
@@ -97,6 +99,8 @@ public interface DAO {
 	 * @return
 	 */
 	public DAO select(String... fields);
+	
+	public DAO select(Class<?>... classes);
 
 	/**
 	 * 这个方法需要搭配values(Object[] values)方法一起使用。
@@ -267,6 +271,22 @@ public interface DAO {
 	 * @return
 	 */
 	public DAO append(String str);
+	
+	public DAO alias(String alias);
+	
+	public DAO leftJoin(String... fieldNames);
+	
+	public DAO rightJoin(String... fieldNames);
+	
+	public DAO join(String fieldName);
+	
+	public DAO join(String fieldName, String alias);
+	
+	public DAO enableExpress(boolean flag);
+	
+	public DAO on();
+	
+	public DAO groupBy(String... fieldNames);
 
 	/**
 	 * 经常给where还有equal，in，notIn，等等一起用。作为条件子句要用到字段的时候。
@@ -356,6 +376,12 @@ public interface DAO {
 	 */
 	public DAO and(String field);
 
+	public DAO orderBy(String field);
+	
+	public DAO desc();
+	
+	public DAO asc();
+	
 	/**
 	 * 就是sql中的降序 order by xxx desc
 	 * 
@@ -486,4 +512,8 @@ public interface DAO {
 	
 	public String getDsName();
 
+	public <T> Page<T> getPage(int pageIndex, int pageSize);
+
+	public DAO order(String sortBy, String order);
+	
 }

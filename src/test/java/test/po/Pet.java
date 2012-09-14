@@ -11,6 +11,8 @@ import org.eweb4j.mvc.validator.annotation.Length;
 import org.eweb4j.mvc.validator.annotation.Required;
 import org.eweb4j.orm.Model;
 
+import test.User;
+
 @Entity
 @Table(name = "t_pet")
 public class Pet extends Model {
@@ -35,9 +37,11 @@ public class Pet extends Model {
 	@Column(name = "cate")
 	private String type;// 只能添加猫和狗两种类型
 
-	@Column(nullable=false)
 	@ManyToOne
 	private Master master;
+	
+	@ManyToOne
+	private User user;
 	
 	public String getNumber() {
 		return number;
@@ -87,11 +91,19 @@ public class Pet extends Model {
 		this.petId = petId;
 	}
 
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 	@Override
 	public String toString() {
 		return "Pet [petId=" + petId + ", number=" + number + ", name=" + name
 				+ ", age=" + age + ", type=" + type + ", master=" + master
-				+ "]";
+				+ ", user=" + user + "]";
 	}
 
 }

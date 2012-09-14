@@ -10,7 +10,7 @@ import org.eweb4j.config.Log;
 import org.eweb4j.config.LogFactory;
 import org.eweb4j.mvc.action.Validation;
 import org.eweb4j.mvc.config.bean.ValidatorConfigBean;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 
 public class ValidateExecution {
 
@@ -34,7 +34,7 @@ public class ValidateExecution {
 					try {
 						validator = (ValidatorIF) Class.forName(val.getClazz()).newInstance();
 					} catch (Exception e) {
-						log.error(StringUtil.getExceptionString(e));
+						log.error(CommonUtil.getExceptionString(e));
 					}
 			}
 

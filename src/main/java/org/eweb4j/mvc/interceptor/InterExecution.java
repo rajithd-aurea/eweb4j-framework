@@ -24,7 +24,7 @@ import org.eweb4j.mvc.config.bean.ActionConfigBean;
 import org.eweb4j.mvc.config.bean.InterConfigBean;
 import org.eweb4j.mvc.config.bean.Uri;
 import org.eweb4j.util.ReflectUtil;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -251,7 +251,7 @@ public class InterExecution {
 			String url = re.substring((RenderType.REDIRECT + ":").length());
 			String location = url;
 
-			this.context.getResponse().sendRedirect(StringUtil.replaceChinese2Utf8(location));
+			this.context.getResponse().sendRedirect(CommonUtil.replaceChinese2Utf8(location));
 
 			return;
 		} else if (re.startsWith(RenderType.ACTION + ":")) {

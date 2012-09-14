@@ -10,7 +10,7 @@ import org.eweb4j.orm.config.ORMConfigBeanUtil;
 import org.eweb4j.orm.dao.DAOException;
 import org.eweb4j.orm.jdbc.JdbcUtil;
 import org.eweb4j.orm.sql.SqlFactory;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 
 public class SelectDAOImpl implements SelectDAO {
 	private DataSource ds;
@@ -110,7 +110,7 @@ public class SelectDAOImpl implements SelectDAO {
 				T t = clazz.newInstance();
 				String sql = SqlFactory.getSelectSql(t, dbType).selectCount(ORMConfigBeanUtil.parseQuery(condition, clazz));
 				String str = String.valueOf(JdbcUtil.getObject(con, sql));
-				if (StringUtil.isNumeric(str)) {
+				if (CommonUtil.isNumeric(str)) {
 					result = Integer.parseInt(str);
 				}
 			}
@@ -164,8 +164,7 @@ public class SelectDAOImpl implements SelectDAO {
 		this.ds = ds;
 	}
 
-	public <T> long selectCount(Class<T> clazz, String condition,
-			Object... args) throws DAOException {
+	public <T> long selectCount(Class<T> clazz, String condition, Object... args) throws DAOException {
 		long result = -1;
 		Connection con = null;
 		try {
@@ -174,7 +173,7 @@ public class SelectDAOImpl implements SelectDAO {
 				T t = clazz.newInstance();
 				String sql = SqlFactory.getSelectSql(t, dbType).selectCount(ORMConfigBeanUtil.parseQuery(condition, clazz));
 				String str = String.valueOf(JdbcUtil.getObject(con, sql, args));
-				if (StringUtil.isNumeric(str)) {
+				if (CommonUtil.isNumeric(str)) {
 					result = Integer.parseInt(str);
 				}
 			}

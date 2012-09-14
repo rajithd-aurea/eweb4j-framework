@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import org.eweb4j.config.Log;
 import org.eweb4j.config.LogFactory;
 import org.eweb4j.orm.dao.DAOException;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 
 public class Transaction {
 
@@ -27,7 +27,7 @@ public class Transaction {
 			} catch (SQLException e1) {
 				throw new DAOException("roll back exception ", e);
 			}
-			String info = StringUtil.getExceptionString(e);
+			String info = CommonUtil.getExceptionString(e);
 			log.debug(info);
 			//throw new DAOException("transaction execute exception ", e);
 		} finally {

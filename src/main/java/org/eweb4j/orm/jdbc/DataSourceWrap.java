@@ -11,7 +11,7 @@ import org.eweb4j.config.Log;
 import org.eweb4j.config.LogFactory;
 import org.eweb4j.orm.dao.config.DAOConfigConstant;
 import org.eweb4j.orm.jdbc.transaction.ConThreadLocal;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 
 import com.mchange.v2.c3p0.DataSources;
 
@@ -70,7 +70,7 @@ public final class DataSourceWrap implements DataSource {
 
 			return con;
 		} catch (SQLException e) {
-			log.error(StringUtil.getExceptionString(e));
+			log.error(CommonUtil.getExceptionString(e));
 			// try {
 			// this.finalize();
 			// } catch (Throwable e1) {

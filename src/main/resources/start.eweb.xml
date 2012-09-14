@@ -42,7 +42,7 @@
 	      	</logs>
 			<scanActionPackage>
 				<path>.</path>
-				<path>AP:/D:/Java/JEE/EclipseWorkSpace/eweb4j/target/classes</path>
+				<path>AP:${RootPath}/target/classes</path>
 			</scanActionPackage>
 			<scanInterceptorPackage>
 	        	<path>.</path>

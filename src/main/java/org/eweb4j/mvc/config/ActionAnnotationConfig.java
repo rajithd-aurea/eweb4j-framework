@@ -28,7 +28,7 @@ import org.eweb4j.mvc.config.bean.ValidatorConfigBean;
 import org.eweb4j.mvc.config.creator.ValidatorUtil;
 import org.eweb4j.mvc.validator.annotation.Validate;
 import org.eweb4j.util.ReflectUtil;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 
 public class ActionAnnotationConfig extends ScanPackage{
 
@@ -59,7 +59,7 @@ public class ActionAnnotationConfig extends ScanPackage{
 			if (controlAnn == null && !simpleName.endsWith("Controller") && !simpleName.endsWith("Action") && !simpleName.endsWith("Control"))
 				return false;
 
-			String moduleName = StringUtil.toLowCaseFirst(simpleName.replace("Controller", "").replace("Control", ""));
+			String moduleName = CommonUtil.toLowCaseFirst(simpleName.replace("Controller", "").replace("Control", ""));
 			if (simpleName.endsWith("Action")) {
 				moduleName = "";
 			}
@@ -193,7 +193,7 @@ public class ActionAnnotationConfig extends ScanPackage{
 
             Path m_path = m.getAnnotation(Path.class);
             if (m_path != null) {
-                    uriMapping = StringUtil.parsePropValue(m_path.value());
+                    uriMapping = CommonUtil.parsePropValue(m_path.value());
             } else if (methodName.startsWith(ActionMethod.PREFIX)) {
                     uriMapping = methodName.substring(ActionMethod.PREFIX.length());
                     // doUriBindParam1AndParam2JoinUriAtPostOrGet
@@ -241,7 +241,7 @@ public class ActionAnnotationConfig extends ScanPackage{
                             String[] pathParams = bind.split(ActionMethod.AND);
                             StringBuilder pathParamSB = new StringBuilder();
                             for (int i = 0; i < pathParams.length; i++) {
-                                    pathParams[i] = StringUtil.toLowCaseFirst(pathParams[i]);
+                                    pathParams[i] = CommonUtil.toLowCaseFirst(pathParams[i]);
                                     pathParamSB.append("/{").append(pathParams[i]).append("}");
                             }
 
@@ -251,12 +251,12 @@ public class ActionAnnotationConfig extends ScanPackage{
                             acb.setPathParams(pathParams);
                     }
 
-                    uriMapping = StringUtil.toLowCaseFirst(uriMapping);
-                    uriMapping = StringUtil.hump2ohter(uriMapping, "-");
+                    uriMapping = CommonUtil.toLowCaseFirst(uriMapping);
+                    uriMapping = CommonUtil.hump2ohter(uriMapping, "-");
 
                     if (join.length() > 0) {
-                            join = StringUtil.toLowCaseFirst(join);
-                            join = StringUtil.hump2ohter(join, "-");
+                            join = CommonUtil.toLowCaseFirst(join);
+                            join = CommonUtil.hump2ohter(join, "-");
                             uriMapping = uriMapping + "/" + join;
                     }
 
@@ -448,7 +448,7 @@ public class ActionAnnotationConfig extends ScanPackage{
 		List<String> pcbs = null;
 		if (producesAnn != null) {
 			pcbs = new ArrayList<String>();
-			String producesStr = StringUtil.parsePropValue(producesAnn.value()[0]);
+			String producesStr = CommonUtil.parsePropValue(producesAnn.value()[0]);
 			pcbs.add(producesStr);
 		}
 
@@ -470,7 +470,7 @@ public class ActionAnnotationConfig extends ScanPackage{
 		ShowValMess cls_vm = cls.getAnnotation(ShowValMess.class);
 		String clsShowValErr = cls_vm == null ? "alert" : cls_vm.value();
 
-		clsShowValErr = StringUtil.parsePropValue(clsShowValErr);
+		clsShowValErr = CommonUtil.parsePropValue(clsShowValErr);
 
 		String methodShowValErr = clsShowValErr.trim().length() == 0 ? "alert" : clsShowValErr;// 验证器验证信息输出方式默认”alert“
 
@@ -525,7 +525,7 @@ public class ActionAnnotationConfig extends ScanPackage{
 		Path cls_path = cls.getAnnotation(Path.class);
 		String clazzUriMapping = cls_path == null ? moduleName : cls_path.value();
 
-		clazzUriMapping = StringUtil.parsePropValue(clazzUriMapping);
+		clazzUriMapping = CommonUtil.parsePropValue(clazzUriMapping);
 
 		return clazzUriMapping;
 	}

@@ -1,16 +1,21 @@
 package test.dao;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import junit.framework.Assert;
+
 import org.eweb4j.config.ConfigConstant;
 import org.eweb4j.config.EWeb4JConfig;
+import org.eweb4j.orm.config.ORMConfigBeanUtil;
 import org.eweb4j.orm.dao.DAO;
 import org.eweb4j.orm.dao.DAOFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import test.po.Master;
 import test.po.Pet;
 
 
@@ -30,6 +35,36 @@ public class DAOTest {
 	}
 
 	@Test
+	public void testCol() throws Exception{
+		Assert.assertEquals("pet.master_id", ORMConfigBeanUtil.getColumn(Master.class, "pets.master"));
+//		Collection<Object> ms = DAOFactory.getDAO(Master.class).enableExpress(false).select("*").join("pets").where().field("pet.name").equal("xiaohei").groupBy("pet.name").query();
+//		System.out.println(ms);
+		
+		DAO dao = DAOFactory.getDAO(Master.class);
+		Master master = dao
+						.alias("m")
+						.join("pets")
+						.join("pets.user", "p.u")
+						.selectAll()
+						.where()
+							.field("m.name").like("wei")
+							.and("p.name").likeLeft("xiao")
+							.and("u.account").equal("admin")
+						.groupBy("m.name")
+						.queryOne();
+		
+		System.out.println("master->"+master);
+		System.out.println("count->"+dao.count());
+		String sql = dao.toSql();
+		
+		List<Map> maps = DAOFactory.getSelectDAO().selectBySQL(Map.class, sql);
+		for (Map<String, Object> map : maps){
+			for (String key : map.keySet()){
+				System.out.println(key + "=>" + map.get(key));
+			}
+		}
+	}
+	
 	public void test() throws Exception {
 		dao.setTable("t_pet");
 		
@@ -56,7 +91,6 @@ public class DAOTest {
 		// }
 	}
 	
-	@Test
 	public void testDAO(){
 		DAO dao = DAOFactory.getDAO(Pet.class);
 		Collection<Pet> pets = dao.clear().selectAll().query(1,4);

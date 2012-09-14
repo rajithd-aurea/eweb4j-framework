@@ -5,7 +5,7 @@ import org.eweb4j.mvc.config.bean.ParamConfigBean;
 import org.eweb4j.mvc.config.bean.ValidatorConfigBean;
 import org.eweb4j.mvc.validator.Validators;
 import org.eweb4j.mvc.validator.annotation.Enumer;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 
 
 public class EnumImpl implements ValidatorCreator {
@@ -26,7 +26,7 @@ public class EnumImpl implements ValidatorCreator {
 
 		FieldConfigBean fcb = new FieldConfigBean();
 		fcb.setName(fieldName);
-		fcb.setMessage(StringUtil.parsePropValue(ann.mess()));
+		fcb.setMessage(CommonUtil.parsePropValue(ann.mess()));
 		ParamConfigBean pcb = new ParamConfigBean();
 		pcb.setName(Validators.ENUM_WORD_PARAM);
 		StringBuilder sb = new StringBuilder();
@@ -34,7 +34,7 @@ public class EnumImpl implements ValidatorCreator {
 			if (sb.length() > 0)
 				sb.append("#");
 			
-			sb.append(StringUtil.parsePropValue(s));
+			sb.append(CommonUtil.parsePropValue(s));
 		}
 		
 		pcb.setValue(sb.toString());

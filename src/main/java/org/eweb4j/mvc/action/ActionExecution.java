@@ -78,7 +78,7 @@ import org.eweb4j.util.ClassUtil;
 import org.eweb4j.util.FileUtil;
 import org.eweb4j.util.JsonConverter;
 import org.eweb4j.util.ReflectUtil;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.xml.BeanXMLUtil;
 import org.eweb4j.util.xml.XMLWriter;
 
@@ -180,7 +180,7 @@ public class ActionExecution {
 			if (ioc.value().trim().length() == 0)
 				beanId = type.getSimpleName();
 			else
-				beanId = StringUtil.parsePropValue(ioc.value());
+				beanId = CommonUtil.parsePropValue(ioc.value());
 
 			Method setter = ru.getSetter(f.getName());
 			if (setter == null)
@@ -567,7 +567,7 @@ public class ActionExecution {
 		}else if(File[].class.isAssignableFrom(retn.getClass())){
 			File[] files = (File[])retn;
 			
-			String fileName = StringUtil.getNowTime("yyyyMMddHHmmss")+ "_" + "download.zip";
+			String fileName = CommonUtil.getNowTime("yyyyMMddHHmmss")+ "_" + "download.zip";
 			
 			HttpServletResponse resp = this.context.getResponse();
 			resp.reset();
@@ -667,7 +667,7 @@ public class ActionExecution {
 			String url = re.substring((RenderType.REDIRECT + ":").length());
 			String location = url;
 
-			this.context.getResponse().sendRedirect(StringUtil.replaceChinese2Utf8(location));
+			this.context.getResponse().sendRedirect(CommonUtil.replaceChinese2Utf8(location));
 
 			return;
 		} else if (re.startsWith(RenderType.ACTION + ":")) {
@@ -732,7 +732,7 @@ public class ActionExecution {
 				String type = r.getType();
 				String location = r.getLocation();
 				if (RenderType.REDIRECT.equalsIgnoreCase(type)) {
-					this.context.getResponse().sendRedirect(StringUtil.replaceChinese2Utf8(location));
+					this.context.getResponse().sendRedirect(CommonUtil.replaceChinese2Utf8(location));
 					
 					return ;
 				} else if (RenderType.FORWARD.equalsIgnoreCase(type)) {
@@ -816,7 +816,7 @@ public class ActionExecution {
 		}
 
 		if (HttpMethod.GET.equalsIgnoreCase(method)) {
-			String pa = param == null ? "" : "?" + StringUtil.replaceChinese2Utf8(param);
+			String pa = param == null ? "" : "?" + CommonUtil.replaceChinese2Utf8(param);
 			context.getResponse().sendRedirect(baseUrl + location + pa);
 			return;
 		}
@@ -841,18 +841,18 @@ public class ActionExecution {
 		Upload upload = method.getAnnotation(Upload.class);
 		UploadConfigBean ucb = cb.getMvc().getUpload();
 		String tmpDir = ucb.getTmp();
-		int memoryMax = StringUtil.strToInt(StringUtil.parseFileSize(ucb.getMaxMemorySize())+"");
-		long sizeMax = StringUtil.parseFileSize(ucb.getMaxRequestSize());
+		int memoryMax = CommonUtil.strToInt(CommonUtil.parseFileSize(ucb.getMaxMemorySize())+"");
+		long sizeMax = CommonUtil.parseFileSize(ucb.getMaxRequestSize());
 		//String[] suffix = ucb.getSuffix().split(",");
 		if (upload != null){
 			if (upload.tmpDir().trim().length() > 0)
 				tmpDir = upload.tmpDir();
 			
 			if (upload.maxMemorySize().trim().length() > 0)
-				memoryMax =  StringUtil.strToInt(StringUtil.parseFileSize(upload.maxMemorySize())+"");
+				memoryMax =  CommonUtil.strToInt(CommonUtil.parseFileSize(upload.maxMemorySize())+"");
 			
 			if (upload.maxRequestSize().trim().length() > 0)
-				sizeMax = StringUtil.parseFileSize(upload.maxRequestSize());
+				sizeMax = CommonUtil.parseFileSize(upload.maxRequestSize());
 			
 			//if (upload.suffix().length > 0)
 				//suffix = upload.suffix();
@@ -889,7 +889,7 @@ public class ActionExecution {
 					if (fileName == null || fileName.trim().length() == 0)
 						continue;
 					
-					String stamp = StringUtil.getNowTime("yyyyMMddHHmmss");
+					String stamp = CommonUtil.getNowTime("yyyyMMddHHmmss");
 					File tmpFile = new File(tmpDir + File.separator + stamp + "_" + fileName);
 					item.write(tmpFile);
 					

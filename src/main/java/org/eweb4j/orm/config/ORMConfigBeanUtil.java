@@ -1,5 +1,6 @@
 package org.eweb4j.orm.config;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -13,8 +14,9 @@ import org.eweb4j.cache.ORMConfigBeanCache;
 import org.eweb4j.orm.PropType;
 import org.eweb4j.orm.config.bean.ORMConfigBean;
 import org.eweb4j.orm.config.bean.Property;
+import org.eweb4j.util.ClassUtil;
+import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.ReflectUtil;
-import org.eweb4j.util.StringUtil;
 
 public class ORMConfigBeanUtil {
 
@@ -50,13 +52,13 @@ public class ORMConfigBeanUtil {
 					else if (ff[1].equalsIgnoreCase("Null"))
 						ff[1] = "NULL";
 					
-					query = query.replace(field.trim(), " "+getColumn(clazz, StringUtil.toLowCaseFirst(ff[0]))+" IS " + ff[1] + " ");
+					query = query.replace(field.trim(), " "+getColumn(clazz, CommonUtil.toLowCaseFirst(ff[0]))+" IS " + ff[1] + " ");
 				}else if (field.contains("NotLike")){
-					query = query.replace(field, " "+getColumn(clazz, StringUtil.toLowCaseFirst(field.replace("NotLike", "")))+" NOT LIKE ? ");
+					query = query.replace(field, " "+getColumn(clazz, CommonUtil.toLowCaseFirst(field.replace("NotLike", "")))+" NOT LIKE ? ");
 				}else if (field.contains("Like")){
-					query = query.replace(field, " "+getColumn(clazz, StringUtil.toLowCaseFirst(field.replace("Like", "")))+" LIKE ? ");
+					query = query.replace(field, " "+getColumn(clazz, CommonUtil.toLowCaseFirst(field.replace("Like", "")))+" LIKE ? ");
 				}else
-					query = query.replace(field, " "+getColumn(clazz, StringUtil.toLowCaseFirst(field))+" = ? ");
+					query = query.replace(field, " "+getColumn(clazz, CommonUtil.toLowCaseFirst(field))+" = ? ");
 			}
 			
 			return query;
@@ -182,13 +184,13 @@ public class ORMConfigBeanUtil {
 
 		if (!(t instanceof Class) && Map.class.isAssignableFrom(clazz)) {
 			HashMap<String, Object> map = (HashMap<String, Object>) t;
-			return (String) map.get("table");
+			return (String) map.get("table") + " map";
 		}
 
 		ORMConfigBean ormBean = ORMConfigBeanCache.get(clazz.getName());
 		String table = ormBean == null ? clazz.getSimpleName() : ormBean
 				.getTable();
-		return table;
+		return table + " "+clazz.getSimpleName().toLowerCase();
 	}
 
 	public static <T> String getSelectAllColumn(T t) {
@@ -212,7 +214,7 @@ public class ORMConfigBeanUtil {
 			if (sb.length() > 0)
 				sb.append(", ");
 
-			sb.append(column);
+			sb.append(clazz.getSimpleName().toLowerCase()+"."+column);
 		}
 
 		String allColumn = sb.toString();
@@ -306,42 +308,87 @@ public class ORMConfigBeanUtil {
 
 		if (strs == null)
 			strs = new String[] { "" };
-
+		
 		String[] result = strs.clone();
 		List<String> list = new ArrayList<String>();
 
 		ORMConfigBean ormBean = ORMConfigBeanCache.get(clazz.getName());
 		if (ormBean != null) {
-			// String idColumn = getIdColumn(clazz);
-			for (int i = 0; i < strs.length; i++) {
-				boolean finished = false;
-				List<Property> properties = ormBean.getProperty();
-				for (Property p : properties) {
-					if (finished)
-						break;
-					switch (type) {
-					case 1:
-						if (p.getName().equals(strs[i])) {
-							result[i] = p.getColumn();
-							finished = true;
+			try{
+				ReflectUtil ru = new ReflectUtil(clazz);
+				// String idColumn = getIdColumn(clazz);
+				for (int i = 0; i < strs.length; i++) {
+					boolean finished = false;
+					List<Property> properties = ormBean.getProperty();
+					for (Property p : properties) {
+						if (finished)
+							break;
+						switch (type) {
+						case 1:
+							int dotIndex = strs[i].indexOf(".");
+							if (dotIndex > 0 && dotIndex < strs[i].length() -1){
+								String[] dots = strs[i].split("\\.");
+								StringBuilder builder = new StringBuilder();
+								Class<?> prevCls = null;
+								for (int j = 0; j < dots.length; j++){
+									String dot = dots[j];
+									Field field = ru.getField(dot);
+									if (field != null){
+										if (j == dots.length-1){
+											if (builder.length() > 0)
+												builder.append(".");
+											
+											builder.append(ORMConfigBeanUtil.getColumn(prevCls, dot));
+										}else{
+											Class<?> cls = ClassUtil.getGenericType(field);
+											if (cls != null){
+												if (ORMConfigBeanCache.get(cls.getName()) != null){
+													if (builder.length() > 0)
+														builder.append(".");
+													
+													builder.append(cls.getSimpleName().toLowerCase());
+													prevCls = cls;
+													ru = new ReflectUtil(cls);
+												}
+											}
+										}
+									}
+								}
+								
+								if (builder.length() > 0){
+									result[i] = builder.toString();
+									finished = true;
+									break;
+								}
+							}
+							if (p.getName().equals(strs[i])) {
+								result[i] = p.getColumn();
+								finished = true;
+							}
+							break;
+						case 2:
+							if (p.getColumn().equals(strs[i])) {
+								result[i] = p.getName();
+								finished = true;
+							}
+							break;
+						case 3:
+							list.add(p.getColumn());
+							break;
+						case 4:
+							list.add(p.getName());
 						}
-						break;
-					case 2:
-						if (p.getColumn().equals(strs[i])) {
-							result[i] = p.getName();
-							finished = true;
-						}
-						break;
-					case 3:
-						list.add(p.getColumn());
-						break;
-					case 4:
-						list.add(p.getName());
 					}
 				}
+			}catch(Exception e){
+				
 			}
 		}
 
 		return list.isEmpty() ? result : list.toArray(new String[] {});
+	}
+	public static void main(String[] args) {
+		String s = "likes.goods";
+		System.out.println(s.split("\\.")[1]);
 	}
 }

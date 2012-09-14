@@ -792,4 +792,8 @@ public class SelectSqlCreator<T> {
 	public void setT(T t) {
 		this.t = t;
 	}
+	
+	public void setTable(String table) {
+		this.table = table;
+	}
 }

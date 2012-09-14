@@ -13,7 +13,7 @@ import org.eweb4j.config.LogFactory;
 import org.eweb4j.config.bean.ConfigBean;
 import org.eweb4j.mvc.config.bean.ActionConfigBean;
 import org.eweb4j.util.FileUtil;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.xml.BeanXMLUtil;
 import org.eweb4j.util.xml.XMLReader;
 import org.eweb4j.util.xml.XMLWriter;
@@ -94,7 +94,7 @@ public class ActionConfig {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				error = rebuildXmlFile(configFile,StringUtil.getExceptionString(e));
+				error = rebuildXmlFile(configFile,CommonUtil.getExceptionString(e));
 			}
 		}
 
@@ -109,7 +109,7 @@ public class ActionConfig {
 		String error;
 		try {
 			// 保存为备份文件
-			File tf = new File(configFile.getAbsolutePath() + ".back" + StringUtil.getNowTime("_MMddHHmmss"));
+			File tf = new File(configFile.getAbsolutePath() + ".back" + CommonUtil.getNowTime("_MMddHHmmss"));
 			FileUtil.copy(configFile, tf);
 			log.debug("backup file->" + tf.getAbsolutePath());
 
@@ -126,7 +126,7 @@ public class ActionConfig {
 		} catch (Exception e1) {
 			e1.printStackTrace();
 			StringBuilder sb2 = new StringBuilder(ConfigErrCons.CANNOT_REPAIR_CONFIG_FILE);
-			sb2.append(StringUtil.getExceptionString(e1));
+			sb2.append(CommonUtil.getExceptionString(e1));
 
 			error = sb2.toString();
 			log.error(error);

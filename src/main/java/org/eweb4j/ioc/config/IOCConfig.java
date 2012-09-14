@@ -12,7 +12,7 @@ import org.eweb4j.config.LogFactory;
 import org.eweb4j.config.bean.ConfigBean;
 import org.eweb4j.ioc.config.bean.IOCConfigBean;
 import org.eweb4j.util.FileUtil;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.xml.BeanXMLUtil;
 import org.eweb4j.util.xml.XMLReader;
 import org.eweb4j.util.xml.XMLWriter;
@@ -77,7 +77,7 @@ public class IOCConfig {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				error = rebuildXmlFile(error + "|" + StringUtil.getExceptionString(e), configFile);
+				error = rebuildXmlFile(error + "|" + CommonUtil.getExceptionString(e), configFile);
 			}
 		}
 
@@ -90,7 +90,7 @@ public class IOCConfig {
 	private static String rebuildXmlFile(String error, File configFile) {
 		try {
 			// 保存为备份文件
-			File tf = new File(configFile.getAbsolutePath() + ".back" + StringUtil.getNowTime("_MMddHHmmss"));
+			File tf = new File(configFile.getAbsolutePath() + ".back" + CommonUtil.getNowTime("_MMddHHmmss"));
 			FileUtil.copy(configFile, tf);
 			log.debug("backup file ->" + tf.getAbsolutePath());
 
@@ -108,7 +108,7 @@ public class IOCConfig {
 			e1.printStackTrace();
 			StringBuilder sb2 = new StringBuilder( ConfigInfoCons.CANNOT_REPAIR_FILE);
 
-			sb2.append(StringUtil.getExceptionString(e1));
+			sb2.append(CommonUtil.getExceptionString(e1));
 			error = sb2.toString();
 
 			log.error(error);

@@ -7,8 +7,8 @@ import java.util.HashSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.FileUtil;
-import org.eweb4j.util.StringUtil;
 
 public abstract class ScanPackage {
 	
@@ -16,59 +16,86 @@ public abstract class ScanPackage {
 	
 	private Collection<String> packages = new HashSet<String>();
 	private Collection<String> jars = new HashSet<String>();
+	private Collection<String> classpaths = new HashSet<String>();
 	private String currentClassPath = null;
+	private Collection<String> scans = null;
+	private Collection<String> jarNames = new HashSet<String>();
 	
 	public String readAnnotation(Collection<String> scans) {
+		this.scans = scans;
 		String error = null;
 		
 		try {
 			if (scans == null)
 				return error;
 			
-			Collection<String> classpaths = new HashSet<String>();
-			
-			for (String scan : scans){
+			for (String scan : this.scans){
 				if (scan.startsWith("AP:")){
-					classpaths.add(scan.replace("AP:", ""));
+					classpaths.add(scan.replace("AP:", "").replace("${RootPath}", ConfigConstant.ROOT_PATH.subSequence(0, ConfigConstant.ROOT_PATH.length()-1)));
 				}else if (scan.startsWith("JAR:")){
-					
+					jarNames.add(scan.replace("JAR:", "").replace(".jar", ""));
 				}else{
 					packages.add(scan);
 				}
 			}
 			
-			Collection<String> paths = FileUtil.getClassPath();
-			for (String path : paths){
-				if (path.endsWith(".jar")){
-					final String name = "JAR:" + new File(path).getName().replace(".jar", "");
-					if (scans.contains(name)){
-						jars.add(path);
-					}
-				}else{
-					classpaths.add(path);
-				}
+			classpaths.add(FileUtil.getTopClassPath(ScanPackage.class));
+			classpaths.add(FileUtil.getLib());
+			log.debug("classpaths -> " + classpaths);
+			log.debug("jarNames -> "+jarNames);
+			for (String jar : FileUtil.getJars()){
+				filterScanJar(scans, jarNames, jar);
 			}
 			
 			// 扫描ClassPath中的*.class
-			for (String classpath : classpaths){
-				scanDir(classpath);
-			}
-			
+			scanClassPath();
+			// 这两个是有先后顺序的！
 			// 扫描jar包
+			log.debug("jars -> " + jars);
 			scanJar();
 
 		} catch (Exception e) {
-			error = StringUtil.getExceptionString(e);
+			error = CommonUtil.getExceptionString(e);
 			log.error(error);
 		}
 
 		return error;
 	}
 
+	private void filterScanJar(Collection<String> scans, Collection<String> jarNames, String jar) {
+		final String name = new File(jar).getName().replace(".jar", "");
+		for (String scan : jarNames){
+			if (scan.equals("*")){
+				jars.add(jar);
+			}else if (scan.startsWith("*") && scan.endsWith("*")){
+				if (name.contains(scan.subSequence(1, scan.lastIndexOf("*")))){
+					jars.add(jar);
+				}
+			}else if (scan.startsWith("*")){
+				if (name.endsWith(scan.substring(1)))
+					jars.add(jar);
+			}else if (scan.endsWith("*")){
+				if (name.startsWith(scan.substring(0, scan.lastIndexOf("*"))))
+					jars.add(jar);
+			}
+			
+			//equals
+			if (scans.contains(name)){
+				jars.add(jar);
+			}
+		}
+	}
+	
+	private void scanClassPath() throws Exception{
+		for (String classpath : classpaths){
+			scanDir(classpath);
+		}
+	}
+	
 	private void scanDir(String classDir) throws Exception {
 		File dir = null;
 		dir = new File(classDir);
-		log.debug("scan dir -> " + dir);
+		log.debug("scan classpath -> " + dir);
 		// 递归文件目录
 		if (dir.isDirectory()){
 			this.currentClassPath = dir.getAbsolutePath();
@@ -97,9 +124,8 @@ public abstract class ScanPackage {
 			else if (f.isFile()) {
 				if (!f.getName().endsWith(".class")){
 					if (f.getName().endsWith(".jar")){
-						final String jarName = f.getAbsolutePath();
-						jars.add(jarName);
-						log.debug(" jar add -> " + jarName);
+						final String jar = f.getAbsolutePath();
+						filterScanJar(scans, jarNames, jar);
 					}
 					continue;
 				}

@@ -1,13 +1,11 @@
 package org.eweb4j.config.bean;
 
-import java.io.File;
-
 import org.eweb4j.util.xml.AttrTag;
 
 public class UploadConfigBean {
 
 	@AttrTag
-	private String tmp = "${RootPath}" + File.separator + "WEB-INF/tmp";
+	private String tmp = "${RootPath}" + "/WEB-INF/tmp";
 
 	@AttrTag
 	private String maxMemorySize = "4M";

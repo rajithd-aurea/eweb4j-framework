@@ -31,7 +31,7 @@ import org.eweb4j.orm.jdbc.transaction.Trans;
 import org.eweb4j.orm.jdbc.transaction.Transaction;
 import org.eweb4j.orm.sql.Model2Table;
 import org.eweb4j.util.FileUtil;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.xml.BeanXMLUtil;
 import org.eweb4j.util.xml.XMLReader;
 import org.eweb4j.util.xml.XMLWriter;
@@ -267,7 +267,7 @@ public class EWeb4JConfig {
 											});
 											
 										}catch (Exception e){
-											String _error13 = StringUtil.getExceptionString(e);
+											String _error13 = CommonUtil.getExceptionString(e);
 											if (_error13 != null)
 												if (error == null)
 													error = _error13;
@@ -323,22 +323,22 @@ public class EWeb4JConfig {
 				try {
 					// 保存为备份文件
 					FileUtil.copy(file, new File(startXmlPath + ".back" + "_"
-							+ StringUtil.getNowTime("MMddHHmmss")));
+							+ CommonUtil.getNowTime("MMddHHmmss")));
 					XMLWriter writer = BeanXMLUtil.getBeanXMLWriter(file,ConfigBeanCreator.getConfigBean());
 					writer.setBeanName("eweb4j");
 					writer.setClass("eweb4j", ConfigBean.class);
 					writer.write();
 					String info = "configuration error, now it has repaired.";
-					error = StringUtil.getNowTime() + "EWeb4JConfig : " + info
-							+ "exception：" + StringUtil.getExceptionString(e);
+					error = CommonUtil.getNowTime() + "EWeb4JConfig : " + info
+							+ "exception：" + CommonUtil.getExceptionString(e);
 
 					log.error(info);
 
 					e.printStackTrace();
 				} catch (Exception e1) {
 					String info = "can not write any configuration";
-					error = StringUtil.getNowTime() + "EWeb4JConfig : " + info
-							+ "exception：" + StringUtil.getExceptionString(e1);
+					error = CommonUtil.getNowTime() + "EWeb4JConfig : " + info
+							+ "exception：" + CommonUtil.getExceptionString(e1);
 					log.fatal(info);
 
 					e1.printStackTrace();

@@ -12,7 +12,7 @@ import org.eweb4j.config.LogFactory;
 import org.eweb4j.config.bean.ConfigBean;
 import org.eweb4j.orm.config.bean.ORMConfigBean;
 import org.eweb4j.util.FileUtil;
-import org.eweb4j.util.StringUtil;
+import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.xml.BeanXMLUtil;
 import org.eweb4j.util.xml.XMLReader;
 import org.eweb4j.util.xml.XMLWriter;
@@ -73,7 +73,7 @@ public class ORMConfig {
 				
 			} catch (Exception e) {
 				e.printStackTrace();
-				error = rebuildXmlFile(configFile,StringUtil.getExceptionString(e));
+				error = rebuildXmlFile(configFile,CommonUtil.getExceptionString(e));
 			}
 		}
 		
@@ -91,7 +91,7 @@ public class ORMConfig {
 		String error;
 		try {
 			// 保存为备份文件
-			File tf = new File(configFile.getAbsolutePath() + ".back"+ StringUtil.getNowTime("_MMddHHmmss"));
+			File tf = new File(configFile.getAbsolutePath() + ".back"+ CommonUtil.getNowTime("_MMddHHmmss"));
 			FileUtil.copy(configFile, tf);
 			log.debug("backup file ->" + tf.getAbsolutePath());
 			XMLWriter writer = BeanXMLUtil.getBeanXMLWriter(configFile,ORMConfigBeanCreator.getORMBean());
@@ -105,7 +105,7 @@ public class ORMConfig {
 			log.error(error);
 		} catch (Exception e1) {
 			e1.printStackTrace();
-			StringBuilder sb3 = new StringBuilder(StringUtil.getExceptionString(e1));
+			StringBuilder sb3 = new StringBuilder(CommonUtil.getExceptionString(e1));
 			sb3.append(ConfigInfoCons.CANNOT_REPAIR_CONFIG_FILE);
 			error = sb3.toString();
 			log.error(error);

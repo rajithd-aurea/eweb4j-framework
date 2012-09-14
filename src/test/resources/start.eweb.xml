@@ -26,12 +26,14 @@
 			<logs>
 				<log console="1" level="debug" file="" size="5" />
 	      	</logs>
-	      	<ddl generate="true" run="true" ds="myDBInfo"/>
+	      	<ddl generate="true" run="false" ds="myDBInfo"/>
 			<dataSource>com.mchange.v2.c3p0.ComboPooledDataSource</dataSource>
 			<scanPojoPackage>
 				<path>.</path>
-				<path>JAR:persistence-api-1.0</path>
-				<path>AP:/D:/Java/JEE/EclipseWorkSpace/eweb4j/target/classes</path>
+				<path>JAR:*contains*</path>
+				<path>JAR:*endsWith</path>
+				<path>JAR:startsWith*</path>
+				<path>AP:${RootPath}/target/classes</path>
 			</scanPojoPackage>
 			<ormXmlFiles />
 			<dbInfoXmlFiles>
@@ -43,10 +45,10 @@
 			<logs>
 				<log console="1" level="debug" file="" size="5" />
 	      	</logs>
-	      	<upload tmp="${RootPath}\WEB-INF/tmp" maxMemorySize="4M" maxRequestSize="4M" />
+	      	<upload tmp="${RootPath}/WEB-INF/tmp" maxMemorySize="4M" maxRequestSize="4M" />
 			<scanActionPackage>
 				<path>.</path>
-				<path>AP:/D:/Java/JEE/EclipseWorkSpace/eweb4j/target/classes</path>
+				<path>AP:${RootPath}/target/classes</path>
 			</scanActionPackage>
 			<scanInterceptorPackage>
 	        	<path>.</path>

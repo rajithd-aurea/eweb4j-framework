@@ -44,7 +44,7 @@ public class InsertSqlCreator<T> {
 			T t = ts[i];
 			ReflectUtil ru = new ReflectUtil(t);
 			Class<?> clazz = t.getClass();
-			String table = ORMConfigBeanUtil.getTable(clazz);
+			String table = ORMConfigBeanUtil.getTable(clazz).replace(" "+clazz.getSimpleName().toLowerCase(), "");
 			StringBuilder columnSB = new StringBuilder();
 			StringBuilder valueSB = new StringBuilder();
 			for (int j = 0; j < fields[i].length; ++j) {
@@ -162,7 +162,7 @@ public class InsertSqlCreator<T> {
 				columns = fields;
 				values = (Object[]) map.get("values");
 			} else {
-				table = ORMConfigBeanUtil.getTable(clazz);
+				table = ORMConfigBeanUtil.getTable(clazz).replace(" "+clazz.getSimpleName().toLowerCase(), "");
 				idColumn = ORMConfigBeanUtil.getIdColumn(t.getClass());
 				fields = ORMConfigBeanUtil.getFields(clazz);
 				columns = ORMConfigBeanUtil.getColumns(clazz);

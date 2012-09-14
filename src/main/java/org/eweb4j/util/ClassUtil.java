@@ -6,8 +6,21 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
+import org.eweb4j.orm.dao.DAO;
+class Test{
+	
+}
 public class ClassUtil {
+	private List<Test> test;
+	public static List<DAO> xxx(){
+		return null;
+	}
+	
+	public static void main(String[] args) throws Exception{
+		System.out.println(getGenericType(ClassUtil.class.getDeclaredField("test")));
+	}
 	
 	public static Class<?> getPojoClass(Method method) {
 		Type type = method.getGenericReturnType();
@@ -37,9 +50,6 @@ public class ClassUtil {
 		return null;
 	}
 
-	public static void main(String[] args) throws ClassNotFoundException {
-		System.out.println(Class.forName("org.eweb4j.config.bean.Prop"));
-	}
 
 	public static boolean isPojo(Class<?> cls) {
 		if (cls == null)
@@ -297,8 +307,8 @@ public class ClassUtil {
 		
 		ParameterizedType pt = (ParameterizedType) f.getGenericType();
 		Type type = pt.getActualTypeArguments()[0];
-
-		Class<?> targetCls = ClassUtil.getPojoClass(type.toString().replace("class ", ""));
+		
+		Class<?> targetCls = ClassUtil.getPojoClass(type.toString().replace("class ", "").replace("interface ", "").trim());
 		if (targetCls == null)
 			return cls;
 
