@@ -24,14 +24,11 @@ import org.eweb4j.orm.dao.DAOFactory;
 import org.eweb4j.orm.dao.config.DAOConfig;
 import org.eweb4j.orm.dao.config.bean.DBInfoConfigBean;
 import org.eweb4j.orm.dao.update.UpdateDAO;
-import org.eweb4j.orm.jdbc.DataSourceWrap;
-import org.eweb4j.orm.jdbc.DataSourceWrapCache;
-import org.eweb4j.orm.jdbc.JdbcUtil;
 import org.eweb4j.orm.jdbc.transaction.Trans;
 import org.eweb4j.orm.jdbc.transaction.Transaction;
 import org.eweb4j.orm.sql.Model2Table;
-import org.eweb4j.util.FileUtil;
 import org.eweb4j.util.CommonUtil;
+import org.eweb4j.util.FileUtil;
 import org.eweb4j.util.xml.BeanXMLUtil;
 import org.eweb4j.util.xml.XMLReader;
 import org.eweb4j.util.xml.XMLWriter;
@@ -190,6 +187,7 @@ public class EWeb4JConfig {
 								else
 									error += error10;
 						}
+						
 						if ("true".equals(cb.getOrm().getOpen()) || "1".equals(cb.getOrm().getOpen())) {
 							// check the db connection
 							String error14 = DAOConfig.check();
@@ -215,74 +213,74 @@ public class EWeb4JConfig {
 								else
 									error += error11;
 							
-							// generate ddl
-							if ("true".equals(cb.getOrm().getDdl().getGenerate()) || "1".equals(cb.getOrm().getDdl().getGenerate())){
-								log.debug("ddl.generate -> true");
-								DBInfoConfigBean dcb = DBInfoConfigBeanCache.get(cb.getOrm().getDdl().getDs());
-								if (DBType.MYSQL_DB.equals(dcb.getDataBaseType())){
-									File sqlFile = new File(ConfigConstant.CONFIG_BASE_PATH()+ cb.getOrm().getDdl().getDs() + "-create.sql");
-									if (!sqlFile.exists()){
-										String errr12 = Model2Table.write(cb.getOrm().getDdl().getDs());
-										if (errr12 != null)
-											if (error == null)
-												error = errr12;
-											else
-												error += errr12;
-										else
-											log.debug("ddl.generate execute success -> " + sqlFile.getAbsolutePath());
-									}else{
-										log.warn("ddl.generate do not need to execute ->" + sqlFile.getAbsolutePath() + " is exists !");
-									}
-								}else{
-									log.warn("sorry only mysql db can use the ddl feature !");
-								}
-							}
-							
-							// run ddl
-							if ("true".equals(cb.getOrm().getDdl().getRun()) || "1".equals(cb.getOrm().getDdl().getRun())){
-								log.debug("ddl.run -> true");
-								DBInfoConfigBean dcb = DBInfoConfigBeanCache.get(cb.getOrm().getDdl().getDs());
-								if (dcb != null) {
+							if (error == null) {
+								// generate ddl
+								log.debug("ORM Module ok");
+								if ("true".equals(cb.getOrm().getDdl().getGenerate()) || "1".equals(cb.getOrm().getDdl().getGenerate())){
+									log.debug("ddl.generate -> true");
+									DBInfoConfigBean dcb = DBInfoConfigBeanCache.get(cb.getOrm().getDdl().getDs());
 									if (DBType.MYSQL_DB.equals(dcb.getDataBaseType())){
 										File sqlFile = new File(ConfigConstant.CONFIG_BASE_PATH()+ cb.getOrm().getDdl().getDs() + "-create.sql");
-										StringBuilder builder = new StringBuilder();
-										
-										BufferedReader sql_reader = null;
-										try {
-											sql_reader = new BufferedReader(new InputStreamReader(new FileInputStream(sqlFile)));
-											String line = null;
-											while ((line = sql_reader.readLine()) != null) {
-												builder.append(line);
-											}
-											final String[] sqls = builder.toString().split(";");
-											
-											final UpdateDAO dao = DAOFactory.getUpdateDAO(cb.getOrm().getDdl().getDs());
-											Transaction.execute(new Trans() {
-												public void run(Object... args) throws Exception {
-													for (String sql : sqls){
-														log.debug("ddl run -> " + sql);
-														dao.updateBySQL(sql);
-													}
-												}
-											});
-											
-										}catch (Exception e){
-											String _error13 = CommonUtil.getExceptionString(e);
-											if (_error13 != null)
-												if (error == null)
-													error = _error13;
-												else
-													error += _error13;
-										} finally {
-											if (sql_reader != null){
-												sql_reader.close();
-											}
+										if (!sqlFile.exists()){
+											String errr12 = Model2Table.write(cb.getOrm().getDdl().getDs());
+											if (errr12 != null)
+												error = errr12;
+											else
+												log.debug("ddl.generate execute success -> " + sqlFile.getAbsolutePath());
+										}else{
+											log.warn("ddl.generate do not need to execute ->" + sqlFile.getAbsolutePath() + " is exists !");
 										}
 									}else{
 										log.warn("sorry only mysql db can use the ddl feature !");
 									}
-								}else{
-									log.error("ddl.ds -> " + cb.getOrm().getDdl().getDs() + " not found !");
+								}
+								
+								// run ddl
+								if ("true".equals(cb.getOrm().getDdl().getRun()) || "1".equals(cb.getOrm().getDdl().getRun())){
+									log.debug("ddl.run -> true");
+									DBInfoConfigBean dcb = DBInfoConfigBeanCache.get(cb.getOrm().getDdl().getDs());
+									if (dcb != null) {
+										if (DBType.MYSQL_DB.equals(dcb.getDataBaseType())){
+											File sqlFile = new File(ConfigConstant.CONFIG_BASE_PATH()+ cb.getOrm().getDdl().getDs() + "-create.sql");
+											StringBuilder builder = new StringBuilder();
+											
+											BufferedReader sql_reader = null;
+											try {
+												sql_reader = new BufferedReader(new InputStreamReader(new FileInputStream(sqlFile)));
+												String line = null;
+												while ((line = sql_reader.readLine()) != null) {
+													builder.append(line);
+												}
+												final String[] sqls = builder.toString().split(";");
+												
+												final UpdateDAO dao = DAOFactory.getUpdateDAO(cb.getOrm().getDdl().getDs());
+												Transaction.execute(new Trans() {
+													public void run(Object... args) throws Exception {
+														for (String sql : sqls){
+															log.debug("ddl run -> " + sql);
+															dao.updateBySQL(sql);
+														}
+													}
+												});
+												
+											}catch (Exception e){
+												String _error13 = CommonUtil.getExceptionString(e);
+												if (_error13 != null)
+													if (error == null)
+														error = _error13;
+													else
+														error += _error13;
+											} finally {
+												if (sql_reader != null){
+													sql_reader.close();
+												}
+											}
+										}else{
+											log.warn("sorry only mysql db can use the ddl feature !");
+										}
+									}else{
+										log.error("ddl.ds -> " + cb.getOrm().getDdl().getDs() + " not found !");
+									}
 								}
 							}
 						}
