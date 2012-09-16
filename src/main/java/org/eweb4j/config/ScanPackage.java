@@ -44,7 +44,7 @@ public abstract class ScanPackage {
 			log.debug("classpaths -> " + classpaths);
 			log.debug("jarNames -> "+jarNames);
 			for (String jar : FileUtil.getJars()){
-				filterScanJar(scans, jarNames, jar);
+				filterScanJar(jarNames, jar);
 			}
 			
 			// 扫描ClassPath中的*.class
@@ -62,7 +62,7 @@ public abstract class ScanPackage {
 		return error;
 	}
 
-	private void filterScanJar(Collection<String> scans, Collection<String> jarNames, String jar) {
+	private void filterScanJar(Collection<String> jarNames, String jar) {
 		final String name = new File(jar).getName().replace(".jar", "");
 		for (String scan : jarNames){
 			if (scan.equals("*")){
@@ -80,7 +80,7 @@ public abstract class ScanPackage {
 			}
 			
 			//equals
-			if (scans.contains(name)){
+			if (scan.equals(name)){
 				jars.add(jar);
 			}
 		}
@@ -125,7 +125,7 @@ public abstract class ScanPackage {
 				if (!f.getName().endsWith(".class")){
 					if (f.getName().endsWith(".jar")){
 						final String jar = f.getAbsolutePath();
-						filterScanJar(scans, jarNames, jar);
+						filterScanJar(jarNames, jar);
 					}
 					continue;
 				}

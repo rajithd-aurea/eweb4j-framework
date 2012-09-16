@@ -30,9 +30,7 @@
 			<dataSource>com.mchange.v2.c3p0.ComboPooledDataSource</dataSource>
 			<scanPojoPackage>
 				<path>.</path>
-				<path>JAR:*contains*</path>
-				<path>JAR:*endsWith</path>
-				<path>JAR:startsWith*</path>
+				<path>JAR:persistence-api-1.0</path>
 				<path>AP:${RootPath}/target/classes</path>
 			</scanPojoPackage>
 			<ormXmlFiles />
