@@ -76,10 +76,12 @@ public class ActionAnnotationConfig extends ScanPackage{
 					obj = cls.newInstance();
 
 			} catch (Error er) {
+				er.printStackTrace();
 				log.debug("the action class new instance failued -> " + clsName + " | " + er.toString());
 				return false;
 			} catch (Exception e) {
-				log.debug("the action class new instance failued -> " + clsName + " | " + e.toString());
+				e.printStackTrace();
+				log.warn("the action class new instance failued -> " + clsName + " | " + e.toString());
 				return false;
 			}
 

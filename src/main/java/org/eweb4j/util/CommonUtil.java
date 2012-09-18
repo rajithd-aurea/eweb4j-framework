@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.eweb4j.cache.Props;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 
 public class CommonUtil {
 
@@ -147,8 +148,15 @@ public class CommonUtil {
 		return JSON.parseObject(json, clazz);
 	}
 
-	public static String toJson(Object object) {
-		return JSON.toJSONString(object);
+	public static String toJson(Object object){
+		return toJson(object, null);
+	}
+	
+	public static String toJson(Object object, SerializerFeature[] features) {
+		if (features == null || features.length == 0){
+			features = new SerializerFeature[]{SerializerFeature.WriteNullBooleanAsFalse, SerializerFeature.WriteNullListAsEmpty, SerializerFeature.WriteNullNumberAsZero, SerializerFeature.WriteNullStringAsEmpty};
+		}
+		return JSON.toJSONString(object, features);
 	}
 
 	public static String percent(long a, long b) {
@@ -855,7 +863,7 @@ public class CommonUtil {
 		return ip;
 	}
 
-	public static String getExceptionString(Exception e) {
+	public static String getExceptionString(Throwable e) {
 		StringBuilder sb = new StringBuilder(e.toString());
 		sb.append(getStack(e.getStackTrace()));
 		Throwable t = e.getCause();

@@ -41,7 +41,7 @@ import org.eweb4j.util.xml.XMLWriter;
  * 
  */
 public class EWeb4JConfig {
- 
+
 	private static Log log = LogFactory.getConfigLogger(EWeb4JConfig.class);
 
 	public synchronized static String start() {
@@ -53,11 +53,11 @@ public class EWeb4JConfig {
 
 		return startByAbFile(ConfigConstant.START_FILE_PATH());
 	}
-	
+
 	private synchronized static String startByAbFile(String aStartXmlPath) {
 		String startXmlPath = aStartXmlPath;
 		String error = null;
-		File file = null; 
+		File file = null;
 		boolean readXml = true;
 		if (ConfigConstant.SUCCESS_START.equals(String.valueOf(SingleBeanCache.get(ConfigConstant.SUCCESS_START)))) {
 			ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
@@ -158,7 +158,6 @@ public class EWeb4JConfig {
 						log.debug(info);
 						// ------log-------
 						// 继续验证其他组件配置信息
-
 						// properties
 						String error13 = null;
 						try {
@@ -178,170 +177,183 @@ public class EWeb4JConfig {
 							else
 								error += e.toString();
 						}
-
-						if ("true".equals(cb.getIoc().getOpen()) || "1".equals(cb.getIoc().getOpen())) {
+						
+						if (error == null)
+							log.debug("properties module -> ok");
+						
+						if (error == null && ("true".equals(cb.getIoc().getOpen()) || "1".equals(cb.getIoc().getOpen()))) {
 							String error10 = IOCConfig.check();
 							if (error10 != null)
-								if (error == null)
-									error = error10;
-								else
-									error += error10;
-						}
+								error = error10;
+							
+							if (error == null)
+								log.debug("ioc module -> ok");
+						}// end ioc module
 						
-						if ("true".equals(cb.getOrm().getOpen()) || "1".equals(cb.getOrm().getOpen())) {
+						if (error == null && ("true".equals(cb.getOrm().getOpen()) || "1".equals(cb.getOrm().getOpen()))) {
 							// check the db connection
 							String error14 = DAOConfig.check();
 							if (error14 != null)
-								if (error == null)
-									error = error14;
-								else
-									error += error14;
-
-							// read jpa annotation
-							String error10 = new PojoAnnotationConfig().readAnnotation(cb.getOrm().getScanPojoPackage().getPath());
-							if (error10 != null)
-								if (error == null)
-									error = error10;
-								else
-									error += error10;
-
-							// read orm xml file
-							String error11 = ORMConfig.check();
-							if (error11 != null)
-								if (error == null)
-									error = error11;
-								else
-									error += error11;
+								error = error14;
 							
-							if (error == null) {
-								// generate ddl
-								log.debug("ORM Module ok");
-								if ("true".equals(cb.getOrm().getDdl().getGenerate()) || "1".equals(cb.getOrm().getDdl().getGenerate())){
-									log.debug("ddl.generate -> true");
-									DBInfoConfigBean dcb = DBInfoConfigBeanCache.get(cb.getOrm().getDdl().getDs());
-									if (DBType.MYSQL_DB.equals(dcb.getDataBaseType())){
-										File sqlFile = new File(ConfigConstant.CONFIG_BASE_PATH()+ cb.getOrm().getDdl().getDs() + "-create.sql");
-										if (!sqlFile.exists()){
-											String errr12 = Model2Table.write(cb.getOrm().getDdl().getDs());
-											if (errr12 != null)
-												error = errr12;
-											else
-												log.debug("ddl.generate execute success -> " + sqlFile.getAbsolutePath());
-										}else{
-											log.warn("ddl.generate do not need to execute ->" + sqlFile.getAbsolutePath() + " is exists !");
-										}
-									}else{
-										log.warn("sorry only mysql db can use the ddl feature !");
-									}
-								}
+							if (error == null){
+								log.debug("orm.dao module -> ok");
+							
+								// read jpa annotation
+								String error10 = new PojoAnnotationConfig().readAnnotation(cb.getOrm().getScanPojoPackage().getPath());
+								if (error10 != null)
+										error = error10;
 								
-								// run ddl
-								if ("true".equals(cb.getOrm().getDdl().getRun()) || "1".equals(cb.getOrm().getDdl().getRun())){
-									log.debug("ddl.run -> true");
-									DBInfoConfigBean dcb = DBInfoConfigBeanCache.get(cb.getOrm().getDdl().getDs());
-									if (dcb != null) {
-										if (DBType.MYSQL_DB.equals(dcb.getDataBaseType())){
+								if (error == null){
+									log.debug("orm.pojo.annotation module -> ok");
+									
+									// read orm xml file
+									String error11 = ORMConfig.check();
+									if (error11 != null)
+										error = error11;
+									
+									if (error == null)
+										log.debug("orm.pojo.xml module -> ok");
+										
+									// generate ddl
+									if (error == null && ("true".equals(cb.getOrm().getDdl().getGenerate()) || "1".equals(cb.getOrm().getDdl().getGenerate()))) {
+										log.debug("ddl.generate -> true");
+										DBInfoConfigBean dcb = DBInfoConfigBeanCache.get(cb.getOrm().getDdl().getDs());
+										if (DBType.MYSQL_DB.equals(dcb.getDataBaseType())) {
 											File sqlFile = new File(ConfigConstant.CONFIG_BASE_PATH()+ cb.getOrm().getDdl().getDs() + "-create.sql");
-											StringBuilder builder = new StringBuilder();
-											
-											BufferedReader sql_reader = null;
-											try {
-												sql_reader = new BufferedReader(new InputStreamReader(new FileInputStream(sqlFile)));
-												String line = null;
-												while ((line = sql_reader.readLine()) != null) {
-													builder.append(line);
-												}
-												final String[] sqls = builder.toString().split(";");
-												
-												final UpdateDAO dao = DAOFactory.getUpdateDAO(cb.getOrm().getDdl().getDs());
-												Transaction.execute(new Trans() {
-													public void run(Object... args) throws Exception {
-														for (String sql : sqls){
-															log.debug("ddl run -> " + sql);
-															dao.updateBySQL(sql);
-														}
-													}
-												});
-												
-											}catch (Exception e){
-												String _error13 = CommonUtil.getExceptionString(e);
-												if (_error13 != null)
-													if (error == null)
-														error = _error13;
-													else
-														error += _error13;
-											} finally {
-												if (sql_reader != null){
-													sql_reader.close();
-												}
+											if (!sqlFile.exists()) {
+												String errr12 = Model2Table.write(cb.getOrm().getDdl().getDs());
+												if (errr12 != null) {
+													error = errr12;
+												} else
+													log.debug("ddl.generate execute success -> " + sqlFile.getAbsolutePath());
+											} else {
+												log.warn("ddl.generate do not need to execute ->" + sqlFile.getAbsolutePath() + " is exists !");
 											}
-										}else{
+										} else {
 											log.warn("sorry only mysql db can use the ddl feature !");
 										}
-									}else{
-										log.error("ddl.ds -> " + cb.getOrm().getDdl().getDs() + " not found !");
-									}
-								}
-							}
-						}
-						if ("true".equals(cb.getMvc().getOpen()) || "1".equals(cb.getMvc().getOpen())) {
+										
+										if (error == null)
+											log.debug("orm.ddl.generate module -> ok");
+									}// end orm.ddl.generate
+									
+									// run ddl
+									if (error == null && ("true".equals(cb.getOrm().getDdl().getRun()) || "1".equals(cb.getOrm().getDdl().getRun()))) {
+										log.debug("ddl.run -> true");
+										DBInfoConfigBean dcb = DBInfoConfigBeanCache.get(cb.getOrm().getDdl().getDs());
+										if (dcb != null) {
+											if (DBType.MYSQL_DB.equals(dcb.getDataBaseType())) {
+												File sqlFile = new File(ConfigConstant.CONFIG_BASE_PATH() + cb.getOrm().getDdl().getDs() + "-create.sql");
+												StringBuilder builder = new StringBuilder();
+		
+												BufferedReader sql_reader = null;
+												try {
+													sql_reader = new BufferedReader(new InputStreamReader(new FileInputStream(sqlFile)));
+													String line = null;
+													while ((line = sql_reader.readLine()) != null) {
+														builder.append(line);
+													}
+													final String[] sqls = builder.toString().split(";");
+		
+													final UpdateDAO dao = DAOFactory.getUpdateDAO(cb.getOrm().getDdl().getDs());
+													Transaction.execute(new Trans() {
+														public void run(Object... args) throws Exception {
+															for (String sql : sqls) {
+																log.debug("ddl run -> "+ sql);
+																dao.updateBySQL(sql);
+															}
+														}
+													});
+		
+												} catch (Exception e) {
+													String _error13 = CommonUtil.getExceptionString(e);
+													if (_error13 != null)
+														error = _error13;
+												} finally {
+													if (sql_reader != null) {
+														sql_reader.close();
+													}
+												}
+											} else {
+												log.warn("sorry only mysql db can use the ddl feature !");
+											}
+										} else {
+											log.error("ddl.ds -> " + cb.getOrm().getDdl().getDs() + " not found !");
+										}
+										
+										if (error == null)
+											log.debug("orm.ddl.run module -> ok");
+										
+									}//end orm.ddl.run
+								}// end if error == null -> pojo.annotation
+								
+							}// end dao ok
+							
+							if (error == null)
+								log.debug("orm module -> ok ");
+						}// end orm module
+						
+						if (error == null && ("true".equals(cb.getMvc().getOpen())|| "1".equals(cb.getMvc().getOpen()))) {
 							String error20 = new ActionAnnotationConfig().readAnnotation(cb.getMvc().getScanActionPackage().getPath());
 							if (error20 != null)
-								if (error == null)
-									error = error20;
-								else
-									error += error20;
-
-							String error11 = ActionConfig.check();
-							if (error11 != null)
-								if (error == null)
-									error = error11;
-								else
-									error += error11;
-
-							String error12 = new InterceptorAnnotationConfig().readAnnotation(cb.getMvc().getScanInterceptorPackage().getPath());
-							if (error12 == null)
-								error = error12;
-							else
-								error += error12;
+								error += error20;
 							
-							String error21 = InterceptorConfig.check();
-							if (error21 != null)
-								if (error == null)
-									error = error21;
-								else
-									error += error21;
-
-						}
-					}
-				}
-
+							if (error == null){
+								log.debug("mvc.action.annotation module -> ok");
+							
+								String error11 = ActionConfig.check();
+								if (error11 != null)
+									error = error11;
+								if (error == null){
+									log.debug("mvc.action.xml module -> ok");
+									
+									String error12 = new InterceptorAnnotationConfig().readAnnotation(cb.getMvc().getScanInterceptorPackage().getPath());
+									if (error12 != null)
+										error = error12;
+									if (error == null){
+										log.debug("mvc.action.interceptor.annotation module -> ok");
+										
+										String error21 = InterceptorConfig.check();
+										if (error21 != null)
+											error = error21;
+										if (error == null)
+											log.debug("mvc.action.interceptor.xml module -> ok");
+									}// end if interceptor annotation ok
+								}// end if action xml ok
+							}// end if action annotation ok
+							
+							if (error == null)
+								log.debug("mvc module -> ok");
+						}// end mvc module
+						
+					}// end if error == null
+					
+				}// end else cb != null
 			} catch (Exception e) {
 				// 重写配置文件
 				try {
 					// 保存为备份文件
-					FileUtil.copy(file, new File(startXmlPath + ".back" + "_"
-							+ CommonUtil.getNowTime("MMddHHmmss")));
+					FileUtil.copy(file, new File(startXmlPath + ".back" + "_" + CommonUtil.getNowTime("MMddHHmmss")));
 					XMLWriter writer = BeanXMLUtil.getBeanXMLWriter(file,ConfigBeanCreator.getConfigBean());
 					writer.setBeanName("eweb4j");
 					writer.setClass("eweb4j", ConfigBean.class);
 					writer.write();
 					String info = "configuration error, now it has repaired.";
-					error = CommonUtil.getNowTime() + "EWeb4JConfig : " + info
-							+ "exception：" + CommonUtil.getExceptionString(e);
+					error = CommonUtil.getNowTime() + "EWeb4JConfig : " + info + "exception：" + CommonUtil.getExceptionString(e);
 
 					log.error(info);
 
 					e.printStackTrace();
 				} catch (Exception e1) {
 					String info = "can not write any configuration";
-					error = CommonUtil.getNowTime() + "EWeb4JConfig : " + info
-							+ "exception：" + CommonUtil.getExceptionString(e1);
+					error = CommonUtil.getNowTime() + "EWeb4JConfig : " + info + "exception：" + CommonUtil.getExceptionString(e1);
 					log.fatal(info);
 
 					e1.printStackTrace();
 				}
 			}
+			
 			if (error != null) {
 				SingleBeanCache.clear();
 				ORMConfigBeanCache.clear();
@@ -350,25 +362,26 @@ public class EWeb4JConfig {
 
 				log.error(error);
 			} else {
-				SingleBeanCache.add(ConfigConstant.SUCCESS_START,ConfigConstant.SUCCESS_START);
+				SingleBeanCache.add(ConfigConstant.SUCCESS_START, ConfigConstant.SUCCESS_START);
 			}
-		}
+		}// end if (readXml)
 
 		return error;
 	}
 
 	public static void createStartXml(String path, ConfigBean cb)
 			throws Exception {
-		XMLWriter writer = BeanXMLUtil.getBeanXMLWriter(new File(ConfigConstant.CONFIG_BASE_PATH()+path), cb);
+		XMLWriter writer = BeanXMLUtil.getBeanXMLWriter(
+				new File(ConfigConstant.CONFIG_BASE_PATH() + path), cb);
 		writer.setBeanName("eweb4j");
 		writer.setClass("eweb4j", ConfigBean.class);
 		writer.write();
 	}
-	
-	public static String about(){
+
+	public static String about() {
 		return "EWeb4J Framework 1.9.1-SNAPSHOT";
 	}
-	
+
 	public static void setSTART_FILE_NAME(String START_FILE_NAME) {
 		if (START_FILE_NAME == null || START_FILE_NAME.trim().length() == 0)
 			return;

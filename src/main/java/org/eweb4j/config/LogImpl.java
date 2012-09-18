@@ -25,14 +25,15 @@ public class LogImpl implements Log {
 	public LogImpl() {
 	}
 
-	private void write(final int level, final String mess) {
+	private String write(final int level, final String mess) {
 		if (logs == null || logs.getLog() == null)
-			return;
+			return mess;
 
+		StringBuilder result = new StringBuilder();
 		for (LogConfigBean log : logs.getLog()) {
 			/* 如果当前给定的日志级别小于配置的允许级别，不予记录 */
 			if (LogLevel.level(log.getLevel()) == 0 || level < LogLevel.level(log.getLevel())) {
-				return;
+				return mess;
 			}
 
 			StringBuilder sb = new StringBuilder();
@@ -49,6 +50,8 @@ public class LogImpl implements Log {
 			sb.append(" ");
 			sb.append(mess);
 
+			result.append(sb.toString());
+			
 			if ("1".equals(log.getConsole()) || "true".equalsIgnoreCase(log.getConsole())){
 				if (level > 3)
 					System.err.println(sb.toString());
@@ -79,7 +82,6 @@ public class LogImpl implements Log {
 					bw.newLine();
 					bw.write(sb.toString());
 					bw.close();
-
 				}
 			} catch (Exception ex) {
 
@@ -93,26 +95,28 @@ public class LogImpl implements Log {
 				}
 			}
 		}
+		
+		return result.toString();
 	}
 
-	public void info(String info) {
-		this.write(1, info);
+	public String info(String info) {
+		return this.write(1, info);
 	}
 
-	public void debug(String debug) {
-		this.write(2, debug);
+	public String debug(String debug) {
+		return this.write(2, debug);
 	}
 
-	public void warn(String warn) {
-		this.write(3,  warn);
+	public String warn(String warn) {
+		return this.write(3,  warn);
 	}
 
-	public void error(String error) {
-		this.write(4,  error);
+	public String error(String error) {
+		return this.write(4,  error);
 	}
 
-	public void fatal(String fatal) {
-		this.write(5,  fatal);
+	public String fatal(String fatal) {
+		return this.write(5,  fatal);
 	}
 
 	public Class<?> getClazz() {

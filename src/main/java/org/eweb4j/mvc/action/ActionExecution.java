@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -36,6 +37,8 @@ import org.apache.commons.fileupload.FileUploadBase.InvalidContentTypeException;
 import org.apache.commons.fileupload.ProgressListener;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.VelocityEngine;
 import org.eweb4j.cache.ActionConfigBeanCache;
 import org.eweb4j.cache.SingleBeanCache;
 import org.eweb4j.config.ConfigConstant;
@@ -75,10 +78,10 @@ import org.eweb4j.orm.dao.update.UpdateDAO;
 import org.eweb4j.orm.jdbc.transaction.Trans;
 import org.eweb4j.orm.jdbc.transaction.Transaction;
 import org.eweb4j.util.ClassUtil;
+import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.FileUtil;
 import org.eweb4j.util.JsonConverter;
 import org.eweb4j.util.ReflectUtil;
-import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.xml.BeanXMLUtil;
 import org.eweb4j.util.xml.XMLWriter;
 
@@ -717,6 +720,31 @@ public class ActionExecution {
 
 			template.process(this.context.getModel(), this.context.getWriter());
 
+			return;
+		}else if (re.startsWith(RenderType.VELOCITY + ":")) {
+			String location = re.substring((RenderType.VELOCITY + ":").length());
+			File viewsDir = new File(ConfigConstant.ROOT_PATH + MVCConfigConstant.FORWARD_BASE_PATH);
+			 // 初始化Velocity模板引擎
+	        Properties p = new Properties();
+	        p.setProperty("resource.loader", "file");
+	        p.setProperty("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.FileResourceLoader");
+	        p.setProperty("file.resource.loader.path", viewsDir.getAbsolutePath());
+	        p.setProperty("file.resource.loader.cache", "true");
+	        p.setProperty("file.resource.loader.modificationCheckInterval", "2");
+	        p.setProperty("input.encoding", "utf-8");
+	        p.setProperty("output.encoding", "utf-8");
+	        VelocityEngine ve = new VelocityEngine(p);
+	        // Velocity获取模板文件，得到模板引用
+	        org.apache.velocity.Template t = ve.getTemplate(location);
+			VelocityContext velocityCtx = new VelocityContext();
+			for (Iterator<Entry<String, Object>> it = this.context.getModel().entrySet().iterator(); it.hasNext(); ){
+				Entry<String, Object> e = it.next();
+				velocityCtx.put(e.getKey(), e.getValue());
+			}
+			
+			// 将环境变量和输出部分结合
+	        t.merge(velocityCtx, this.context.getWriter());
+	        this.context.getWriter().flush();
 			return;
 		} else {
 			List<ResultConfigBean> results = this.context.getActionConfigBean().getResult();

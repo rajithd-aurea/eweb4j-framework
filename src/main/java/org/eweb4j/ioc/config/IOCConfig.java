@@ -34,11 +34,13 @@ public class IOCConfig {
 			return null;
 
 		List<String> iocXmlFilePaths = cb.getIoc().getIocXmlFiles().getPath();
+		log.debug("ioc xml files size -> " + iocXmlFilePaths.size());
 		for (String filePath : iocXmlFilePaths) {
 			if (filePath == null || filePath.length() == 0)
 				continue;
-
+			
 			File configFile = new File(ConfigConstant.CONFIG_BASE_PATH+ filePath);
+			log.debug("check ioc file -> " + configFile.getAbsolutePath());
 			try {
 				XMLReader reader = BeanXMLUtil.getBeanXMLReader(configFile);
 				reader.setBeanName("ioc");
@@ -47,6 +49,7 @@ public class IOCConfig {
 				if (iocList == null || iocList.isEmpty()) {
 					error = rebuildXmlFile(ConfigInfoCons.CANNOT_READ_CONFIG_FILE, configFile);
 				} else {
+					log.debug("read from the ioc file there has ->" + iocList.size() + " beans will be checked ");
 					for (IOCConfigBean ioc : iocList) {
 						String error1 = CheckConfigBean.checkIOC(ioc, filePath);
 						if (error1 != null)
@@ -54,25 +57,20 @@ public class IOCConfig {
 								error = error1;
 							else
 								error += error1;
-
+						
 						String error2 = CheckConfigBean.checkIOCJnject(ioc.getInject(), iocList, ioc.getId(), filePath);
 						if (error2 != null)
 							if (error == null)
 								error = error2;
 							else
 								error += error2;
-
 					}
 
 					if (error == null) {
 						for (IOCConfigBean ioc : iocList)
-							if (!"".equals(ioc.getClazz())) {
-								if (!"".equals(ioc.getId()))
-									IOCConfigBeanCache.add(ioc.getId(), ioc);
+							IOCConfigBeanCache.add(ioc.getId(), ioc);
 
-							}
-
-						log.debug(ConfigInfoCons.READ_CONFIG_FILE_SUCCESS);
+						log.debug(configFile.getAbsolutePath() + " beans has checked success ");
 					}
 				}
 			} catch (Exception e) {

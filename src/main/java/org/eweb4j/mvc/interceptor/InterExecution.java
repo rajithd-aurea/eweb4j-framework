@@ -7,9 +7,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.VelocityEngine;
 import org.eweb4j.cache.ActionConfigBeanCache;
 import org.eweb4j.cache.InterConfigBeanCache;
 import org.eweb4j.cache.SingleBeanCache;
@@ -23,8 +26,8 @@ import org.eweb4j.mvc.config.MVCConfigConstant;
 import org.eweb4j.mvc.config.bean.ActionConfigBean;
 import org.eweb4j.mvc.config.bean.InterConfigBean;
 import org.eweb4j.mvc.config.bean.Uri;
-import org.eweb4j.util.ReflectUtil;
 import org.eweb4j.util.CommonUtil;
+import org.eweb4j.util.ReflectUtil;
 
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -295,6 +298,31 @@ public class InterExecution {
 
 			template.process(context.getModel(), this.context.getWriter());
 
+			return;
+		} else if (re.startsWith(RenderType.VELOCITY + ":")) {
+			String location = re.substring((RenderType.VELOCITY + ":").length());
+			File viewsDir = new File(ConfigConstant.ROOT_PATH + MVCConfigConstant.FORWARD_BASE_PATH);
+			 // 初始化Velocity模板引擎
+	        Properties p = new Properties();
+	        p.setProperty("resource.loader", "file");
+	        p.setProperty("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.FileResourceLoader");
+	        p.setProperty("file.resource.loader.path", viewsDir.getAbsolutePath());
+	        p.setProperty("file.resource.loader.cache", "true");
+	        p.setProperty("file.resource.loader.modificationCheckInterval", "2");
+	        p.setProperty("input.encoding", "utf-8");
+	        p.setProperty("output.encoding", "utf-8");
+	        VelocityEngine ve = new VelocityEngine(p);
+	        // Velocity获取模板文件，得到模板引用
+	        org.apache.velocity.Template t = ve.getTemplate(location);
+			VelocityContext velocityCtx = new VelocityContext();
+			for (Iterator<Entry<String, Object>> it = this.context.getModel().entrySet().iterator(); it.hasNext(); ){
+				Entry<String, Object> e = it.next();
+				velocityCtx.put(e.getKey(), e.getValue());
+			}
+			
+			// 将环境变量和输出部分结合
+	        t.merge(velocityCtx, this.context.getWriter());
+	        this.context.getWriter().flush();
 			return;
 		} else{
 			this.context.getWriter().print(re);
