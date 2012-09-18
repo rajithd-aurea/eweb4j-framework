@@ -333,11 +333,15 @@ public class ORMConfigBeanUtil {
 								for (int j = 0; j < dots.length; j++){
 									String dot = dots[j];
 									Field field = ru.getField(dot);
-									if (field != null){
+									if (field == null && dot.equals(clazz.getSimpleName().toLowerCase())){
+										if (builder.length() > 0)
+											builder.append(".");
+										builder.append(dot);
+										prevCls = clazz;
+									}else if(field != null){
 										if (j == dots.length-1){
 											if (builder.length() > 0)
 												builder.append(".");
-											
 											builder.append(ORMConfigBeanUtil.getColumn(prevCls, dot));
 										}else{
 											Class<?> cls = ClassUtil.getGenericType(field);

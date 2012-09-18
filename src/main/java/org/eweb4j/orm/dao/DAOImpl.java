@@ -5,10 +5,12 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -45,7 +47,7 @@ public class DAOImpl implements DAO {
 	private List<Object> args = new ArrayList<Object>();;
 	private String dbType;
 	private DataSource ds;
-	private StringBuilder joins = new StringBuilder();
+	private Set<String> joins = new HashSet<String>();
 	private String table = null;
 	private String selectAllColumn;
 
@@ -115,30 +117,6 @@ public class DAOImpl implements DAO {
 		this.condition.append(" ").append(query).append(" ");
 		return this;
 	}
-
-	public static void main(String[] args) {
-		Map<String,String> aliasMap = new HashMap<String,String>();
-		aliasMap.put("l", "likes");
-		aliasMap.put("u", "user");
-		String fieldName = "l.u.name";
-		int dotIndex = fieldName.indexOf(".");
-		if (dotIndex > 0 && dotIndex < fieldName.length() -1){
-			String[] dots = fieldName.split("\\.");
-			StringBuilder builder = new StringBuilder();
-			for (String dot : dots){
-				if (aliasMap.containsKey(dot))
-					dot = aliasMap.get(dot);
-				if (builder.length() > 0)
-					builder.append(".");
-				
-				builder.append(dot);
-			}
-			if (builder.length() > 0)
-				fieldName = builder.toString();
-		}
-		
-		System.out.println(fieldName);
-	}
 	
 	public DAO field(String fieldName) {
 		String _fieldName = handleFieldAlias(fieldName);
@@ -171,7 +149,8 @@ public class DAOImpl implements DAO {
 		if (!this.express)
 			condition.append("'").append(value).append("' ");
 		else
-			condition.append(value);
+			condition.append(ORMConfigBeanUtil.getColumn(clazz, handleFieldAlias(String.valueOf(value))));
+		
 		return this;
 	}
 
@@ -181,7 +160,7 @@ public class DAOImpl implements DAO {
 		if (!this.express)
 			condition.append("'").append(value).append("' ");
 		else
-			condition.append(value);
+			condition.append(ORMConfigBeanUtil.getColumn(clazz, handleFieldAlias(String.valueOf(value))));
 		
 		return this;
 	}
@@ -192,7 +171,7 @@ public class DAOImpl implements DAO {
 		if (!this.express)
 			condition.append("'").append(value).append("' ");
 		else
-			condition.append(value);
+			condition.append(ORMConfigBeanUtil.getColumn(clazz, handleFieldAlias(String.valueOf(value))));
 		
 		return this;
 	}
@@ -203,7 +182,7 @@ public class DAOImpl implements DAO {
 		if (!this.express)
 			condition.append("'").append(value).append("' ");
 		else
-			condition.append(value);
+			condition.append(ORMConfigBeanUtil.getColumn(clazz, handleFieldAlias(String.valueOf(value))));
 		
 		return this;
 	}
@@ -214,7 +193,7 @@ public class DAOImpl implements DAO {
 		if (!this.express)
 			condition.append("'").append(value).append("' ");
 		else
-			condition.append(value);
+			condition.append(ORMConfigBeanUtil.getColumn(clazz, handleFieldAlias(String.valueOf(value))));
 		
 		return this;
 	}
@@ -329,8 +308,14 @@ public class DAOImpl implements DAO {
 	public long count(){
 		final String query = this.condition.toString().replace("WHERE", "").replace("'?'", "?");
 		String _table = this.table;
-		if (this.joins != null && this.joins.length() > 0){
-			_table = this.table + ", " + this.joins;
+		if (this.joins != null && !this.joins.isEmpty()){
+			StringBuilder sb = new StringBuilder();
+			for (String j : joins){
+				if (sb.length() > 0)
+					sb.append(", ");
+				sb.append(j);
+			}
+			_table = this.table + ", " + sb.toString();
 		}
 		
 		final String sql = "SELECT COUNT(*) as count FROM " + _table + " WHERE " + ORMConfigBeanUtil.parseQuery(query, clazz);
@@ -370,14 +355,26 @@ public class DAOImpl implements DAO {
 			}
 			
 			SelectSqlCreator<Object> select =  SqlFactory.getSelectSql(obj, dbType);
-			if (this.joins != null && this.joins.length() > 0){
-				select.setTable(this.table + ", " + this.joins);
+			if (this.joins != null && !this.joins.isEmpty()){
+				StringBuilder sb = new StringBuilder();
+				for (String j : joins){
+					if (sb.length() > 0)
+						sb.append(", ");
+					sb.append(j);
+				}
+				select.setTable(this.table + ", " + sb.toString());
 			}
 			sql = select.divPage(page, length, orderField, oType, query.replace("WHERE", ""));
 		} catch (Exception e) {
 			String _table = this.table;
-			if (this.joins != null && this.joins.length() > 0){
-				_table = this.table + ", " + this.joins;
+			if (this.joins != null && !this.joins.isEmpty()){
+				StringBuilder sb = new StringBuilder();
+				for (String j : joins){
+					if (sb.length() > 0)
+						sb.append(", ");
+					sb.append(j);
+				}
+				_table = this.table + ", " + sb.toString();
 			}
 			
 			sql = this.sql.append(orderStr).append(" LIMIT ").append((page - 1) * length).append(", ").append(length).toString().replace("${_TABLES_}", _table).replace("${_where_}", query);
@@ -612,13 +609,24 @@ public class DAOImpl implements DAO {
 	}
 
 	public DAO likeLeft(Object value) {
-		this.condition.append(" LIKE '").append(value).append("%' ");
+		this.condition.append(" LIKE ");
+		
+		if (!this.express)
+			condition.append("'").append(value).append("%' ");
+		else
+			condition.append(ORMConfigBeanUtil.getColumn(clazz, handleFieldAlias(String.valueOf(value))));
 		
 		return this;
 	}
 
 	public DAO likeRight(Object value) {
-		this.condition.append(" LIKE '%").append(value).append("' ");
+		this.condition.append(" LIKE ");
+		
+		if (!this.express)
+			condition.append("'%").append(value).append("' ");
+		else
+			condition.append(ORMConfigBeanUtil.getColumn(clazz, handleFieldAlias(String.valueOf(value))));
+		
 		return this;
 	}
 
@@ -628,7 +636,7 @@ public class DAOImpl implements DAO {
 		if (!this.express)
 			condition.append("'%").append(value).append("%' ");
 		else
-			condition.append(value);
+			condition.append(ORMConfigBeanUtil.getColumn(clazz, handleFieldAlias(String.valueOf(value))));
 		
 		return this;
 	}
@@ -644,7 +652,7 @@ public class DAOImpl implements DAO {
 		this.args.clear();
 		this.orderStr = "";
 		this.joins = null;
-		this.joins = new StringBuilder();
+		this.joins = new HashSet<String>();
 		this.express = false;
 		this.aliasMap = null;
 		this.aliasMap = new HashMap<String, String>();
@@ -663,7 +671,10 @@ public class DAOImpl implements DAO {
 			if (sb.length() > 0)
 				sb.append(", ");
 
-			sb.append("'").append(o).append("'");
+			if (!this.express)
+				sb.append("'").append(o).append("'");
+			else
+				sb.append(ORMConfigBeanUtil.getColumn(clazz, handleFieldAlias(String.valueOf(o))));
 		}
 
 		this.condition.append(sb.toString());
@@ -684,7 +695,10 @@ public class DAOImpl implements DAO {
 			if (sb.length() > 0)
 				sb.append(", ");
 
-			sb.append("'").append(o).append("'");
+			if (!this.express)
+				sb.append("'").append(o).append("'");
+			else
+				sb.append(ORMConfigBeanUtil.getColumn(clazz, handleFieldAlias(String.valueOf(o))));
 		}
 
 		this.condition.append(sb.toString());
@@ -714,8 +728,14 @@ public class DAOImpl implements DAO {
 
 	public String toSql() {
 		String _table = this.table;
-		if (this.joins != null && this.joins.length() > 0){
-			_table = this.table + ", " + this.joins;
+		if (this.joins != null && !this.joins.isEmpty()){
+			StringBuilder sb = new StringBuilder();
+			for (String j : joins){
+				if (sb.length() > 0)
+					sb.append(", ");
+				sb.append(j);
+			}
+			_table = this.table + ", " + sb.toString();
 		}
 		
 		return sql.append(orderStr).toString().replace("${_TABLES_}", _table).replace("${_where_}", condition.toString()).replace("'?'", "?");
@@ -774,6 +794,7 @@ public class DAOImpl implements DAO {
 	}
 
 	public DAO rightJoin(String... fieldNames) {
+		
 		return this;
 	}
 
@@ -803,37 +824,32 @@ public class DAOImpl implements DAO {
 	}
 
 	private void handleJoin(String _fieldName, String _alias) {
-		int dotIndex = _fieldName.indexOf(".");
-		if (dotIndex > 0 && dotIndex < _fieldName.length() -1){
-			String[] fDots = _fieldName.split("\\.");
-			String[] aDots = _alias.split("\\.");
-			Class<?> currentClazz = this.clazz;
-			for (int i = 0; i < fDots.length; i++){
-				String fieldName = fDots[i];
-				String alias = aDots[i];
-			
-				ReflectUtil ru = null;
-				try {
-					ru = new ReflectUtil(currentClazz);
-					Field field = ru.getField(fieldName);
-					if (field == null)
-						throw new Exception("field->"+fieldName+" invalid");
-					Class<?> cls = ClassUtil.getGenericType(field);
-					if (cls == null)
-						throw new Exception("can not get the field->"+fieldName+" class");
-					if (!ORMConfigBeanCache.containsKey(cls.getName()))
-						throw new Exception("field->" + fieldName + cls.getName() + " is not a entity");
-					
-					String table = ORMConfigBeanUtil.getTable(cls);
-					if (joins.length() > 0)
-						joins.append(", ");
-					
-					joins.append(table);
-					aliasMap .put(alias, fieldName);
-					currentClazz = cls;
-				} catch (Exception e){
-					log.error(e.toString());
-				}
+		String[] fDots = _fieldName.split("\\.");
+		String[] aDots = _alias.split("\\.");
+		Class<?> currentClazz = this.clazz;
+		for (int i = 0; i < fDots.length; i++){
+			String fieldName = fDots[i];
+			String alias = aDots[i];
+		
+			ReflectUtil ru = null;
+			try {
+				ru = new ReflectUtil(currentClazz);
+				Field field = ru.getField(fieldName);
+				if (field == null)
+					throw new Exception("field->"+fieldName+" invalid");
+				Class<?> cls = ClassUtil.getGenericType(field);
+				if (cls == null)
+					throw new Exception("can not get the field->"+fieldName+" class");
+				if (!ORMConfigBeanCache.containsKey(cls.getName()))
+					throw new Exception("field->" + fieldName + cls.getName() + " is not a entity");
+				
+				String table = ORMConfigBeanUtil.getTable(cls);
+				
+				joins.add(table);
+				aliasMap.put(alias, fieldName);
+				currentClazz = cls;
+			} catch (Exception e){
+				log.error(e.toString());
 			}
 		}
 	}

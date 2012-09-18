@@ -380,7 +380,7 @@ public class JdbcUtil {
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("execute sql：").append(sqls[i]);
-		sb.append("affected rows：").append(result[i]).append(";");
+		sb.append(" affected rows：").append(result[i]).append(";");
 		log.debug(sb.toString());
 	}
 
@@ -398,7 +398,7 @@ public class JdbcUtil {
 		StringBuilder sb = new StringBuilder();
 		int count = list == null ? 0 : list.size();
 		sb.append("execute sql：").append(sql);
-		sb.append("affected rows：").append(count).append(";");
+		sb.append(" affected rows：").append(count).append(";");
 		log.debug(sb.toString());
 	}
 
@@ -406,7 +406,7 @@ public class JdbcUtil {
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("execute sql：").append(sql);
-		sb.append("result rows：").append(result.size()).append(";");
+		sb.append(" result rows：").append(result.size()).append(";");
 		log.debug(sb.toString());
 	}
 
