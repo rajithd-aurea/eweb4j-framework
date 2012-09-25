@@ -2,6 +2,7 @@ package test.po;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
@@ -37,7 +38,7 @@ public class Pet extends Model<Pet> {
 	@Column(name = "cate")
 	private String type;// 只能添加猫和狗两种类型
 
-	@ManyToOne
+	@ManyToOne(fetch=FetchType.LAZY)
 	private Master master;
 	
 	@ManyToOne

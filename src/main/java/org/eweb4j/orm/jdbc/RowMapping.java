@@ -137,12 +137,12 @@ public class RowMapping {
 								continue;
 
 							Field field = ru.getField(p.getName());
+							
 							Class<?> tarClass = field.getType();
 
 							String tarFKField = null;
 
 							tarFKField = ORMConfigBeanUtil.getIdField(tarClass);
-
 							Object tarObj = tarClass.newInstance();
 							tarObj = ClassUtil.injectFieldValue(tarObj,tarFKField, new String[] { v });
 							
@@ -157,6 +157,7 @@ public class RowMapping {
 						}
 
 					}
+					
 					list.add(t);
 				}
 			}
@@ -165,8 +166,7 @@ public class RowMapping {
 		return list.isEmpty() ? null : list;
 	}
 
-	public static <T> T mapOneRow(ResultSet rs, ResultSetMetaData rsmd,
-			Class<T> cls) throws Exception {
+	public static <T> T mapOneRow(ResultSet rs, ResultSetMetaData rsmd, Class<T> cls) throws Exception {
 		List<T> list = mapRows(rs, cls);
 		return list == null ? null : list.get(0);
 	}

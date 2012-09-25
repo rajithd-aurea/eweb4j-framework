@@ -34,7 +34,6 @@ public class DAOTest {
 		dao = DAOFactory.getDAO(Map.class);
 	}
 
-	@Test
 	public void testCol() throws Exception{
 		Assert.assertEquals("pet.master_id", ORMConfigBeanUtil.getColumn(Master.class, "pets.master"));
 //		Collection<Object> ms = DAOFactory.getDAO(Master.class).enableExpress(false).select("*").join("pets").where().field("pet.name").equal("xiaohei").groupBy("pet.name").query();
@@ -91,9 +90,17 @@ public class DAOTest {
 		// }
 	}
 	
+	@Test
 	public void testDAO(){
 		DAO dao = DAOFactory.getDAO(Pet.class);
-		Collection<Pet> pets = dao.clear().selectAll().query(1,4);
-		System.out.println(pets);
+		Pet pet = dao.clear()
+					.fetch("master")
+					.unfetch("user")
+					.selectAll()
+					.where()
+						.field("id").equal(5)
+					.queryOne();
+		//System.out.println(pet);
+		System.out.println("fck!");
 	}
 }

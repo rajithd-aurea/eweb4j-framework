@@ -86,13 +86,14 @@ public class InterExecution {
 
 			List<Uri> uris = inter.getUri();
 			final int size = uris.size();
-			int result = 1;
+			boolean canProcess = false;// 默认不能处理
 			
 			for (int i = 0; i < size; i++) {
 				Uri u = uris.get(i);
 				String type = u.getType();
 				String value = u.getValue();
-				int c = 1;
+				
+				boolean found = true;// 默认找到
 				
 				if ("start".equalsIgnoreCase(type) && uri.startsWith(value))
 					// 以url开头
@@ -110,9 +111,8 @@ public class InterExecution {
 					// 正则匹配
 					;
 				else if ("actions".equalsIgnoreCase(type)) {
-
 					if (!findActionUriMapping())
-						c = 0;
+						found = false;
 
 				} else if ("!start".equalsIgnoreCase(type) && !uri.startsWith(value))
 					// 不以url开头
@@ -132,42 +132,50 @@ public class InterExecution {
 					;
 				else if ("!actions".equalsIgnoreCase(type)) {
 
-					if (ActionConfigBeanCache.containsKey(uri) || (ActionConfigBeanCache.getByMatches(uri,context.getHttpMethod())) != null) {
-						// 找到了action 与当前访问的uri映射
-						c = 0;
-					}
+					if (ActionConfigBeanCache.containsKey(uri) || (ActionConfigBeanCache.getByMatches(uri,context.getHttpMethod())) != null) 
+						found = false;
 				} else if ("*".equals(type)) {
 					// 所有都匹配
 					;
 				} else
-					c = 0;
+					found = false;
 
-				if (isOR)
-					result += c;
-				else {
-					if (c == 0)
+				log.debug("uri -> " +value+ " found -> " + found);
+				
+				// 如果是 或者 
+				if (isOR){
+					// 如果找到一个规则符合，就可以执行了。
+					if (found){
+						canProcess = true;
 						break;
-
-					result *= c;
+					}
+				}else {
+					// 如果是 并且
+					if (!found){
+						//只要找到一个规则不符合，就退出，且不处理
+						canProcess = false;
+						break;
+					}else{
+						canProcess = true;
+					}
 				}
-				
-				if (i < size - 1)		
-					continue;
 
-				if (result == 0)
-					continue;
-
-				this.doIntercept(inter);
+			}// find uri match
+			
+			if (!canProcess)
+				continue;
+			
+			this.doIntercept(inter);
+			
+			if (this.error == null){
+				// 如果拦截处理之后没有任何错误信息，进入下一个拦截器继续处理
+				continue;
+			}else{
+				// 否则显示错误信息, 并且退出方法
+				log.debug("do interceptor -> " + inter.getClazz() + " error -> " + error);
+				logErr();
 				
-				if (this.error == null){
-					// 如果拦截处理之后没有任何错误信息，进入下一个URI继续处理
-					continue;
-				}else{
-					// 否则显示错误信息, 并且退出方法
-					logErr();
-					
-					return true;
-				}
+				return true;
 			}
 		}
 
@@ -280,7 +288,7 @@ public class InterExecution {
 			}
 
 			// 服务端跳转
-			request.getRequestDispatcher(MVCConfigConstant.FORWARD_BASE_PATH + location).forward(request, this.context.getResponse());
+			request.getRequestDispatcher(MVCConfigConstant.FORWARD_BASE_PATH + "/"+location).forward(request, this.context.getResponse());
 
 			return;
 		} else if (re.startsWith(RenderType.FREEMARKER + ":")) {

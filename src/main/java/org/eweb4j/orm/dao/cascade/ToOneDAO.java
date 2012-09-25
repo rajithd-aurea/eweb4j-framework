@@ -11,8 +11,6 @@ import javax.persistence.OneToOne;
 import org.eweb4j.orm.config.ORMConfigBeanUtil;
 import org.eweb4j.orm.dao.DAOException;
 import org.eweb4j.orm.dao.DAOFactory;
-import org.eweb4j.orm.jdbc.transaction.Trans;
-import org.eweb4j.orm.jdbc.transaction.Transaction;
 import org.eweb4j.util.ReflectUtil;
 
 public class ToOneDAO {

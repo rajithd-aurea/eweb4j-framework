@@ -84,9 +84,10 @@ public final class DataSourceWrap implements DataSource {
 	protected void finalize() throws Throwable {
 		DataSourceWrapCache.remove(this.dsName);
 		DataSources.destroy(this.ds); // 关闭datasource
-		DataSource _ds = DataSourceCreator.create(DBInfoConfigBeanCache
-				.get(dsName));
+		log.debug("create datasource -> " + dsName);
+		DataSource _ds = DataSourceCreator.create(DBInfoConfigBeanCache.get(dsName));
 		DataSourceWrap dsw = new DataSourceWrap(dsName, _ds);
+		log.debug("finalize...");
 		DataSourceWrapCache.put(dsName, dsw);
 		super.finalize();
 

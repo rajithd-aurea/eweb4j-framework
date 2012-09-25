@@ -63,7 +63,8 @@ public abstract class ScanPackage {
 	}
 
 	private void filterScanJar(Collection<String> jarNames, String jar) {
-		final String name = new File(jar).getName().replace(".jar", "");
+		jar = jar.replace("\\", "/");
+		final String name = new File(jar).getName().replace(".jar", "").replace("\\", "/");
 		for (String scan : jarNames){
 			if (scan.equals("*")){
 				jars.add(jar);
@@ -122,8 +123,9 @@ public abstract class ScanPackage {
 			if (f.isDirectory())
 				scanFile(f);
 			else if (f.isFile()) {
-				if (!f.getName().endsWith(".class")){
-					if (f.getName().endsWith(".jar")){
+				final String name = f.getName();
+				if (!name.endsWith(".class")){
+					if (name.endsWith(".jar")){
 						final String jar = f.getAbsolutePath();
 						filterScanJar(jarNames, jar);
 					}

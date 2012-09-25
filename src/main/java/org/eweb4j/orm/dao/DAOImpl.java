@@ -12,6 +12,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.persistence.FetchType;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.sql.DataSource;
 
 import org.eweb4j.cache.DBInfoConfigBeanCache;
@@ -50,6 +55,8 @@ public class DAOImpl implements DAO {
 	private Set<String> joins = new HashSet<String>();
 	private String table = null;
 	private String selectAllColumn;
+	private Set<String> unFetch = new HashSet<String>();
+	private Set<String> fetch = new HashSet<String>();
 
 	private Map<String, String> aliasMap = new HashMap<String, String>();
 
@@ -290,11 +297,44 @@ public class DAOImpl implements DAO {
 			if (result != null && result.size() > 0){
 				for (T t : result){
 					// ToOne relation class cascade select
-					final String[] fields = ORMConfigBeanUtil.getToOneField(t.getClass());
+					final String[] fields = ORMConfigBeanUtil.getFields(t.getClass());
 					if (fields == null || fields.length == 0)
 						continue;
-					
-					DAOFactory.getCascadeDAO(dsName).select(t, fields);
+					ReflectUtil ru = new ReflectUtil(t);
+					for (String f : fields){
+						Field field = ru.getField(f);
+						OneToOne o2o = field.getAnnotation(OneToOne.class);
+						ManyToOne m2o = field.getAnnotation(ManyToOne.class);
+						OneToMany o2m = field.getAnnotation(OneToMany.class);
+						ManyToMany m2m = field.getAnnotation(ManyToMany.class);
+						FetchType fetchType = null;
+						if (o2o != null)
+							fetchType = o2o.fetch();
+						if (m2o != null)
+							fetchType = m2o.fetch();
+						if (o2m != null)
+							fetchType = o2m.fetch();
+						if (m2m != null)
+							fetchType = m2m.fetch();
+						
+						if (fetchType == null)
+							continue;
+						
+						if (this.unFetch.contains(f))
+							continue;
+						
+						if (this.fetch.contains(f)){
+							DAOFactory.getCascadeDAO(dsName).select(t, f);
+							log.debug("cascade select -> " + t.getClass().getName() +"." + f);
+							continue;
+						}
+						
+						if (FetchType.LAZY.equals(fetchType))
+							continue ;
+						
+						DAOFactory.getCascadeDAO(dsName).select(t, f);
+						log.debug("cascade select -> " + t.getClass().getName() +"." + f);
+					}
 				}
 			}
 			
@@ -318,11 +358,14 @@ public class DAOImpl implements DAO {
 			_table = this.table + ", " + sb.toString();
 		}
 		
-		final String sql = "SELECT COUNT(*) as count FROM " + _table + " WHERE " + ORMConfigBeanUtil.parseQuery(query, clazz);
+		String sql = "SELECT COUNT(*) as count FROM " + _table ;;
+		if (query != null && query.trim().length() > 0)
+			sql += " WHERE " + ORMConfigBeanUtil.parseQuery(query, clazz);
+		
 		List<Map> maps = null;
-		if (args != null && args.size() > 0) {
+		if (args != null && args.size() > 0) 
 			maps = DAOFactory.getSelectDAO(dsName).selectBySQL(Map.class, sql, args);
-		}else
+		else
 			maps = DAOFactory.getSelectDAO(dsName).selectBySQL(Map.class, sql);
 		
 		if (maps == null || maps.isEmpty())
@@ -651,11 +694,11 @@ public class DAOImpl implements DAO {
 		this.condition = new StringBuilder();
 		this.args.clear();
 		this.orderStr = "";
-		this.joins = null;
-		this.joins = new HashSet<String>();
+		this.joins.clear();
 		this.express = false;
-		this.aliasMap = null;
-		this.aliasMap = new HashMap<String, String>();
+		this.aliasMap.clear();
+		this.unFetch.clear();
+		this.fetch.clear();
 
 		return this;
 	}
@@ -872,6 +915,22 @@ public class DAOImpl implements DAO {
 		}
 		this.condition.append(" group by ").append(builder.toString()).append(" ");
 
+		return this;
+	}
+
+	public DAO fetch(String... fields) {
+		if (fields == null)
+			return this;
+		for (String field : fields)
+			this.fetch.add(field);
+		return this;
+	}
+
+	public DAO unfetch(String... fields) {
+		if (fields == null)
+			return this;
+		for (String field : fields)
+			this.unFetch.add(field);
 		return this;
 	}
 	

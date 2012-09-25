@@ -55,15 +55,16 @@ public class DAOConfig {
 						DataSourceWrap dsw = null;
 						if (DataSourceWrapCache.containsKey(dcb.getDsName())){
 							dsw = (DataSourceWrap) DataSourceWrapCache.get(dcb.getDsName());
-							if (dsw == null)
+							if (dsw == null){
 								DataSourceWrapCache.remove(dcb.getDsName());
-							else
+								log.debug("remove dsName->"+dcb.getDsName());
+							}else
 								log.debug("DataSource -> " + dcb.getDsName() + " is alive !");
 						}
 						
-						if (dsw == null){
+						if (dsw == null)
 							dsw = new DataSourceWrap(dcb.getDsName(), DataSourceCreator.create(dcb));
-						}
+						
 						
 						String error2 = dsw.getConnection() == null ? ConfigInfoCons.CANNOT_GET_DB_CON : null;
 
@@ -79,8 +80,10 @@ public class DAOConfig {
 							// ------log-------
 							// 将数据源放入缓存，它可是个重量级对象
 							// 此步也是为了共存多个数据源
-							if (!DataSourceWrapCache.containsKey(dcb.getDsName()))
+							if (!DataSourceWrapCache.containsKey(dcb.getDsName())){
+								log.debug("init put ds to cache...");
 								DataSourceWrapCache.put(dcb.getDsName(), dsw);
+							}
 						}
 					} else if (error == null)
 						error = error1;

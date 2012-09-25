@@ -263,7 +263,11 @@ public interface DAO {
 	public DAO isNull();
 	
 	public DAO isNotNull();
-
+	
+	public DAO fetch(String... fields);
+	
+	public DAO unfetch(String... fields);
+	
 	/**
 	 * 就单纯的一个append字符串的操作
 	 * 

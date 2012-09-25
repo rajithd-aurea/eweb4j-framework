@@ -702,7 +702,7 @@ public class ActionExecution {
 			}
 
 			// 服务端跳转
-			request.getRequestDispatcher(MVCConfigConstant.FORWARD_BASE_PATH + location).forward(request, this.context.getResponse());
+			request.getRequestDispatcher(MVCConfigConstant.FORWARD_BASE_PATH + "/"+ location).forward(request, this.context.getResponse());
 
 			return;
 		} else if (re.startsWith(RenderType.FREEMARKER + ":")) {
