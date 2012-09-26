@@ -38,7 +38,7 @@ public class Pet extends Model<Pet> {
 	@Column(name = "cate")
 	private String type;// 只能添加猫和狗两种类型
 
-	@ManyToOne(fetch=FetchType.LAZY)
+	@ManyToOne(fetch=FetchType.EAGER)
 	private Master master;
 	
 	@ManyToOne

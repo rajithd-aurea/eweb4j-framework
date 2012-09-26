@@ -332,8 +332,8 @@ public class DAOImpl implements DAO {
 						if (FetchType.LAZY.equals(fetchType))
 							continue ;
 						
-						DAOFactory.getCascadeDAO(dsName).select(t, f);
 						log.debug("cascade select -> " + t.getClass().getName() +"." + f);
+						DAOFactory.getCascadeDAO(dsName).select(t, f);
 					}
 				}
 			}

@@ -94,7 +94,6 @@ public class DAOTest {
 	public void testDAO(){
 		DAO dao = DAOFactory.getDAO(Pet.class);
 		Pet pet = dao.clear()
-					.fetch("master")
 					.unfetch("user")
 					.selectAll()
 					.where()
