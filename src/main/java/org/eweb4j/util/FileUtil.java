@@ -1,5 +1,6 @@
 package org.eweb4j.util;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,6 +12,8 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
 
+import javax.imageio.ImageIO;
+
 /**
  * 文件操作工具类
  * 
@@ -18,6 +21,28 @@ import java.util.HashSet;
  * 
  */
 public class FileUtil {
+	
+	/**
+	 * 
+	 * @param imageUrl 给定的图片URL
+	 * @param retryTimes 如果发生异常重试次数
+	 * @return
+	 */
+	public static BufferedImage getBufferedImage(String imageUrl, int retryTimes) throws Exception{
+		int count = 0;
+		while (true){
+			try {
+				URL url = new URL(imageUrl);
+				return ImageIO.read(url);
+			} catch (Exception e) {
+				if (count >= 5){
+					e.printStackTrace();
+					throw e;
+				}
+			} 
+			count++;
+		}
+	}
 	
 	public static boolean exists(String filePath){
 		File dir = new File(CommonUtil.uriDecoding(filePath));
@@ -52,8 +77,14 @@ public class FileUtil {
 		return path;
 	}
 
-	public static void main(String[] args) {
-		System.out.println(getCurrPath(FileUtil.class));
+	public static void main(String[] args) throws Exception {
+		String imageUrl = "http://static.zalora.sg/p/evie-0117-52557-1-zoom.jpg";
+		String format = "jpg";
+		int retryTimes = 5;
+		
+		BufferedImage im = FileUtil.getBufferedImage(imageUrl, retryTimes);
+		FileOutputStream os = new FileOutputStream(new File("d:/testxxxxxx.jpg"));
+		ImageIO.write(im, format, os);
 	}
 
 	/**

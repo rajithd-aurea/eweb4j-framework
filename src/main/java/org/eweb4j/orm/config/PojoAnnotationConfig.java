@@ -92,10 +92,10 @@ public class PojoAnnotationConfig extends ScanPackage {
 			ormBean.setProperty(properties);
 			ORMConfigBeanCache.add(clazz.getName(), ormBean);
 		} catch (Error er) {
-			log.warn("the action class new instance failued -> " + clsName + " | " + er.toString());
+			log.warn("the entity class new instance failued -> " + clsName + " | " + er.toString());
 			return false;
 		} catch (Exception e) {
-			log.warn("the action class new instance failued -> " + clsName + " | " + e.toString());
+			log.warn("the entity class new instance failued -> " + clsName + " | " + e.toString());
 			return false;
 		}
 		
