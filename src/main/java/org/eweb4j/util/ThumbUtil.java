@@ -17,9 +17,9 @@ import org.eweb4j.util.FileUtil;
  */
 public class ThumbUtil {
 
-	private static final String W = "width";
-	private static final String H = "height";
-	private static Map<String,Integer> wh = new HashMap<String,Integer>();
+	private  final String W = "width";
+	private  final String H = "height";
+	private  Map<String,Integer> wh = new HashMap<String,Integer>();
 	
 	/**
 	 * 注意！当宽度和高度都给定的情况下会进行裁剪。裁剪规则是：先按照比例压缩，然后将多出的部分分两边裁剪。
@@ -31,7 +31,7 @@ public class ThumbUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public static ByteArrayOutputStream generateThumb(String remoteImageUrl, String outputFormat, int failRetryTimes, int outputWidth, int outputHeight) throws Exception{
+	public ByteArrayOutputStream generateThumb(String remoteImageUrl, String outputFormat, int failRetryTimes, int outputWidth, int outputHeight) throws Exception{
 		if (remoteImageUrl == null || remoteImageUrl.trim().length() == 0)
 			throw new Exception("ImageURL required");
 		
@@ -93,9 +93,9 @@ public class ThumbUtil {
 		return os;
 	}
 	
-	public static void main(String[] args) throws Exception{
+	public  void main(String[] args) throws Exception{
 		String format = "jpg";
-		String imageUrl = "http://static.zalora.sg/p/chuck-bo-korea-selection-7428-72957-1-zoom.jpg";
+		String imageUrl = "http://.zalora.sg/p/chuck-bo-korea-selection-7428-72957-1-zoom.jpg";
 		HashMap<String, Integer> wh = new HashMap<String, Integer>();
 		wh.put(W, 270);
 		wh.put(H, 180);
