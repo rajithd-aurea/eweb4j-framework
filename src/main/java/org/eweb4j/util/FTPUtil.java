@@ -1,6 +1,6 @@
 package org.eweb4j.util;
 
-import java.io.IOException;
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.net.ProtocolCommandEvent;
@@ -52,53 +52,63 @@ public class FTPUtil implements ProtocolCommandListener{
         	listener.onInfo("FTP login success");
 	}
 	
-    /**
-    * 递归创建远程服务器目录
-    * 
-    * @param remote
-    *            远程服务器文件绝对路径
-    * 
-    * @return 目录创建是否成功
-    * @throws IOException
-    */
-    public boolean makeDirectory(String remote) throws IOException {
-        boolean success = true;
-        String directory = remote.substring(0, remote.lastIndexOf("/") + 1);
-        // 如果远程目录不存在，则递归创建远程服务器目录
-        if (!directory.equalsIgnoreCase("/") && !client.changeWorkingDirectory(new String(directory))) {
-
-            int start = 0;
-            int end = 0;
-            if (directory.startsWith("/")) {
-                start = 1;
-            } else {
-                start = 0;
-            }
-            end = directory.indexOf("/", start);
-            while (true) {
-                String subDirectory = new String(remote.substring(start, end));
-                if (!client.changeWorkingDirectory(subDirectory)) {
-                    if (client.makeDirectory(subDirectory)) {
-                    	client.changeWorkingDirectory(subDirectory);
-                    } else {
-                    	if (this.listener != null)
-                    		listener.onInfo("makie dir -> " + subDirectory + " fail");
-                        success = false;
-                        return success;
-                    }
-                }
-                start = end + 1;
-                end = directory.indexOf("/", start);
-                // 检查所有目录是否创建完毕
-                if (end <= start) {
-                    break;
-                }
-            }
-        }
-        
-        return success;
-    }
-    
+	public void logoutAndDisconnect(){
+		if (client != null) {
+			try {
+				client.logout();
+				if (listener != null)
+					listener.onInfo(" ftp logout success");
+			} catch (Exception e){
+				if (listener != null)
+					listener.onError(" can not logout ftp", e);
+			}
+			
+			try {
+				client.disconnect();
+				if (listener != null)
+					listener.onInfo(" ftp disconnect success");
+			} catch (Exception e){
+				if (listener != null)
+					listener.onError(" can not disconnect ftp", e);
+			}
+		}
+	}
+	
+	private static String resolvePath(String path){
+		File dir = new File(path);
+		return dir.getPath().replace("\\", "/");
+	}
+	
+	public boolean mkdir(String remoteDir) throws Exception{
+		if (remoteDir == null || remoteDir.trim().length() == 0)
+			throw new Exception("remoteDir -> " + remoteDir + " required !");
+		String path = FTPUtil.resolvePath(remoteDir);
+		// split by /
+		String[] remoteDirs = path.split("/");
+		StringBuilder builder = new StringBuilder("/");
+		for (String dir : remoteDirs){
+			if (builder.length() > 1)
+				builder.append("/");
+			
+			builder.append(dir);
+			boolean isDirOk = client.changeWorkingDirectory(builder.toString());
+			if (!isDirOk)
+				isDirOk = client.makeDirectory(builder.toString());
+			
+			if (!isDirOk)
+				throw new Exception("ftp mkdir -> " + builder.toString() + " fail");
+		}
+		
+		return true;
+	}
+	
+	public static void main(String[] args) throws Exception{
+		FTPUtil ftp = new FTPUtil("sytime.com", 21, "wfl", "wufulin");
+		ftp.connectAndLogin();
+		ftp.mkdir("/wwwroot/longyan-web/cache/bigpic/20121002/470/");
+		ftp.logoutAndDisconnect();
+	}
+	
     public void protocolCommandSent(ProtocolCommandEvent ev) {
 		try {
 			String info  = new String(("sent->"+ev.getReplyCode()+"-"+"c->"+ev.getCommand()+"-"+ev.getMessage()).getBytes("iso8859-1"), "gbk");
