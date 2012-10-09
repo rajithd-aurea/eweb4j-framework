@@ -44,12 +44,14 @@ public class DAOImpl implements DAO {
 	private Map<String, Object> buffer = new HashMap<String, Object>();
 	
 	private String orderStr = "";
+	private StringBuilder groupBy = new StringBuilder();
 	private boolean express = false;
 	private Map<String, Object> map;
 	private Class<?> clazz;
+	private Class<?> targetEntity;
 	private String dsName;
-	private StringBuilder sql = new StringBuilder("");
-	private StringBuilder condition = new StringBuilder("");
+	private StringBuilder sql = new StringBuilder();
+	private StringBuilder condition = new StringBuilder();
 	private List<Object> args = new ArrayList<Object>();;
 	private String dbType;
 	private DataSource ds;
@@ -271,43 +273,107 @@ public class DAOImpl implements DAO {
 		this.buffer.put("orderType", OrderType.ASC_ORDER);
 		return this;
 	}
-
-	// --------------------------------------------------------
-	public <T> Collection<T> query(Class<T> clazz){
-		if (clazz == null)
-			return null;
-		
-		return queryBySql(clazz, toSql(), this.args, this.fetch, this.unFetch, this.dsName, this.ds);
-	}
 	
 	public DAO sql(String sql){
 		if (sql == null)
 			return this;
-		
 		this.sql = new StringBuilder(sql);
 		return this;
 	}
 	
-	private <T> List<T> queryBySql(Class<T> clazz, String sql){
-		return queryBySql(clazz, sql, args, fetch, unFetch, dsName, ds);
+	// --------------------------------------------------------
+	public <T> DAO rowMapping(Class<T> targetEntity){
+		if (targetEntity == null)
+			return this;
+		this.targetEntity = targetEntity;
+		
+		return this;
+	}
+	public <T> T queryOne() {
+		Collection<T> list = query();
+		T result = list == null ? null : list.size() > 0 ? new ArrayList<T>(list).get(0) : null;
+		return result;
 	}
 	
-	private static <T> List<T> queryBySql(Class<T> clazz, String sql, List<Object> args, Set<String> fetch, Set<String> unFetch,  String dsName, DataSource ds) {
+	public <T> Collection<T> query(){
+		return queryBySql(toSql());
+	}
+	
+	public <T> Collection<T> query(int max) {
+		return (Collection<T>) queryPage(1, max);
+	}
+	
+	public <T> Collection<T> query(int page, int length){
+		return (Collection<T>) queryPage(page, length);
+	}
+	
+	private <T> Collection<T> queryPage(final int page, final int length) {
+		String _sql = null;
+		final String orderField = (String) buffer.get("orderField");
+		final int oType = (Integer) buffer.get("orderType");
+		final String query = condition.toString().replace("'?'", "?") + groupBy.toString();
+		try {
+			Object obj = null;
+			if (Map.class.isAssignableFrom(clazz)){
+				obj = new HashMap<String, Object>();
+				((Map<String, Object>)obj).put("table", table);
+			}else {
+				obj = clazz.newInstance();
+			}
+			
+			SelectSqlCreator<Object> select =  SqlFactory.getSelectSql(obj, dbType);
+			
+			if (joins != null && !joins.isEmpty()){
+				StringBuilder sb = new StringBuilder();
+				for (String j : joins){
+					if (sb.length() > 0)
+						sb.append(", ");
+					sb.append(j);
+				}
+				select.setTable(table + ", " + sb.toString());
+			}
+			select.setSelectAllColumn(this.selectAllColumn);
+			_sql = select.divPage(page, length, orderField, oType, query.replace("WHERE", ""));
+		} catch (Exception e) {
+			String _table = table;
+			if (joins != null && !joins.isEmpty()){
+				StringBuilder sb = new StringBuilder();
+				for (String j : joins){
+					if (sb.length() > 0)
+						sb.append(", ");
+					sb.append(j);
+				}
+				_table = table + ", " + sb.toString();
+			}
+			
+			_sql = sql.append(orderStr).append(" LIMIT ").append((page - 1) * length).append(", ").append(length).toString().replace("${_TABLES_}", _table).replace("${_where_}", query);
+		}
+		
+		return queryBySql(_sql);
+	}
+	
+	public <T> Collection<T> queryBySql(final String sql) {
+		Class<T> mappingCls = null;
+		if (this.targetEntity == null)
+			mappingCls = (Class<T>) this.clazz;
+		else
+			mappingCls = (Class<T>) this.targetEntity;
+		
 		List<T> result = null;
 		try {
-			if (Map.class.isAssignableFrom(clazz)) {
+			if (Map.class.isAssignableFrom(mappingCls)) {
 				Connection con = ds.getConnection();
 				if (args != null && args.size() > 0) {
-					result = (List<T>) JdbcUtil.getListWithArgs(con, clazz, sql, args.toArray(new Object[] {}));
+					result = (List<T>) JdbcUtil.getListWithArgs(con, mappingCls, sql, args.toArray(new Object[] {}));
 				} else {
-					result = (List<T>) JdbcUtil.getList(con, clazz, sql);
+					result = (List<T>) JdbcUtil.getList(con, mappingCls, sql);
 				}
 
 			} else {
 				if (args != null && args.size() > 0) {
-					result = (List<T>) DAOFactory.getSelectDAO(dsName).selectBySQL(clazz, sql, args.toArray(new Object[] {}));
+					result = (List<T>) DAOFactory.getSelectDAO(dsName).selectBySQL(mappingCls, sql, args.toArray(new Object[] {}));
 				} else {
-					result = (List<T>) DAOFactory.getSelectDAO(dsName).selectBySQL(clazz, sql);
+					result = (List<T>) DAOFactory.getSelectDAO(dsName).selectBySQL(mappingCls, sql);
 				}
 
 			}
@@ -322,6 +388,10 @@ public class DAOImpl implements DAO {
 					ReflectUtil ru = new ReflectUtil(t);
 					for (String f : fields){
 						Field field = ru.getField(f);
+						boolean isEntity = ORMConfigBeanCache.containsKey(field.getType().getName());
+						if (!isEntity)
+							continue;
+						
 						OneToOne o2o = field.getAnnotation(OneToOne.class);
 						ManyToOne m2o = field.getAnnotation(ManyToOne.class);
 						OneToMany o2m = field.getAnnotation(OneToMany.class);
@@ -391,81 +461,6 @@ public class DAOImpl implements DAO {
 			return 0;
 		
 		return Long.parseLong(String.valueOf(maps.get(0).get("count")));
-	}
-
-	public <T> Collection<T> query() {
-		return (Collection<T>) this.query(clazz);
-
-	}
-
-	public <T> Collection<T> query(Class<T> clazz, int max) {
-		return query(clazz, 1, max);
-	}
-	
-	public <T> Collection<T> query(int max) {
-		return (Collection<T>) query(clazz, 1, max);
-	}
-	
-	public <T> Collection<T> query(Class<T> clazz, int page, int length){
-		return queryPage(clazz, page, length);
-	}
-	
-	public <T> Collection<T> query(int page, int length){
-		return (Collection<T>) queryPage(clazz, page, length);
-	}
-
-	private <T> Collection<T> queryPage(final Class<T> clazz, final int page, final int length) {
-		String _sql = null;
-		final String orderField = (String) buffer.get("orderField");
-		final int oType = (Integer) buffer.get("orderType");
-		final String query = condition.toString().replace("'?'", "?");
-		try {
-			Object obj = null;
-			if (Map.class.isAssignableFrom(clazz)){
-				obj = new HashMap<String, Object>();
-				((Map<String, Object>)obj).put("table", table);
-			}else {
-				obj = clazz.newInstance();
-			}
-			
-			SelectSqlCreator<Object> select =  SqlFactory.getSelectSql(obj, dbType);
-			if (joins != null && !joins.isEmpty()){
-				StringBuilder sb = new StringBuilder();
-				for (String j : joins){
-					if (sb.length() > 0)
-						sb.append(", ");
-					sb.append(j);
-				}
-				select.setTable(table + ", " + sb.toString());
-			}
-			_sql = select.divPage(page, length, orderField, oType, query.replace("WHERE", ""));
-		} catch (Exception e) {
-			e.printStackTrace();
-			String _table = table;
-			if (joins != null && !joins.isEmpty()){
-				StringBuilder sb = new StringBuilder();
-				for (String j : joins){
-					if (sb.length() > 0)
-						sb.append(", ");
-					sb.append(j);
-				}
-				_table = table + ", " + sb.toString();
-			}
-			
-			_sql = sql.append(orderStr).append(" LIMIT ").append((page - 1) * length).append(", ").append(length).toString().replace("${_TABLES_}", _table).replace("${_where_}", query);
-		}
-		sql(_sql);
-		return queryBySql(clazz, _sql);
-	}
-
-	public <T> T queryOne(Class<T> clazz) {
-		Collection<T> list = query(clazz);
-		T result = list == null ? null : list.size() > 0 ? new ArrayList<T>(list).get(0) : null;
-		return result;
-	}
-	
-	public <T> T queryOne() {
-		return (T) queryOne(clazz);
 	}
 
 	public DAO selectStr(String str) {
@@ -661,20 +656,21 @@ public class DAOImpl implements DAO {
 	public DAO select(Class<?>... classes){
 		if (classes == null || classes.length == 0)
 			return this;
-		
 		this.sql.append(" SELECT ");
 		StringBuilder sb = new StringBuilder();
 		for(Class<?> cls : classes){
+			
 			String _selectAllColumn = ORMConfigBeanUtil.getSelectAllColumn(cls);
 			if (sb.length() > 0)
 				sb.append(", ");
 			sb.append(_selectAllColumn);
 		}
 		
-		if (sb.length() == 0)
-			sb.append(selectAllColumn);
+		if (sb.length() > 0)
+			selectAllColumn = sb.toString();
 		
-		sql.append(sb.toString()).append(" FROM ").append(" ${_TABLES_} ").append(" ");
+		this.sql.append(this.selectAllColumn).append(" FROM ").append(" ${_TABLES_} ").append(" ");
+		rowMapping(classes[0]);
 		
 		return this;
 	}
@@ -746,6 +742,7 @@ public class DAOImpl implements DAO {
 		this.unFetch.clear();
 		this.fetch.clear();
 		this.updateFields.clear();
+		this.targetEntity = null;
 
 		return this;
 	}
@@ -828,7 +825,7 @@ public class DAOImpl implements DAO {
 			_table = this.table + ", " + sb.toString();
 		}
 		
-		return sql.append(orderStr).toString().replace("${_TABLES_}", _table).replace("${_where_}", condition.toString()).replace("'?'", "?");
+		return sql.append(orderStr).toString().replace("${_TABLES_}", _table).replace("${_where_}", condition.toString()+groupBy.toString()).replace("'?'", "?");
 	}
 
 	public DAO fillArgs(Object... args) {
@@ -960,7 +957,7 @@ public class DAOImpl implements DAO {
 				builder.append(", ");
 			builder.append(col);
 		}
-		this.condition.append(" group by ").append(builder.toString()).append(" ");
+		this.groupBy.append(" group by ").append(builder.toString()).append(" ");
 
 		return this;
 	}

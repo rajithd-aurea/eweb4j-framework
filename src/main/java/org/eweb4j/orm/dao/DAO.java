@@ -456,6 +456,8 @@ public interface DAO {
 
 	public DAO sql(String sql);
 	
+	public <T> DAO rowMapping(Class<T> targetEntity);
+	
 	/**
 	 * 执行查询操作使用，返回多个结果
 	 * 
@@ -464,25 +466,11 @@ public interface DAO {
 	 */
 	public <T> Collection<T> query();
 	
-	public <T> Collection<T> query(Class<T> targetEntity);
-	
 	public <T> Collection<T> query(int max);
-	
-	public <T> Collection<T> query(Class<T> targetEntity, int max);
 	
 	public <T> Collection<T> query(int page, int length);
 	
-	public <T> Collection<T> query(Class<T> targetEntity, int page, int length);
-
-	/**
-	 * 执行查询操作使用，返回第一个结果
-	 * 
-	 * @param <T>
-	 * @return
-	 */
 	public <T> T queryOne();
-	
-	public <T> T queryOne(Class<T> targetEntity);
 	
 	/**
 	 * 计算记录数

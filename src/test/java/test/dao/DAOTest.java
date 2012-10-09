@@ -15,6 +15,7 @@ import org.eweb4j.orm.dao.DAOFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import test.User;
 import test.po.Master;
 import test.po.Pet;
 
@@ -34,22 +35,23 @@ public class DAOTest {
 		dao = DAOFactory.getDAO(Map.class);
 	}
 
+	@Test
 	public void testCol() throws Exception{
 		Assert.assertEquals("pet.master_id", ORMConfigBeanUtil.getColumn(Master.class, "pets.master"));
 //		Collection<Object> ms = DAOFactory.getDAO(Master.class).enableExpress(false).select("*").join("pets").where().field("pet.name").equal("xiaohei").groupBy("pet.name").query();
 //		System.out.println(ms);
 		
 		DAO dao = DAOFactory.getDAO(Master.class);
-		Master master = dao
+		User master = dao
 						.alias("m")
 						.join("pets")
 						.join("pets.user", "p.u")
-						.selectAll()
+						.select(User.class)
 						.where()
 							.field("m.name").like("wei")
 							.and("p.name").likeLeft("xiao")
 							.and("u.account").equal("admin")
-						.groupBy("m.name")
+						.groupBy("u.account")
 						.queryOne();
 		
 		System.out.println("master->"+master);

@@ -31,6 +31,10 @@ public class SelectSqlCreator<T> {
 	private String dbType;
 	private String selectAllColumn;
 
+	public void setSelectAllColumn(String selectAllColumn) {
+		this.selectAllColumn = selectAllColumn;
+	}
+
 	public SelectSqlCreator(T t, String dbType) {
 		this.t = t;
 		this.clazz = t.getClass();
