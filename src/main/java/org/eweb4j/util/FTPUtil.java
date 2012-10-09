@@ -103,9 +103,20 @@ public class FTPUtil implements ProtocolCommandListener{
 	}
 	
 	public static void main(String[] args) throws Exception{
-		FTPUtil ftp = new FTPUtil("sytime.com", 21, "wfl", "wufulin");
+		FTPUtil ftp = new FTPUtil("shoplay.com", 21, "weiwei", "123456");
+		ftp.setListener(new FTPListener() {
+			public void onInfo(String info) {
+				System.out.println(info);
+			}
+			
+			public void onError(String err, Exception e) {
+				e.printStackTrace();
+			}
+		});
+		
+		ftp.setDebug(true);
 		ftp.connectAndLogin();
-		ftp.mkdir("/wwwroot/longyan-web/cache/bigpic/20121002/470/");
+		ftp.mkdir("/wwwroot/longyan-web/cache/bigpic/20121006/470/");
 		ftp.logoutAndDisconnect();
 	}
 	

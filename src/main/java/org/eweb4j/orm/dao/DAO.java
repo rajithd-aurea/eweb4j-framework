@@ -180,11 +180,13 @@ public interface DAO {
 	 * 
 	 * @return
 	 */
-	public DAO update();
+	public DAO update(String... fields);
+	
+	public DAO update(Map<String, Object> map);
 
 	/**
-	 * 这个方法需要搭配set(String[] fields, Object[] values)方法一起使用。
-	 * dao.update().set(String[] fields, Object[]).execute() <code>
+	 * 这个方法需要搭配set(Object... values)方法一起使用。
+	 * dao.update(String...).set(Object...).execute() <code>
 	 * <pre>
 	 * Entity
 	 * Table(name="t_pet")
@@ -195,10 +197,7 @@ public interface DAO {
 	 *     name;
 	 * }
 	 *  DAO dao = DAOFactory.getDAO(Pet.class);
-	 * 	dao.clear();
-	 *  String[] fields = {"petId", "name"};
-	 *  Object[] values = {3, "baby"};
-	 *  String sql = dao.set(fields, values).toSql();
+	 *  String sql = dao.update("petId", "name").set(3, "baby").toSql();
 	 * 	Assert.assertEquals(" UPDATE t_pet ", sql);
 	 * 
 	 * </pre>
@@ -208,9 +207,7 @@ public interface DAO {
 	 * @param values
 	 * @return
 	 */
-	public DAO set(String[] fields, Object... values);
-
-	public DAO set(Map<String, Object> map);
+	public DAO set(Object... values);
 
 	/**
 	 * 
@@ -457,6 +454,8 @@ public interface DAO {
 	 */
 	public String toSql();
 
+	public DAO sql(String sql);
+	
 	/**
 	 * 执行查询操作使用，返回多个结果
 	 * 
@@ -465,9 +464,15 @@ public interface DAO {
 	 */
 	public <T> Collection<T> query();
 	
+	public <T> Collection<T> query(Class<T> targetEntity);
+	
 	public <T> Collection<T> query(int max);
 	
+	public <T> Collection<T> query(Class<T> targetEntity, int max);
+	
 	public <T> Collection<T> query(int page, int length);
+	
+	public <T> Collection<T> query(Class<T> targetEntity, int page, int length);
 
 	/**
 	 * 执行查询操作使用，返回第一个结果
@@ -476,6 +481,8 @@ public interface DAO {
 	 * @return
 	 */
 	public <T> T queryOne();
+	
+	public <T> T queryOne(Class<T> targetEntity);
 	
 	/**
 	 * 计算记录数

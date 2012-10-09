@@ -64,6 +64,18 @@ public class DAOTest {
 		}
 	}
 	
+	@Test
+	public void testUpdate() throws Exception{
+		int i = DAOFactory.getDAO(Pet.class)
+				.update("name", "age")
+				.set("fuckyou!", 4)
+				.where()
+					.field("id").equal(1)
+				.execute();
+		
+		System.out.println("~~~~ update i = > " + i);
+	}
+	
 	public void test() throws Exception {
 		dao.setTable("t_pet");
 		

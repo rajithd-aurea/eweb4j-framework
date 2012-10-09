@@ -77,13 +77,11 @@ public class EWebFilter implements Filter, Servlet {
 	 * @param res
 	 * @throws Exception
 	 */
-	private Context initContext(HttpServletRequest request,
-			HttpServletResponse response) throws Exception {
+	private Context initContext(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		request.setCharacterEncoding("utf-8");
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html");
-		return new Context(servletContext, request, response, null, null, null,
-				null);
+		return new Context(servletContext, request, response, null, null, null, null);
 	}
 
 	/**
@@ -167,7 +165,6 @@ public class EWebFilter implements Filter, Servlet {
 	}
 
 	private void parseBaseUrl(Context context) throws Exception {
-
 		ServletContext servletContext = context.getServletContext();
 		HttpServletRequest request = context.getRequest();
 		String uri = context.getUri();

@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -57,6 +58,7 @@ public class DAOImpl implements DAO {
 	private String selectAllColumn;
 	private Set<String> unFetch = new HashSet<String>();
 	private Set<String> fetch = new HashSet<String>();
+	private List<String> updateFields = new ArrayList<String>();
 
 	private Map<String, String> aliasMap = new HashMap<String, String>();
 
@@ -271,12 +273,29 @@ public class DAOImpl implements DAO {
 	}
 
 	// --------------------------------------------------------
-
-	private <T> List<T> query(String sql) {
+	public <T> Collection<T> query(Class<T> clazz){
+		if (clazz == null)
+			return null;
+		
+		return queryBySql(clazz, toSql(), this.args, this.fetch, this.unFetch, this.dsName, this.ds);
+	}
+	
+	public DAO sql(String sql){
+		if (sql == null)
+			return this;
+		
+		this.sql = new StringBuilder(sql);
+		return this;
+	}
+	
+	private <T> List<T> queryBySql(Class<T> clazz, String sql){
+		return queryBySql(clazz, sql, args, fetch, unFetch, dsName, ds);
+	}
+	
+	private static <T> List<T> queryBySql(Class<T> clazz, String sql, List<Object> args, Set<String> fetch, Set<String> unFetch,  String dsName, DataSource ds) {
 		List<T> result = null;
 		try {
-
-			if (Map.class.isAssignableFrom(this.clazz)) {
+			if (Map.class.isAssignableFrom(clazz)) {
 				Connection con = ds.getConnection();
 				if (args != null && args.size() > 0) {
 					result = (List<T>) JdbcUtil.getListWithArgs(con, clazz, sql, args.toArray(new Object[] {}));
@@ -320,10 +339,10 @@ public class DAOImpl implements DAO {
 						if (fetchType == null)
 							continue;
 						
-						if (this.unFetch.contains(f))
+						if (unFetch.contains(f))
 							continue;
 						
-						if (this.fetch.contains(f)){
+						if (fetch.contains(f)){
 							DAOFactory.getCascadeDAO(dsName).select(t, f);
 							log.debug("cascade select -> " + t.getClass().getName() +"." + f);
 							continue;
@@ -374,62 +393,79 @@ public class DAOImpl implements DAO {
 		return Long.parseLong(String.valueOf(maps.get(0).get("count")));
 	}
 
-	public <T> List<T> query() {
-		return query(toSql());
+	public <T> Collection<T> query() {
+		return (Collection<T>) this.query(clazz);
 
 	}
 
-	public <T> List<T> query(int max) {
-		return query(1, max);
+	public <T> Collection<T> query(Class<T> clazz, int max) {
+		return query(clazz, 1, max);
+	}
+	
+	public <T> Collection<T> query(int max) {
+		return (Collection<T>) query(clazz, 1, max);
+	}
+	
+	public <T> Collection<T> query(Class<T> clazz, int page, int length){
+		return queryPage(clazz, page, length);
+	}
+	
+	public <T> Collection<T> query(int page, int length){
+		return (Collection<T>) queryPage(clazz, page, length);
 	}
 
-	public <T> List<T> query(int page, int length) {
-		String sql = null;
+	private <T> Collection<T> queryPage(final Class<T> clazz, final int page, final int length) {
+		String _sql = null;
 		final String orderField = (String) buffer.get("orderField");
 		final int oType = (Integer) buffer.get("orderType");
-		final String query = this.condition.toString().replace("'?'", "?");
+		final String query = condition.toString().replace("'?'", "?");
 		try {
 			Object obj = null;
 			if (Map.class.isAssignableFrom(clazz)){
 				obj = new HashMap<String, Object>();
-				((Map<String, Object>)obj).put("table", this.table);
+				((Map<String, Object>)obj).put("table", table);
 			}else {
 				obj = clazz.newInstance();
 			}
 			
 			SelectSqlCreator<Object> select =  SqlFactory.getSelectSql(obj, dbType);
-			if (this.joins != null && !this.joins.isEmpty()){
+			if (joins != null && !joins.isEmpty()){
 				StringBuilder sb = new StringBuilder();
 				for (String j : joins){
 					if (sb.length() > 0)
 						sb.append(", ");
 					sb.append(j);
 				}
-				select.setTable(this.table + ", " + sb.toString());
+				select.setTable(table + ", " + sb.toString());
 			}
-			sql = select.divPage(page, length, orderField, oType, query.replace("WHERE", ""));
+			_sql = select.divPage(page, length, orderField, oType, query.replace("WHERE", ""));
 		} catch (Exception e) {
-			String _table = this.table;
-			if (this.joins != null && !this.joins.isEmpty()){
+			e.printStackTrace();
+			String _table = table;
+			if (joins != null && !joins.isEmpty()){
 				StringBuilder sb = new StringBuilder();
 				for (String j : joins){
 					if (sb.length() > 0)
 						sb.append(", ");
 					sb.append(j);
 				}
-				_table = this.table + ", " + sb.toString();
+				_table = table + ", " + sb.toString();
 			}
 			
-			sql = this.sql.append(orderStr).append(" LIMIT ").append((page - 1) * length).append(", ").append(length).toString().replace("${_TABLES_}", _table).replace("${_where_}", query);
+			_sql = sql.append(orderStr).append(" LIMIT ").append((page - 1) * length).append(", ").append(length).toString().replace("${_TABLES_}", _table).replace("${_where_}", query);
 		}
-		
-		return query(sql);
+		sql(_sql);
+		return queryBySql(clazz, _sql);
 	}
 
-	public <T> T queryOne() {
-		List<T> list = query();
-		T result = list == null ? null : list.size() > 0 ? list.get(0) : null;
+	public <T> T queryOne(Class<T> clazz) {
+		Collection<T> list = query(clazz);
+		T result = list == null ? null : list.size() > 0 ? new ArrayList<T>(list).get(0) : null;
 		return result;
+	}
+	
+	public <T> T queryOne() {
+		return (T) queryOne(clazz);
 	}
 
 	public DAO selectStr(String str) {
@@ -552,36 +588,47 @@ public class DAOImpl implements DAO {
 		return id;
 	}
 
-	public DAO update() {
+	public DAO update(String... fields) {
 		if (clazz == null)
 			return this;
+		
+		if (fields == null || fields.length == 0)
+			return this;
 
+		StringBuilder sb = new StringBuilder();
+		String[] columns = ORMConfigBeanUtil.getColumns(clazz, fields);
+		for (int i = 0; i < columns.length; i++) {
+			if (sb.length() > 0)
+				sb.append(", ");
+			String col = columns[i];
+			this.updateFields.add(col);
+		}
+		
 		this.sql.append(" UPDATE ").append(table.replace(" "+clazz.getSimpleName().toLowerCase(), "")).append(" ");
 
 		return this;
 	}
 
-	public DAO set(String[] fields, Object... values) {
-		if (fields == null || values == null || fields.length == 0
-				|| values.length == 0 || fields.length != values.length)
+	public DAO set(Object... values) {
+		if (this.updateFields == null || values == null || this.updateFields.size() == 0
+				|| values.length == 0 || this.updateFields.size() != values.length)
 			return this;
 
 		StringBuilder sb = new StringBuilder();
-		String[] columns = ORMConfigBeanUtil.getColumns(clazz, fields);
 		for (int i = 0; i < values.length; i++) {
 			if (sb.length() > 0)
 				sb.append(", ");
-			String col = columns[i];
+			String col = this.updateFields.get(i);
 			Object val = values[i];
 			sb.append(col).append(" = '").append(val).append("'");
 		}
 
-		this.sql.append(" SET ").append(sb.toString()).append(" ");
+		this.sql.append("SET ").append(sb.toString()).append(" ");
 
 		return this;
 	}
 
-	public DAO set(Map<String, Object> map) {
+	public DAO update(Map<String, Object> map) {
 		int size = map.size();
 		List<String> fields = new ArrayList<String>(size);
 		List<Object> values = new ArrayList<Object>(size);
@@ -590,9 +637,8 @@ public class DAOImpl implements DAO {
 			fields.add(entry.getKey());
 			values.add(entry.getValue());
 		}
-
-		this.set(fields.toArray(new String[] {}),
-				values.toArray(new Object[] {}));
+		
+		this.update(fields.toArray(new String[]{})).set(values.toArray(new Object[] {}));
 
 		return this;
 	}
@@ -699,6 +745,7 @@ public class DAOImpl implements DAO {
 		this.aliasMap.clear();
 		this.unFetch.clear();
 		this.fetch.clear();
+		this.updateFields.clear();
 
 		return this;
 	}

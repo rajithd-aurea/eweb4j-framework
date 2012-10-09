@@ -64,8 +64,7 @@ public class RowMapping {
 					ReflectUtil ru = new ReflectUtil(t);
 					ORMConfigBean ormBean = ORMConfigBeanCache.get(cls.getName());
 
-					for (Iterator<Property> it = ormBean.getProperty()
-							.iterator(); it.hasNext();) {
+					for (Iterator<Property> it = ormBean.getProperty().iterator(); it.hasNext();) {
 						Property p = it.next();
 						String type = p.getType();
 						if (type == null)
@@ -95,34 +94,39 @@ public class RowMapping {
 						if (v == null) {
 							v = "";
 						}
-
-						if ("int".equalsIgnoreCase(type)
-								|| "java.lang.Integer".equalsIgnoreCase(type)) {
+						
+						if ("int".equalsIgnoreCase(type) || "java.lang.Integer".equalsIgnoreCase(type)) {
 							if ("".equals(v.trim())) {
 								v = "0";
 							}
+							if (value instanceof Boolean)
+								v = ((Boolean)value ? "1" : "0");
+							
 							m.invoke(t, Integer.parseInt(v));
-						} else if ("long".equalsIgnoreCase(type)
-								|| "java.lang.Long".equalsIgnoreCase(type)) {
+						} else if ("long".equalsIgnoreCase(type) || "java.lang.Long".equalsIgnoreCase(type)) {
 							if ("".equals(v.trim())) {
 								v = "0";
 							}
+							if (value instanceof Boolean)
+								v = ((Boolean)value ? "1" : "0");
+							
 							m.invoke(t, Long.parseLong(v));
-						} else if ("float".equalsIgnoreCase(type)
-								|| "java.lang.Float".equalsIgnoreCase(type)) {
+						} else if ("float".equalsIgnoreCase(type) || "java.lang.Float".equalsIgnoreCase(type)) {
 							if ("".equals(v.trim())) {
 								v = "0.0";
 							}
+							if (value instanceof Boolean)
+								v = ((Boolean)value ? "1.0" : "0.0");
+							
 							m.invoke(t, Float.parseFloat(v));
-						} else if ("double".equalsIgnoreCase(type)
-								|| "java.lang.Double".equalsIgnoreCase(type)) {
+						} else if ("double".equalsIgnoreCase(type) || "java.lang.Double".equalsIgnoreCase(type)) {
 							if ("".equals(v.trim())) {
 								v = "0.0";
 							}
-
+							if (value instanceof Boolean)
+								v = ((Boolean)value ? "1.0" : "0.0");
 							m.invoke(t, Float.parseFloat(v));
-						} else if ("string".equalsIgnoreCase(type)
-								|| "java.lang.String".equalsIgnoreCase(type)) {
+						} else if ("string".equalsIgnoreCase(type) || "java.lang.String".equalsIgnoreCase(type)) {
 							m.invoke(t, v);
 						} else if ("boolean".equalsIgnoreCase(type) || "java.lang.Boolean".equalsIgnoreCase(type)){
 							if ("1".equals(v.trim()) || "true".equals(v.trim())){
