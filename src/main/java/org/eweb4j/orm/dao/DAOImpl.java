@@ -875,16 +875,6 @@ public class DAOImpl implements DAO {
 		return page;
 	}
 
-	public DAO leftJoin(String... fieldNames) {
-		
-		return this;
-	}
-
-	public DAO rightJoin(String... fieldNames) {
-		
-		return this;
-	}
-
 	public DAO join(String fieldName){
 		return join(fieldName, fieldName);
 	}
@@ -976,6 +966,26 @@ public class DAOImpl implements DAO {
 		for (String field : fields)
 			this.unFetch.add(field);
 		return this;
+	}
+
+	public DAO leftJoin(String fieldName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public DAO leftJoin(String fieldName, String alias) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public DAO rightJoin(String fieldName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public DAO rightJoin(String fieldName, String alias) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	

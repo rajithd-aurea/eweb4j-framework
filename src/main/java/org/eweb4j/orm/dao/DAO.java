@@ -275,9 +275,15 @@ public interface DAO {
 	
 	public DAO alias(String alias);
 	
-	public DAO leftJoin(String... fieldNames);
+	public DAO leftJoin(String fieldName);
 	
-	public DAO rightJoin(String... fieldNames);
+	public DAO leftJoin(String fieldName, String alias);
+	
+	public DAO rightJoin(String fieldName);
+	
+	public DAO rightJoin(String fieldName, String alias);
+	
+	public DAO on();
 	
 	public DAO join(String fieldName);
 	
@@ -285,7 +291,6 @@ public interface DAO {
 	
 	public DAO enableExpress(boolean flag);
 	
-	public DAO on();
 	
 	public DAO groupBy(String... fieldNames);
 

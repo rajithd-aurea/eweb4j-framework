@@ -28,7 +28,7 @@ public class FileUtil {
 	 * @param retryTimes 如果发生异常重试次数
 	 * @return
 	 */
-	public static BufferedImage getBufferedImage(String imageUrl, int retryTimes) throws Exception{
+	public static BufferedImage getBufferedImage(String imageUrl, int retryTimes, long sleep) throws Exception{
 		int count = 0;
 		while (true){
 			try {
@@ -36,9 +36,9 @@ public class FileUtil {
 				return ImageIO.read(url);
 			} catch (Exception e) {
 				if (count >= 5){
-					e.printStackTrace();
 					throw e;
 				}
+				Thread.sleep(sleep);
 			} 
 			count++;
 		}
@@ -82,7 +82,7 @@ public class FileUtil {
 		String format = "jpg";
 		int retryTimes = 5;
 		
-		BufferedImage im = FileUtil.getBufferedImage(imageUrl, retryTimes);
+		BufferedImage im = FileUtil.getBufferedImage(imageUrl, retryTimes, 1*1000);
 		FileOutputStream os = new FileOutputStream(new File("d:/testxxxxxx.jpg"));
 		ImageIO.write(im, format, os);
 	}

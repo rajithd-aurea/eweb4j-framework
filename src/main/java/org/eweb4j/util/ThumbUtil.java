@@ -31,7 +31,7 @@ public class ThumbUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public ByteArrayOutputStream generateThumb(String remoteImageUrl, String outputFormat, int failRetryTimes, int outputWidth, int outputHeight) throws Exception{
+	public ByteArrayOutputStream generateThumb(String remoteImageUrl, String outputFormat, int failRetryTimes, long sleep, int outputWidth, int outputHeight) throws Exception{
 		if (remoteImageUrl == null || remoteImageUrl.trim().length() == 0)
 			throw new Exception("ImageURL required");
 		
@@ -53,7 +53,13 @@ public class ThumbUtil {
 		if (outputHeight > 0)
 			wh.put(H, outputHeight);
 		
-		BufferedImage bi = FileUtil.getBufferedImage(remoteImageUrl, failRetryTimes);
+		BufferedImage bi = null;
+		try {
+			bi = FileUtil.getBufferedImage(remoteImageUrl, failRetryTimes, sleep);
+		}catch(Exception e){
+			throw e;
+		}
+		
 		if (bi == null)
 			throw new Exception("can not get the image from website");
 		
@@ -100,7 +106,7 @@ public class ThumbUtil {
 		wh.put(W, 270);
 		wh.put(H, 180);
 		
-		BufferedImage bi = FileUtil.getBufferedImage(imageUrl, 5);
+		BufferedImage bi = FileUtil.getBufferedImage(imageUrl, 5, 1*1000);
 		if (bi == null)
 			throw new Exception("can not get the image from website");
 		//比较W与H，找出小的，记住小的那个
