@@ -35,7 +35,7 @@ public class FileUtil {
 				URL url = new URL(imageUrl);
 				return ImageIO.read(url);
 			} catch (Exception e) {
-				if (count >= 5){
+				if (count >= retryTimes){
 					throw e;
 				}
 				Thread.sleep(sleep);
