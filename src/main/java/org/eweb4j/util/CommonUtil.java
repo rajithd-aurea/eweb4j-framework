@@ -26,6 +26,15 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 
 public class CommonUtil {
 
+	public static Long getNow(int length){
+		return getTime(length, new Date());
+	}
+	
+	public static Long getTime(int length, Date date){
+		String time = String.valueOf(date.getTime()).substring(0, length);
+		return Long.parseLong(time);
+	}
+	
 	public static String md5(final String input) {
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");

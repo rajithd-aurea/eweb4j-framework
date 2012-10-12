@@ -388,6 +388,10 @@ public class DAOImpl implements DAO {
 					ReflectUtil ru = new ReflectUtil(t);
 					for (String f : fields){
 						Field field = ru.getField(f);
+						if (field == null)
+							continue;
+						if (field.getType() == null)
+							continue;
 						boolean isEntity = ORMConfigBeanCache.containsKey(field.getType().getName());
 						if (!isEntity)
 							continue;
@@ -986,6 +990,20 @@ public class DAOImpl implements DAO {
 	public DAO rightJoin(String fieldName, String alias) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public DAO likeEqual(Object value) {
+		if (value == null)
+			return this;
+		
+		this.condition.append(" LIKE ");
+		
+		if (!this.express)
+			condition.append("'").append(value).append("' ");
+		else
+			condition.append(ORMConfigBeanUtil.getColumn(clazz, handleFieldAlias(String.valueOf(value))));
+		
+		return this;
 	}
 	
 	

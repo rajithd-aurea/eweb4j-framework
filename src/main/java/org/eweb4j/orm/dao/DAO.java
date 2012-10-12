@@ -342,6 +342,13 @@ public interface DAO {
 	 * @return
 	 */
 	public DAO like(Object value);
+	
+	/**
+	 * like 'xxx'
+	 * @param value
+	 * @return
+	 */
+	public DAO likeEqual(Object value);
 
 	/**
 	 * 就是sql中的 = 'xxx'
