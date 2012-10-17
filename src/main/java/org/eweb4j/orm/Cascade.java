@@ -7,7 +7,7 @@ package org.eweb4j.orm;
  */
 public interface Cascade {
 
-	void merge(String... fields);
+	void fetch(String... fields);
 	
 	void refresh(long newIdVal, String... fields);
 	

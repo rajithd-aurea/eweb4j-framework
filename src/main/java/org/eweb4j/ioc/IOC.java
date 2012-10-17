@@ -142,7 +142,13 @@ public class IOC {
 							// 使用构造器注入的时候，需要按照构造器参数列表顺序实例化
 							Object obj = getBean(ref);
 							initargList.add(obj);
-							argList.add(obj.getClass());
+							String type = inj.getType();
+							if (type != null && type.trim().length() > 0){
+								Class<?> cls = Class.forName(type);
+								argList.add(cls);
+							}else{
+								argList.add(obj.getClass());
+							}
 						}
 					} else {
 						// 注入基本类型

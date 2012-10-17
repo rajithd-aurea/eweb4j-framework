@@ -38,7 +38,7 @@ public class ManyToManyDAO {
 		this.t = t;
 		this.fields = fields;
 		this.ru = new ReflectUtil(this.t);
-		this.table = ORMConfigBeanUtil.getTable(this.t.getClass());
+		this.table = ORMConfigBeanUtil.getTable(this.t.getClass(), true);
 		// 主类的ID属性名
 		this.idField = ORMConfigBeanUtil.getIdField(this.t.getClass());
 		this.idSetter = ru.getSetter(idField);
@@ -338,7 +338,7 @@ public class ManyToManyDAO {
 				tarClass = ClassUtil.getGenericType(f);
 			}
 			
-			String tarTable = ORMConfigBeanUtil.getTable(tarClass);
+			String tarTable = ORMConfigBeanUtil.getTable(tarClass, true);
 			// 目标类对应的数据库表Id字段
 			String referencedColumn = tos[0].referencedColumnName();
 			if (referencedColumn == null || referencedColumn.trim().length() == 0)

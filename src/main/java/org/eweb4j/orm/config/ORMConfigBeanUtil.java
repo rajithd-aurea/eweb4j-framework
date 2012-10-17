@@ -51,7 +51,10 @@ public class ORMConfigBeanUtil {
 						ff[1] = "NOT NULL";
 					else if (ff[1].equalsIgnoreCase("Null"))
 						ff[1] = "NULL";
-					
+					else{
+						query = query.replace(field, " "+getColumn(clazz, CommonUtil.toLowCaseFirst(field))+" = ? ");
+						continue;
+					}
 					query = query.replace(field.trim(), " "+getColumn(clazz, CommonUtil.toLowCaseFirst(ff[0]))+" IS " + ff[1] + " ");
 				}else if (field.contains("NotLike")){
 					query = query.replace(field, " "+getColumn(clazz, CommonUtil.toLowCaseFirst(field.replace("NotLike", "")))+" NOT LIKE ? ");
@@ -168,13 +171,17 @@ public class ORMConfigBeanUtil {
 		return pk;
 	}
 
+	public static <T> String getTable(T t) {
+		return getTable(t, false);
+	}
 	/**
 	 * get table name
 	 * 
 	 * @param clazz
 	 * @return
 	 */
-	public static <T> String getTable(T t) {
+	public static <T> String getTable(T t, boolean isAlias) {
+		String table = null;
 		Class<?> clazz;
 		if (t instanceof Class) {
 			clazz = (Class<?>) t;
@@ -184,13 +191,18 @@ public class ORMConfigBeanUtil {
 
 		if (!(t instanceof Class) && Map.class.isAssignableFrom(clazz)) {
 			HashMap<String, Object> map = (HashMap<String, Object>) t;
-			return (String) map.get("table") + " map";
+			table = (String) map.get("table");
+			if (isAlias)
+				return table + " map";
+			return table;
 		}
 
 		ORMConfigBean ormBean = ORMConfigBeanCache.get(clazz.getName());
-		String table = ormBean == null ? clazz.getSimpleName() : ormBean
-				.getTable();
-		return table + " "+clazz.getSimpleName().toLowerCase();
+		table = ormBean == null ? clazz.getSimpleName() : ormBean.getTable();
+		if (isAlias)
+			return table + " "+clazz.getSimpleName().toLowerCase();
+		
+		return table;
 	}
 
 	public static <T> String getSelectAllColumn(T t) {

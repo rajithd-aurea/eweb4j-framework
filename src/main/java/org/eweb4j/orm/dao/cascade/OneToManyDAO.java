@@ -48,7 +48,7 @@ public class OneToManyDAO {
 		this.t = t;
 		this.fields = fields;
 		this.ru = new ReflectUtil(this.t);
-		this.table = ORMConfigBeanUtil.getTable(this.t.getClass());
+		this.table = ORMConfigBeanUtil.getTable(this.t.getClass(), true);
 		// 主类的ID属性名
 		this.idField = ORMConfigBeanUtil.getIdField(this.t.getClass());
 		this.idGetter = ru.getGetter(idField);

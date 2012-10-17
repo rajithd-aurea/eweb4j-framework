@@ -38,9 +38,9 @@ public class Model2Table {
 		StringBuilder sql = new StringBuilder();
 		StringBuilder manyMany = new StringBuilder();
 		for (Iterator<Entry<Object, ORMConfigBean>> it = ORMConfigBeanCache.entrySet().iterator(); it.hasNext();) {
-			Entry<Object, ORMConfigBean> e = it.next();
-			ORMConfigBean ocb = e.getValue();
-			String table = ocb.getTable();
+			final Entry<Object, ORMConfigBean> e = it.next();
+			final ORMConfigBean ocb = e.getValue();
+			final String table = ocb.getTable();
 			
 //			sql.append( "\n-- ----------------------------" +
 //						"\n-- Created by "+ EWeb4JConfig.about() + 
@@ -90,12 +90,12 @@ public class Model2Table {
 					auto =  " AUTO_INCREMENT ";
 				
 				if (PropType.ONE_ONE.equals(p.getType()) || PropType.MANY_ONE.equals(p.getType())){
-					final String relTable = ORMConfigBeanUtil.getTable(p.getRelClass());
+					final String relTable = ORMConfigBeanUtil.getTable(p.getRelClass(), false);
 					if (p.getRelProperty() == null || p.getRelProperty().trim().length() == 0)
 						p.setRelProperty(ORMConfigBeanUtil.getIdField(p.getRelClass()));
 					
 					final String relColumn = ORMConfigBeanUtil.getColumn(p.getRelClass(), p.getRelProperty());
-					fkSb.append(String.format(fk, col, col, col, col, relTable, relColumn));
+					fkSb.append(String.format(fk, col, col, table+"_"+col, col, relTable, relColumn));
 				}
 				
 				sb.append("\t").append(col).append(" ").append(getType(type)).append(size == null ? "" : size).append(notNull).append(auto);
@@ -157,13 +157,13 @@ public class Model2Table {
 						manyManyField.append("\n\t").append(relFrom).append(" ").append(getType("long")).append(" (20) ,");
 						manyManyField.append("\n\t").append(relTo).append(" ").append(getType("long")).append(" (20) ,");
 						manyManyField.append("\n\t").append("PRIMARY KEY (id)");
-						String tarTable = ORMConfigBeanUtil.getTable(targetClass);
+						String tarTable = ORMConfigBeanUtil.getTable(targetClass, false);
 						String tarIdCol = ORMConfigBeanUtil.getIdColumn(targetClass);
 						
 						String fk1 = String.format(fk, relFrom, relFrom, relTable + "_" + relFrom, relFrom, table, idCol);
 						manyManyField.append(fk1);
 						
-						String fk2 = String.format(fk,relTo, relTo, relTable + "_" + relTo, relTo, tarTable, tarIdCol);
+						String fk2 = String.format(fk, relTo, relTo, relTable + "_" + relTo, relTo, tarTable, tarIdCol);
 						manyManyField.append(fk2);
 						
 						manyMany.append(String.format(create_table_script, relTable, relTable, manyManyField.toString()));

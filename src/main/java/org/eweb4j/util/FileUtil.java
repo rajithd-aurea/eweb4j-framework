@@ -22,6 +22,33 @@ import javax.imageio.ImageIO;
  */
 public class FileUtil {
 	
+	public static boolean deleteFolder(File folder) {
+		return deleteFolderContents(folder) && folder.delete();
+	}
+	
+	/**
+	 * Delete folder's children files
+	 * @param folder
+	 * @return
+	 */
+	public static boolean deleteFolderContents(File folder) {
+		File[] files = folder.listFiles();
+		if (files!=null) {
+			for (File file : files) {
+				if (file.isFile()) {
+					if (!file.delete()) {
+						return false;
+					}
+				} else {
+					if (!deleteFolder(file)) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+	
 	/**
 	 * 
 	 * @param imageUrl 给定的图片URL

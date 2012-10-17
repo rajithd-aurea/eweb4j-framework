@@ -42,7 +42,7 @@ public class UpdateSqlCreator<T> {
 
 	private String makeSQL(T t, String condition) {
 		Class<?> clazz = t.getClass();
-		String table = ORMConfigBeanUtil.getTable(clazz).replace(" "+clazz.getSimpleName().toLowerCase(), "");
+		String table = ORMConfigBeanUtil.getTable(clazz, false);
 		return String.format("UPDATE %s %s ;", table, condition);
 	}
 
@@ -95,7 +95,7 @@ public class UpdateSqlCreator<T> {
 			fields = columns;
 			values = (Object[]) map.get("values");
 		} else {
-			table = ORMConfigBeanUtil.getTable(clazz).replace(" "+clazz.getSimpleName().toLowerCase(), "");
+			table = ORMConfigBeanUtil.getTable(clazz, false);
 			columns = ORMConfigBeanUtil.getColumns(clazz);
 			fields = ORMConfigBeanUtil.getFields(clazz);
 			idColumn = ORMConfigBeanUtil.getIdColumn(clazz);
@@ -178,7 +178,7 @@ public class UpdateSqlCreator<T> {
 
 	private String makeSQL(T t, String[] fields) throws SqlCreateException {
 		Class<?> clazz = t.getClass();
-		String table = ORMConfigBeanUtil.getTable(clazz).replace(" "+clazz.getSimpleName().toLowerCase(), "");
+		String table = ORMConfigBeanUtil.getTable(clazz, false);
 		StringBuilder condition = new StringBuilder();
 		StringBuilder values = new StringBuilder();
 		ReflectUtil ru = new ReflectUtil(t);
@@ -254,7 +254,7 @@ public class UpdateSqlCreator<T> {
 	private String makeSQL(T t, String[] fields, String[] values)
 			throws SqlCreateException {
 		Class<?> clazz = t.getClass();
-		String table = ORMConfigBeanUtil.getTable(clazz).replace(" "+clazz.getSimpleName().toLowerCase(), "");
+		String table = ORMConfigBeanUtil.getTable(clazz, false);
 		ReflectUtil ru = new ReflectUtil(t);
 		String[] columns = ORMConfigBeanUtil.getColumns(clazz, fields);
 		String idColumn = ORMConfigBeanUtil.getIdColumn(clazz);

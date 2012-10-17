@@ -39,7 +39,7 @@ public class ToOneDAO {
 		this.t = t;
 		this.fields = fields;
 		this.ru = new ReflectUtil(this.t);
-		this.table = ORMConfigBeanUtil.getTable(t.getClass());
+		this.table = ORMConfigBeanUtil.getTable(t.getClass(), true);
 		// 主类的ID属性名
 		this.idField = ORMConfigBeanUtil.getIdField(this.t.getClass());
 		this.idColumn = ORMConfigBeanUtil.getIdColumn(this.t.getClass());
@@ -206,7 +206,7 @@ public class ToOneDAO {
 				if (flag) {
 					// select * from {tarTable} where {referencedColumn} = (select {fk} from {table} where {idColumn} = {idVal})
 					String format = "select %s from %s where %s = (select %s from %s where %s = %s )";
-					String tarTable = ORMConfigBeanUtil.getTable(tarClass);
+					String tarTable = ORMConfigBeanUtil.getTable(tarClass, true);
 					
 					
 					String sql = String.format(format,ORMConfigBeanUtil.getSelectAllColumn(tarClass),tarTable, referencedColumn, fk, table, idColumn,idVal);

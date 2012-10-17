@@ -88,7 +88,7 @@ public class DAOImpl implements DAO {
 				table = (String) map.get("table") + " map";
 			}
 		} else {
-			this.table = ORMConfigBeanUtil.getTable(clazz);
+			this.table = ORMConfigBeanUtil.getTable(clazz, true);
 			selectAllColumn = ORMConfigBeanUtil.getSelectAllColumn(clazz);
 		}
 
@@ -855,7 +855,7 @@ public class DAOImpl implements DAO {
 				table = (String) map.get("table");
 			}
 		} else {
-			this.table = ORMConfigBeanUtil.getTable(clazz);
+			this.table = ORMConfigBeanUtil.getTable(clazz, true);
 			selectAllColumn = ORMConfigBeanUtil.getSelectAllColumn(clazz);
 		}
 
@@ -924,7 +924,7 @@ public class DAOImpl implements DAO {
 				if (!ORMConfigBeanCache.containsKey(cls.getName()))
 					throw new Exception("field->" + fieldName + cls.getName() + " is not a entity");
 				
-				String table = ORMConfigBeanUtil.getTable(cls);
+				String table = ORMConfigBeanUtil.getTable(cls, true);
 				
 				joins.add(table);
 				aliasMap.put(alias, fieldName);

@@ -241,7 +241,7 @@ public class TestCascadeDAO {
 		// TestCascadeDAO.testManyManyUpdate();
 		Master master = new Master().findById(1);
 		System.out.println("=============== " + master);
-		master.cascade().merge("pets");
+		master.cascade().fetch("pets");
 		System.out.println("===after=="+master);
 		
 //		master.cascade().refresh(2, "pets");

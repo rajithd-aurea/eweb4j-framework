@@ -54,7 +54,7 @@ public class UserControl {
 		user.setPassword("321456");
 		user.create();
 		
-		user.cascade().merge("master");
+		user.cascade().fetch("master");
 		user.cascade().persist("master");
 		user.cascade().refresh(222, "master");
 		user.cascade().remove("master");

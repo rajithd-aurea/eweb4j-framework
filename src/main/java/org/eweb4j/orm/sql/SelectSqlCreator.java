@@ -61,7 +61,7 @@ public class SelectSqlCreator<T> {
 			}
 		} else {
 			this.selectAllColumn = ORMConfigBeanUtil.getSelectAllColumn(clazz);
-			this.table = ORMConfigBeanUtil.getTable(clazz);
+			this.table = ORMConfigBeanUtil.getTable(clazz, true);
 			this.idColumn = ORMConfigBeanUtil.getIdColumn(clazz);
 			this.idField = ORMConfigBeanUtil.getIdField(clazz);
 		}

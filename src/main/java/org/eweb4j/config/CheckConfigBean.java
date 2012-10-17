@@ -508,10 +508,16 @@ public class CheckConfigBean {
 							&& !"long".equalsIgnoreCase(inj.getType())
 							&& !"double".equalsIgnoreCase(inj.getType())
 							&& !"float".equalsIgnoreCase(inj.getType())) {
-						sb.append("当前您填写的：( type=")
-								.append(inj.getType())
-								.append(" )是错误的！它只能填写为：int|String|long|float|boolean|double 中的一种 ;")
-								.append("\n");
+						String type = inj.getType();
+						try {
+							Class.forName(type);
+						} catch (ClassNotFoundException e) {
+							sb.append("当前您填写的：( type=")
+							.append(inj.getType())
+							.append(" )是错误的！它只能填写为：int|String|long|float|boolean|double 中的一种 或者有效的类名 ;")
+							.append("\n");
+						}
+						
 					}
 				}
 				if ("int".equalsIgnoreCase(inj.getType())) {

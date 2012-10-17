@@ -12,7 +12,7 @@ public class CascadeImpl<T> implements Cascade{
 		this.model = model;
 	}
 	
-	public void merge(String... fields) {
+	public void fetch(String... fields) {
 		this.cascadeDAO.select(model, fields);
 	}
 

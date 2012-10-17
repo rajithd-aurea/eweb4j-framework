@@ -28,7 +28,7 @@ public class DAOUtil {
 			table = (String) map.get("table");
 		} else {
 			idColumn = ORMConfigBeanUtil.getIdColumn(clazz);
-			table = ORMConfigBeanUtil.getTable(clazz);
+			table = ORMConfigBeanUtil.getTable(clazz, true);
 		}
 
 		idColumn = OrderColumnUtil.getOrderColumn(idColumn, dbType);
