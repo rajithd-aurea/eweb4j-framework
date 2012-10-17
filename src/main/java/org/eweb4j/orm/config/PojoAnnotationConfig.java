@@ -221,8 +221,7 @@ public class PojoAnnotationConfig extends ScanPackage {
 					oneAnn = f.getAnnotation(OneToOne.class);
 
 				if (oneAnn != null) {
-					JoinColumn joinColumn = getter
-							.getAnnotation(JoinColumn.class);
+					JoinColumn joinColumn = getter.getAnnotation(JoinColumn.class);
 					if (joinColumn == null)
 						joinColumn = f.getAnnotation(JoinColumn.class);
 
@@ -258,24 +257,22 @@ public class PojoAnnotationConfig extends ScanPackage {
 						_ru = new ReflectUtil(f.getType());
 
 						for (Field _f : _ru.getFields()) {
-							if (!ClassUtil.isListClass(_f))
-								continue;
-
 							String _name = _f.getName();
 							Method _getter = ru.getGetter(_name);
 							if (getter == null)
 								continue;
 
-							OneToMany oneManyAnn = _getter
-									.getAnnotation(OneToMany.class);
+							OneToMany oneManyAnn = _getter.getAnnotation(OneToMany.class);
 							if (oneManyAnn == null)
 								oneManyAnn = f.getAnnotation(OneToMany.class);
-
+							
 							if (oneManyAnn == null)
 								continue;
-
-							Class<?> _targetClass = ClassUtil
-									.getGenericType(_f);
+							
+							if (!ClassUtil.isListClass(_f))
+								continue;
+							
+							Class<?> _targetClass = ClassUtil.getGenericType(_f);
 							if (!clazz.getName().equals(_targetClass.getName()))
 								continue;
 
