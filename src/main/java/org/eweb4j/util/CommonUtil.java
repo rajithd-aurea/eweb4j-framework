@@ -1,13 +1,15 @@
 package org.eweb4j.util;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.text.Normalizer;
+import java.text.Normalizer.Form;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.text.Normalizer.Form;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -27,6 +29,55 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
 public class CommonUtil {
+	
+	public static void main(String[] args){
+		System.out.println("http://www.dealprimo.com/a248.e.akamai.net/origin-cdn.volusion.com/gmtrx.mqpsr/v/vspfiles/photos/DP-FringePerm-3.jpg?1349736248".matches("^.*\\.(jpg|png|gif).*$"));
+	}
+	
+	public static Float toSeconds(String strTime){
+		Float time = 0F;
+		if (strTime.endsWith("s")){
+			time = Float.parseFloat(strTime.replace("s", "")) * 1;
+		}else if (strTime.endsWith("m")){
+			time = Float.parseFloat(strTime.replace("m", "")) * 60;
+		}else if (strTime.endsWith("h")){
+			time = Float.parseFloat(strTime.replace("h", "")) * 60 * 60;
+		}else if (strTime.endsWith("d")){
+			time = Float.parseFloat(strTime.replace("d", "")) * 60 * 60 * 24;
+		}else
+			time = Float.parseFloat(strTime);
+		
+		return time;
+	}
+	
+	public static boolean isSameHost(String hostUrl, String url) throws Exception{
+		URL siteURL = new URL(hostUrl);
+		URL currURL = new URL(url);
+		String siteHost = siteURL.getHost();
+		String currHost = currURL.getHost();
+		return siteHost.equals(currHost);
+	}
+	
+	public static String findOneByRegex(String input, String regex){
+		List<String> list = findByRegex(input, regex);
+		if (list == null)
+			return null;
+		
+		return list.get(0);
+	}
+	
+	public static List<String> findByRegex(String input, String regex){
+		List<String> result = new ArrayList<String>();
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(input);
+		while(m.find()){
+			result.add(m.group());
+		}
+		
+		if (result.isEmpty()) return null;
+		
+		return result;
+	}
 	
 	public static byte[] long2ByteArray(long l) {
 		byte[] array = new byte[8];
