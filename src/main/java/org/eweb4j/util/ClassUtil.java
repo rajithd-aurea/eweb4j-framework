@@ -30,7 +30,6 @@ public class ClassUtil {
 				return cls;
 
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
 		}
 
 		return null;
