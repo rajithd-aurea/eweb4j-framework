@@ -17,9 +17,12 @@ import org.eweb4j.util.FileUtil;
  */
 public class ThumbUtil {
 
-	private  final String W = "width";
-	private  final String H = "height";
-	private  Map<String,Integer> wh = new HashMap<String,Integer>();
+	private final String W = "width";
+	private final String H = "height";
+	//原图宽高
+	private Map<String,Integer> source = new HashMap<String,Integer>();
+	//目标宽高
+	private Map<String,Integer> output = new HashMap<String, Integer>();
 	
 	/**
 	 * 注意！当宽度和高度都给定的情况下会进行裁剪。裁剪规则是：先按照比例压缩，然后将多出的部分分两边裁剪。
@@ -48,10 +51,10 @@ public class ThumbUtil {
 			throw new Exception("outputWidth and outputHeight must have one");
 		
 		if (outputWidth > 0)
-			wh.put(W, outputWidth);
+			output.put(W, outputWidth);
 		
 		if (outputHeight > 0)
-			wh.put(H, outputHeight);
+			output.put(H, outputHeight);
 		
 		BufferedImage bi = null;
 		try {
@@ -66,30 +69,33 @@ public class ThumbUtil {
 		//比较W与H，找出小的，记住小的那个
 		int w = bi.getWidth();
 		int h = bi.getHeight();
+		source.put(W, w);
+		source.put(H, h);
+		
 		String min = W;
 		if (h < w)
 			min = H;
-		// 如果小值不存在，则小值取给过来的值
-		if (!wh.containsKey(min)){
-			if (wh.containsKey(W))
+		// 如果小值不存在，则小值取给过来的其中一个值
+		if (!output.containsKey(min)){
+			if (output.containsKey(W))
 				min = W;
 			else
 				min = H;
 		}
 		
 		//算出比例
-		double scale = (double)w/wh.get(min);
+		double scale = (double)source.get(min)/output.get(min);
 		int sW = new Double(w/scale).intValue();
 		int sH = new Double(h/scale).intValue();
 		
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		
 		//如果给了两个参数，则剪裁
-		if (wh.containsKey(W) && wh.containsKey(H)){
+		if (output.containsKey(W) && output.containsKey(H)){
 			//压缩
 			BufferedImage _bi = Thumbnails.of(bi).size(sW, sH).outputFormat(outputFormat).asBufferedImage();
 			//scale必须为 1 的时候图片才不被放大
-			Thumbnails.of(_bi).scale(1).sourceRegion(Positions.CENTER, wh.get(W), wh.get(H)).outputFormat(outputFormat).toOutputStream(os);
+			Thumbnails.of(_bi).scale(1).sourceRegion(Positions.CENTER, output.get(W), output.get(H)).outputFormat(outputFormat).toOutputStream(os);
 			
 		}else{
 			//压缩
