@@ -19,24 +19,24 @@ public class ThumbUtil {
 
 	/**
 	 * 注意！当宽度和高度都给定的情况下会进行裁剪。裁剪规则是：先按照比例压缩，然后将多出的部分分两边裁剪。
-	 * @param remoteImageUrl 远程图片URL
+	 * @param imagePath 图片path，如果是以 http:// || https:// 开头则认为是远程图片
 	 * @param outputFormat 希望生成的缩略图格式
-	 * @param failRetryTimes 远程图片下载失败尝试次数
+	 * @param failRetryTimes 图片获取失败尝试次数
 	 * @param sleep 重试间隔时间 单位 毫秒
 	 * @param outputWidth 希望生成的缩略图宽度
 	 * @param outputHeight 希望生成的缩略图高度
 	 * @return
 	 * @throws Exception
 	 */
-	public static ByteArrayOutputStream generateThumb(String remoteImageUrl, String outputFormat, int failRetryTimes, long sleep, int outputWidth, int outputHeight) throws Exception{
-		if (remoteImageUrl == null || remoteImageUrl.trim().length() == 0)
+	public static ByteArrayOutputStream generateThumb(String imagePath, String outputFormat, int failRetryTimes, long sleep, int outputWidth, int outputHeight) throws Exception{
+		if (imagePath == null || imagePath.trim().length() == 0)
 			throw new Exception("ImageURL required");
 		
 		if (outputFormat == null || outputFormat.trim().length() == 0)
-			outputFormat = remoteImageUrl.substring(remoteImageUrl.lastIndexOf(".")+1, remoteImageUrl.length());
+			outputFormat = imagePath.substring(imagePath.lastIndexOf(".")+1, imagePath.length());
 		
 		if (outputFormat == null || outputFormat.trim().length() == 0)
-			throw new Exception("can not get the image suffix -> " + remoteImageUrl);
+			throw new Exception("can not get the image suffix -> " + imagePath);
 		
 		if (failRetryTimes <= 0)
 			failRetryTimes = 1;
@@ -59,7 +59,7 @@ public class ThumbUtil {
 		
 		BufferedImage bi = null;
 		try {
-			bi = FileUtil.getBufferedImage(remoteImageUrl, failRetryTimes, sleep);
+			bi = FileUtil.getBufferedImage(imagePath, failRetryTimes, sleep);
 		}catch(Exception e){
 			throw e;
 		}
@@ -108,9 +108,9 @@ public class ThumbUtil {
 	
 	public static void main(String[] args) throws Exception{
 		String outputFormat = "jpg";
-		String remoteImageUrl = "http://static.deal.com.sg/sites/default/files/BodySlimmingMassager.jpg";
-		int outputWidth = 1000;
-		int outputHeight = 1000;
+		String remoteImageUrl = "d:/Weiming_lake_peking_university-w990h270.jpg";
+		int outputWidth = 120;
+		int outputHeight = 120;
 		
 		File file = new File("d:/test_w"+outputWidth+"h"+outputHeight+".jpg");
 		

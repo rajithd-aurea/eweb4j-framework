@@ -1,4 +1,4 @@
-package org.eweb4j.mvc.upload;
+package org.eweb4j.mvc.validator.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -20,5 +20,5 @@ public @interface Upload {
 	
 	Class<?> listener() default void.class;
 	
-	String[] suffix() default {};
+	String[] suffix();
 }

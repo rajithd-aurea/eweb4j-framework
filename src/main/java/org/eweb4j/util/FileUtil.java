@@ -51,16 +51,24 @@ public class FileUtil {
 	
 	/**
 	 * 
-	 * @param imageUrl 给定的图片URL
+	 * @param imagePath 给定的图片Path
 	 * @param retryTimes 如果发生异常重试次数
+	 * @param sleep
 	 * @return
 	 */
-	public static BufferedImage getBufferedImage(String imageUrl, int retryTimes, long sleep) throws Exception{
+	public static BufferedImage getBufferedImage(String imagePath, int retryTimes, long sleep) throws Exception{
+		if (imagePath == null || imagePath.trim().length() == 0)
+			throw new Exception("image url can not be empty");
+		
 		int count = 0;
 		while (true){
 			try {
-				URL url = new URL(imageUrl);
-				return ImageIO.read(url);
+				if (imagePath.startsWith("http://") || imagePath.startsWith("https://")){
+					URL url = new URL(imagePath);
+					return ImageIO.read(url);
+				}else {
+					return ImageIO.read(new File(imagePath));
+				}
 			} catch (Exception e) {
 				if (count >= retryTimes){
 					throw e;

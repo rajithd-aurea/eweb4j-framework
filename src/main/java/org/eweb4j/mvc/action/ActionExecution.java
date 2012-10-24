@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -61,10 +62,10 @@ import org.eweb4j.mvc.config.bean.ResultConfigBean;
 import org.eweb4j.mvc.interceptor.After;
 import org.eweb4j.mvc.interceptor.Before;
 import org.eweb4j.mvc.interceptor.InterExecution;
-import org.eweb4j.mvc.upload.Upload;
 import org.eweb4j.mvc.upload.UploadFile;
 import org.eweb4j.mvc.validator.ValidateExecution;
 import org.eweb4j.mvc.validator.annotation.DateFormat;
+import org.eweb4j.mvc.validator.annotation.Upload;
 import org.eweb4j.orm.dao.DAO;
 import org.eweb4j.orm.dao.DAOFactory;
 import org.eweb4j.orm.dao.DAOImpl;
@@ -877,7 +878,7 @@ public class ActionExecution {
 		String tmpDir = ucb.getTmp();
 		int memoryMax = CommonUtil.strToInt(CommonUtil.parseFileSize(ucb.getMaxMemorySize())+"");
 		long sizeMax = CommonUtil.parseFileSize(ucb.getMaxRequestSize());
-		//String[] suffix = ucb.getSuffix().split(",");
+		String[] suffixArray = null;
 		if (upload != null){
 			if (upload.tmpDir().trim().length() > 0)
 				tmpDir = upload.tmpDir();
@@ -888,8 +889,8 @@ public class ActionExecution {
 			if (upload.maxRequestSize().trim().length() > 0)
 				sizeMax = CommonUtil.parseFileSize(upload.maxRequestSize());
 			
-			//if (upload.suffix().length > 0)
-				//suffix = upload.suffix();
+			if (upload.suffix().length > 0)
+				suffixArray = upload.suffix();
 		}
 		
 		if (tmpDir.trim().length() == 0)
@@ -902,7 +903,11 @@ public class ActionExecution {
 		factory.setRepository(new File(tmpDir));
 		
 		ServletFileUpload _upload = new ServletFileUpload(factory);
+		if (!_upload.isMultipartContent(this.context.getRequest()))
+			return ;
+		
 		_upload.setSizeMax(sizeMax);
+		
 		if (upload != null){
 			Class<?> clazz = upload.listener();
 			if (!void.class.isAssignableFrom(clazz) && ProgressListener.class.isAssignableFrom(clazz))
@@ -911,6 +916,7 @@ public class ActionExecution {
 		
 		try{
 			List<FileItem> items = _upload.parseRequest(this.context.getRequest());
+			
 			Iterator<FileItem> it = items.iterator();
 			while (it.hasNext()){
 				FileItem item = it.next();
@@ -922,7 +928,24 @@ public class ActionExecution {
 					String fileName = item.getName();
 					if (fileName == null || fileName.trim().length() == 0)
 						continue;
+					boolean isOk = false;
+					for (String suffix : suffixArray){
+						if (fileName.endsWith("."+suffix)){
+							isOk = true;
+							break;
+						}
+					}
 					
+					if (!isOk){
+						String err = "your upload file "+fileName+" type invalid ! only allow " + Arrays.asList(suffixArray);
+						Map<String,String> errMap = new HashMap<String,String>();
+						errMap.put(fieldName, err);
+						this.context.getValidation().getErrors().put("upload", errMap);
+						return ;
+					}
+					
+					item.getSize();
+					item.getContentType();
 					String stamp = CommonUtil.getNowTime("yyyyMMddHHmmss");
 					File tmpFile = new File(tmpDir + File.separator + stamp + "_" + fileName);
 					item.write(tmpFile);
@@ -939,7 +962,7 @@ public class ActionExecution {
 				}
 			}
 		}catch(InvalidContentTypeException e){
-			
+			throw new Exception("upload file error", e);
 		} 
 	}
 	
