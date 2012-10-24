@@ -253,12 +253,10 @@ public class ParamUtil {
 	}
 
 	// 将request的请求参数转到另外一个map中去
-	public static Map<String, String[]> copyReqParams(HttpServletRequest req)
-			throws UnsupportedEncodingException {
+	public static Map<String, String[]> copyReqParams(HttpServletRequest req)throws UnsupportedEncodingException {
 		Map<String, String[]> map = new HashMap<String, String[]>();
 		for (@SuppressWarnings("unchecked")
-		Iterator<Entry<String, String[]>> it = req.getParameterMap().entrySet()
-				.iterator(); it.hasNext();) {
+		Iterator<Entry<String, String[]>> it = req.getParameterMap().entrySet().iterator(); it.hasNext();) {
 			Entry<String, String[]> e = it.next();
 			String key = URLDecoder.decode(e.getKey(), "utf-8");
 			String[] val = e.getValue();

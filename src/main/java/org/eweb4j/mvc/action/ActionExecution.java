@@ -910,7 +910,7 @@ public class ActionExecution {
 		
 		if (upload != null){
 			Class<?> clazz = upload.listener();
-			if (!void.class.isAssignableFrom(clazz) && ProgressListener.class.isAssignableFrom(clazz))
+			if (!clazz.getName().equals(ProgressListener.class.getName()) && ProgressListener.class.isAssignableFrom(clazz))
 				_upload.setProgressListener((ProgressListener) clazz.newInstance());
 		}
 		
