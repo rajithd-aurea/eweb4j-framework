@@ -41,21 +41,12 @@ public class ThumbUtil {
 		if (failRetryTimes <= 0)
 			failRetryTimes = 1;
 		
-		if (outputWidth <= 0 && outputHeight <= 0)
-			throw new Exception("outputWidth and outputHeight must have one");
-		
 		final String W = "width";
 		final String H = "height";
 		//原图宽高
 		final Map<String,Integer> source = new HashMap<String,Integer>();
 		//目标宽高
 		final Map<String,Integer> output = new HashMap<String, Integer>();
-		
-		if (outputWidth > 0)
-			output.put(W, outputWidth);
-		
-		if (outputHeight > 0)
-			output.put(H, outputHeight);
 		
 		BufferedImage bi = null;
 		try {
@@ -65,11 +56,23 @@ public class ThumbUtil {
 		}
 		
 		if (bi == null)
-			throw new Exception("can not get the image from website");
+			throw new Exception("can not get the image file from -> " + imagePath);
 		
 		//比较W与H，找出小的，记住小的那个
 		int w = bi.getWidth();
 		int h = bi.getHeight();
+		//如果给出的长宽不大于0的话，用原图大小
+		if (outputWidth <= 0 && outputHeight <= 0){
+			outputWidth = w;
+			outputHeight = h;
+		}
+		
+		if (outputWidth > 0)
+			output.put(W, outputWidth);
+		
+		if (outputHeight > 0)
+			output.put(H, outputHeight);
+		
 		source.put(W, w);
 		source.put(H, h);
 		
