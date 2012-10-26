@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
@@ -186,16 +187,28 @@ public class SelectSqlCreator<T> {
 							
 						}
 						
-						if (oneAnn != null || manyToOneAnn != null) {
-							ReflectUtil tarRu = new ReflectUtil(_value);
-							String tarFKField = ORMConfigBeanUtil.getIdField(_value.getClass());
-
-							Method tarFKGetter = tarRu.getGetter(tarFKField);
-							value = tarFKGetter.invoke(_value);
+						if (oneAnn != null || manyToOneAnn != null){ 
+							JoinColumn joinColAnn = getter.getAnnotation(JoinColumn.class);
+							if (joinColAnn == null)
+								joinColAnn = f.getAnnotation(JoinColumn.class);
+							
+							if (joinColAnn != null && joinColAnn.referencedColumnName().trim().length() > 0){
+								String refField = joinColAnn.referencedColumnName();
+								ReflectUtil tarRu = new ReflectUtil(_value);
+								Method tarFKGetter = tarRu.getGetter(refField);
+								
+								value = tarFKGetter.invoke(_value);
+							}else{
+								ReflectUtil tarRu = new ReflectUtil(_value);
+								String tarFKField = ORMConfigBeanUtil.getIdField(_value.getClass());
+								Method tarFKGetter = tarRu.getGetter(tarFKField);
+								value = tarFKGetter.invoke(_value);
+							}
 						}
-					}
-
-					if (value == null)
+						
+						if (value == null)
+							continue;
+					}else
 						value = _value;
 
 					if (condition.length() > 0)

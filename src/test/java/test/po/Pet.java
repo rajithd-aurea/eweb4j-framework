@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
@@ -39,6 +40,7 @@ public class Pet extends Model<Pet> {
 	private String type;// 只能添加猫和狗两种类型
 
 	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="master_id", referencedColumnName="id")
 	private Master master;
 	
 	@ManyToOne

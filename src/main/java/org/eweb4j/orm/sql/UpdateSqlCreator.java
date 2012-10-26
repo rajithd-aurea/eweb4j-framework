@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
@@ -149,16 +150,26 @@ public class UpdateSqlCreator<T> {
 							
 						}
 						
-						if (oneAnn != null || manyToOneAnn != null) {
-							ReflectUtil tarRu = new ReflectUtil(_value);
-							String tarFKField = ORMConfigBeanUtil.getIdField(_value.getClass());
-
-							Method tarFKGetter = tarRu.getGetter(tarFKField);
-							value = tarFKGetter.invoke(_value);
+						if (oneAnn != null || manyToOneAnn != null){ 
+							JoinColumn joinColAnn = getter.getAnnotation(JoinColumn.class);
+							if (joinColAnn == null)
+								joinColAnn = f.getAnnotation(JoinColumn.class);
+							
+							if (joinColAnn != null && joinColAnn.referencedColumnName().trim().length() > 0){
+								String refField = joinColAnn.referencedColumnName();
+								ReflectUtil tarRu = new ReflectUtil(_value);
+								Method tarFKGetter = tarRu.getGetter(refField);
+								value = tarFKGetter.invoke(_value);
+							}else{
+								ReflectUtil tarRu = new ReflectUtil(_value);
+								String tarFKField = ORMConfigBeanUtil.getIdField(_value.getClass());
+								Method tarFKGetter = tarRu.getGetter(tarFKField);
+								value = tarFKGetter.invoke(_value);
+							}
 						}
-					}
-
-					if (value == null)
+						if (value == null)
+							continue;
+					}else
 						value = _value;
 				}
 
@@ -169,7 +180,7 @@ public class UpdateSqlCreator<T> {
 						.append("'");
 			}
 		} catch (Exception e) {
-			throw new SqlCreateException("" + e.toString());
+			throw new SqlCreateException("" + e.toString(), e);
 		}
 
 		return String.format("UPDATE %s SET %s WHERE %s ;", table, valuesSb,
@@ -193,8 +204,7 @@ public class UpdateSqlCreator<T> {
 			condition.append(idColumn).append(" = '")
 					.append(idGetter.invoke(t)).append("'");
 		} catch (Exception e) {
-			throw new SqlCreateException(idGetter + " invoke exception "
-					+ e.toString());
+			throw new SqlCreateException(idGetter + " invoke exception " + e.toString(), e);
 		}
 
 		for (int i = 0; i < fields.length; i++) {
@@ -225,25 +235,37 @@ public class UpdateSqlCreator<T> {
 						
 					}
 					
-					if (oneAnn != null || manyToOneAnn != null) {
-						ReflectUtil tarRu = new ReflectUtil(_value);
-						String tarFKField = ORMConfigBeanUtil.getIdField(_value.getClass());
-
-						Method tarFKGetter = tarRu.getGetter(tarFKField);
-						value = tarFKGetter.invoke(_value);
+					if (oneAnn != null || manyToOneAnn != null){ 
+						JoinColumn joinColAnn = getter.getAnnotation(JoinColumn.class);
+						if (joinColAnn == null)
+							joinColAnn = f.getAnnotation(JoinColumn.class);
+						
+						if (joinColAnn != null && joinColAnn.referencedColumnName().trim().length() > 0){
+							String refField = joinColAnn.referencedColumnName();
+							ReflectUtil tarRu = new ReflectUtil(_value);
+							Method tarFKGetter = tarRu.getGetter(refField);
+							value = tarFKGetter.invoke(_value);
+						}else{
+							ReflectUtil tarRu = new ReflectUtil(_value);
+							String tarFKField = ORMConfigBeanUtil.getIdField(_value.getClass());
+							Method tarFKGetter = tarRu.getGetter(tarFKField);
+							value = tarFKGetter.invoke(_value);
+						}
 					}
-				}
-
-				if (value == null)
+					
+					if (value == null)
+						continue;
+					
+				}else{
 					value = _value;
+				}
 
 				if (values.length() > 0)
 					values.append(", ");
 
 				values.append(column).append(" = '").append(value).append("'");
 			} catch (Exception e) {
-				throw new SqlCreateException(idGetter + " invoke exception "
-						+ e.toString());
+				throw new SqlCreateException(idGetter + " invoke exception " + e.toString(), e);
 			}
 		}
 
@@ -268,8 +290,7 @@ public class UpdateSqlCreator<T> {
 			condition.append(idColumn).append(" = '")
 					.append(idGetter.invoke(t)).append("'");
 		} catch (Exception e) {
-			throw new SqlCreateException(idGetter + " invoke exception "
-					+ e.toString());
+			throw new SqlCreateException(idGetter + " invoke exception " + e.toString(), e);
 		}
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < columns.length; ++i) {

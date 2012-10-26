@@ -35,9 +35,9 @@ public class ModelHelper<T> implements IModel<T>{
 	}
 	
 	public boolean create(String... field) {
-		Long _id = _getId();
-		if (_id != null && _id > 0)
-			return false;
+//		Long _id = _getId();
+//		if (_id != null && _id > 0)
+//			return false;
 		Number id;
 		if (field != null && field.length > 0)
 			id = DAOFactory.getInsertDAO(this.dsName).insertByField(this.model, field);

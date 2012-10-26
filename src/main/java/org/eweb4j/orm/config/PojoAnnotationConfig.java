@@ -219,96 +219,102 @@ public class PojoAnnotationConfig extends ScanPackage {
 				OneToOne oneAnn = getter.getAnnotation(OneToOne.class);
 				if (oneAnn == null)
 					oneAnn = f.getAnnotation(OneToOne.class);
-
-				if (oneAnn != null) {
+				
+				ManyToOne manyToOneAnn = null;
+				if (oneAnn == null){
+					manyToOneAnn = getter.getAnnotation(ManyToOne.class);
+					if (manyToOneAnn == null)
+						manyToOneAnn = f.getAnnotation(ManyToOne.class);
+				}
+				
+				if (oneAnn != null || manyToOneAnn != null) {
+					if (oneAnn != null)
+						p.setType(PropType.ONE_ONE);
+					else
+						p.setType(PropType.MANY_ONE);
+					
 					JoinColumn joinColumn = getter.getAnnotation(JoinColumn.class);
 					if (joinColumn == null)
 						joinColumn = f.getAnnotation(JoinColumn.class);
 
-					if (joinColumn == null) {
+					if (joinColumn != null && joinColumn.name().trim().length() > 0) 
+						p.setColumn(joinColumn.name());
+					 else 
 						p.setColumn(f.getName() + "_id");
-					} else {
-						if (joinColumn.name().trim().length() == 0) {
-							String refCol = joinColumn.referencedColumnName();
-							if (refCol == null || refCol.trim().length() == 0)
-								p.setColumn(f.getName() + "_id");
-							else
-								p.setColumn(f.getName() + "_" + refCol);
-						} else
-							p.setColumn(joinColumn.name());
-					}
-					String relProperty = oneAnn.mappedBy();
-					if (relProperty == null || relProperty.trim().length() == 0)
+					
+					String relProperty = null;
+					if (joinColumn != null && joinColumn.referencedColumnName().trim().length() > 0){
+						relProperty = joinColumn.referencedColumnName();
+					}else
 						relProperty = ORMConfigBeanUtil.getIdField(f.getType());
-
+					
 					p.setRelProperty(relProperty);
 					p.setRelClass(f.getType());
-					p.setType(PropType.ONE_ONE);
 					p.setSize("20");
 				}
 
-				ManyToOne manyOneAnn = getter.getAnnotation(ManyToOne.class);
-				if (manyOneAnn == null)
-					manyOneAnn = f.getAnnotation(ManyToOne.class);
+//				ManyToOne manyOneAnn = getter.getAnnotation(ManyToOne.class);
+//				if (manyOneAnn == null)
+//					manyOneAnn = f.getAnnotation(ManyToOne.class);
+//
+//				if (manyOneAnn != null) {
+//					ReflectUtil _ru;
+//					try {
+//						_ru = new ReflectUtil(f.getType());
+//
+//						for (Field _f : _ru.getFields()) {
+//							String _name = _f.getName();
+//							Method _getter = ru.getGetter(_name);
+//							if (getter == null)
+//								continue;
+//
+//							OneToMany oneManyAnn = _getter.getAnnotation(OneToMany.class);
+//							if (oneManyAnn == null)
+//								oneManyAnn = f.getAnnotation(OneToMany.class);
+//							
+//							if (oneManyAnn == null)
+//								continue;
+//							
+//							if (!ClassUtil.isListClass(_f))
+//								continue;
+//							
+//							Class<?> _targetClass = ClassUtil.getGenericType(_f);
+//							if (!clazz.getName().equals(_targetClass.getName()))
+//								continue;
+//
+//							String relProperty = oneManyAnn.mappedBy();
+//							if (relProperty == null
+//									|| relProperty.trim().length() == 0)
+//								relProperty = ORMConfigBeanUtil.getIdField(_f
+//										.getType());
+//
+//							p.setRelProperty(relProperty);
+//
+//							break;
+//						}
+//					} catch (Exception e) {
+//					}
 
-				if (manyOneAnn != null) {
-					ReflectUtil _ru;
-					try {
-						_ru = new ReflectUtil(f.getType());
-
-						for (Field _f : _ru.getFields()) {
-							String _name = _f.getName();
-							Method _getter = ru.getGetter(_name);
-							if (getter == null)
-								continue;
-
-							OneToMany oneManyAnn = _getter.getAnnotation(OneToMany.class);
-							if (oneManyAnn == null)
-								oneManyAnn = f.getAnnotation(OneToMany.class);
-							
-							if (oneManyAnn == null)
-								continue;
-							
-							if (!ClassUtil.isListClass(_f))
-								continue;
-							
-							Class<?> _targetClass = ClassUtil.getGenericType(_f);
-							if (!clazz.getName().equals(_targetClass.getName()))
-								continue;
-
-							String relProperty = oneManyAnn.mappedBy();
-							if (relProperty == null
-									|| relProperty.trim().length() == 0)
-								relProperty = ORMConfigBeanUtil.getIdField(_f
-										.getType());
-
-							p.setRelProperty(relProperty);
-
-							break;
-						}
-					} catch (Exception e) {
-					}
-
-					p.setRelClass(f.getType());
-					p.setType(PropType.MANY_ONE);
-					p.setSize("20");
-					JoinColumn col = getter.getAnnotation(JoinColumn.class);
-					if (col == null)
-						col = f.getAnnotation(JoinColumn.class);
-
-					if (col == null) {
-						p.setColumn(f.getName() + "_id");
-					} else {
-						if (col.name().trim().length() == 0) {
-							String refCol = col.referencedColumnName();
-							if (refCol == null || refCol.trim().length() == 0)
-								p.setColumn(f.getName() + "_id");
-							else
-								p.setColumn(f.getName() + "_" + refCol);
-						} else
-							p.setColumn(col.name());
-					}
-				}
+//					p.setRelClass(f.getType());
+//					
+//					p.setSize("20");
+//					JoinColumn col = getter.getAnnotation(JoinColumn.class);
+//					if (col == null)
+//						col = f.getAnnotation(JoinColumn.class);
+//
+//					if (col == null) {
+//						p.setColumn(f.getName() + "_id");
+//					} else {
+//						if (col.name().trim().length() == 0) {
+//							String refCol = col.referencedColumnName();
+//							if (refCol == null || refCol.trim().length() == 0)
+//								p.setColumn(f.getName() + "_id");
+//							else
+//								p.setColumn(f.getName() + "_" + refCol);
+//						} else
+//							p.setColumn(col.name());
+//					}
+//				}
 			}
 
 			result.add(p);

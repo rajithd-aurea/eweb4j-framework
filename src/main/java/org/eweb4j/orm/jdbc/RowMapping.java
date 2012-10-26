@@ -141,12 +141,11 @@ public class RowMapping {
 								continue;
 
 							Field field = ru.getField(p.getName());
-							
 							Class<?> tarClass = field.getType();
 
 							String tarFKField = null;
-
-							tarFKField = ORMConfigBeanUtil.getIdField(tarClass);
+							
+							tarFKField = p.getRelProperty();
 							Object tarObj = tarClass.newInstance();
 							tarObj = ClassUtil.injectFieldValue(tarObj,tarFKField, new String[] { v });
 							
