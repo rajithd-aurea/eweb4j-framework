@@ -21,8 +21,7 @@ public class SelectDAOImpl implements SelectDAO {
 		this.dbType = dbType;
 	}
 
-	public <T> List<T> selectAll(Class<T> clazz, String orderField,
-			int orderType) throws DAOException {
+	public <T> List<T> selectAll(Class<T> clazz, String orderField, int orderType) throws DAOException {
 		List<T> list = null;
 		if (clazz != null) {
 			Connection con = null;
@@ -37,8 +36,7 @@ public class SelectDAOImpl implements SelectDAO {
 		return list;
 	}
 
-	public <T> List<T> selectAll(Class<T> clazz, int orderType)
-			throws DAOException {
+	public <T> List<T> selectAll(Class<T> clazz, int orderType) throws DAOException {
 		return this.selectAll(clazz, null, orderType);
 	}
 
@@ -75,8 +73,7 @@ public class SelectDAOImpl implements SelectDAO {
 			try {
 				con = ds.getConnection();
 				T t = clazz.newInstance();
-				String sql = SqlFactory.getSelectSql(t, dbType).selectWhere(
-						fields, values);
+				String sql = SqlFactory.getSelectSql(t, dbType).selectWhere(fields, values);
 				List<T> list = JdbcUtil.getList(con, clazz, sql);
 				if (list != null && !list.isEmpty()) {
 					result = list.get(0);

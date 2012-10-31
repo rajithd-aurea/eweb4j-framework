@@ -43,10 +43,6 @@ public class ThumbUtil {
 		
 		final String W = "width";
 		final String H = "height";
-		//原图宽高
-		final Map<String,Integer> source = new HashMap<String,Integer>();
-		//目标宽高
-		final Map<String,Integer> output = new HashMap<String, Integer>();
 		
 		BufferedImage bi = null;
 		try {
@@ -58,23 +54,34 @@ public class ThumbUtil {
 		if (bi == null)
 			throw new Exception("can not get the image file from -> " + imagePath);
 		
-		//比较W与H，找出小的，记住小的那个
 		int w = bi.getWidth();
 		int h = bi.getHeight();
+		
+		//如果原图比目标长宽要少，用原图大小,这样就不会进行放大了
+		if (w < outputWidth)
+			outputWidth = w;
+		if (h < outputHeight)
+			outputHeight = h;
+		
+		//原图宽高
+		final Map<String,Integer> source = new HashMap<String,Integer>();
+		source.put(W, w);
+		source.put(H, h);
+		
+		//比较W与H，找出小的，记住小的那个
 		//如果给出的长宽不大于0的话，用原图大小
 		if (outputWidth <= 0 && outputHeight <= 0){
 			outputWidth = w;
 			outputHeight = h;
 		}
 		
+		//目标宽高
+		final Map<String,Integer> output = new HashMap<String, Integer>();
 		if (outputWidth > 0)
 			output.put(W, outputWidth);
 		
 		if (outputHeight > 0)
 			output.put(H, outputHeight);
-		
-		source.put(W, w);
-		source.put(H, h);
 		
 		String min = W;
 		if (h < w)
@@ -110,12 +117,13 @@ public class ThumbUtil {
 	}
 	
 	public static void main(String[] args) throws Exception{
-		String outputFormat = "jpg";
-		String remoteImageUrl = "d:/Weiming_lake_peking_university-w990h270.jpg";
-		int outputWidth = 120;
-		int outputHeight = 120;
+		String outputFormat = "png";
+		String name = "ada";
+		String remoteImageUrl = "d:/"+name+".png";
+		int outputWidth = 16;
+		int outputHeight = 16;
 		
-		File file = new File("d:/test_w"+outputWidth+"h"+outputHeight+".jpg");
+		File file = new File("d:/"+name+"_w"+outputWidth+"h"+outputHeight+"."+outputFormat);
 		
 		ByteArrayOutputStream os = ThumbUtil.generateThumb(remoteImageUrl, outputFormat, 1, 1*1000, outputWidth, outputHeight);
 		FileOutputStream writer = new FileOutputStream(file);

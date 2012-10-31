@@ -11,10 +11,6 @@ import org.eweb4j.util.ReflectUtil;
 
 public class ModelHelper<T> implements IModel<T>{
 
-	public static <T> ModelHelper<T> inst(T t){
-		return new ModelHelper<T>(t);
-	}
-	
 	private T model;
 	private ReflectUtil ru ;
 	
@@ -156,18 +152,7 @@ public class ModelHelper<T> implements IModel<T>{
 	}
 
 	public List<T> findAll() {
-		List<T> list = (List<T>) DAOFactory.getSelectDAO(dsName).selectAll(this.model.getClass());
-		if (list != null)
-			for (T t : list){
-				// ToOne relation class cascade select
-				final String[] fields = ORMConfigBeanUtil.getToOneField(this.model.getClass());
-				if (fields == null || fields.length == 0)
-					continue;
-				
-				DAOFactory.getCascadeDAO(dsName).select(t, fields);
-			}
-		
-		return list;
+		return (List<T>) find().fetch();
 	}
 
 	public long count() {

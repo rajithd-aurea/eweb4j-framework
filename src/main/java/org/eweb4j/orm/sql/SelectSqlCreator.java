@@ -698,8 +698,7 @@ public class SelectSqlCreator<T> {
 	 * @return
 	 * @throws SqlCreateException
 	 */
-	public String divPage(int currPage, int numPerPage, String orderField,
-			int oType, String condition) throws SqlCreateException {
+	public String divPage(int currPage, int numPerPage, String orderField, int oType, String condition) throws SqlCreateException {
 		String sql = null;
 		if (orderField == null) {
 			orderField = idColumn;
@@ -713,17 +712,14 @@ public class SelectSqlCreator<T> {
 		if (DBType.MYSQL_DB.equalsIgnoreCase(dbType)) {
 			sql = "SELECT ${allColumn} FROM ${table} ${condition} ORDER BY ${orderField} ${orderType} LIMIT ${first}, ${numPerPage} ;";
 			if (currPage > 0 && numPerPage > 0) {
-				sql = sql.replace("${first}",
-						String.valueOf((currPage - 1) * numPerPage));
+				sql = sql.replace("${first}", String.valueOf((currPage - 1) * numPerPage));
 				sql = sql.replace("${numPerPage}", String.valueOf(numPerPage));
 			}
-		} else if (DBType.MSSQL2000_DB.equalsIgnoreCase(dbType)
-				|| DBType.MSSQL2005_DB.equalsIgnoreCase(dbType)) {
+		} else if (DBType.MSSQL2000_DB.equalsIgnoreCase(dbType) || DBType.MSSQL2005_DB.equalsIgnoreCase(dbType)) {
 			sql = "SELECT TOP ${numPerPage} ${allColumn} FROM ${table} WHERE ${orderField} NOT IN (SELECT TOP ${first} ${orderField} FROM ${table} ORDER BY ${orderField} ${orderType}) ${condition} ORDER BY ${orderField} ${orderType} ;";
 			if (currPage > 0 && numPerPage > 0) {
 				sql = sql.replace("${numPerPage}", String.valueOf(numPerPage));
-				sql = sql.replace("${first}",
-						String.valueOf(numPerPage * (currPage - 1)));
+				sql = sql.replace("${first}", String.valueOf(numPerPage * (currPage - 1)));
 			}
 		} else if (DBType.ORACLE_DB.equalsIgnoreCase(dbType)) {
 			if (currPage > 0 && numPerPage > 0) {
@@ -745,8 +741,7 @@ public class SelectSqlCreator<T> {
 		sql = sql.replace("${orderField}", orderField);
 		sql = sql.replace("${orderType}", orderType);
 		if (condition != null && condition.trim().length() > 0) {
-			if (DBType.MYSQL_DB.equalsIgnoreCase(dbType)
-					|| DBType.ORACLE_DB.equalsIgnoreCase(dbType)) {
+			if (DBType.MYSQL_DB.equalsIgnoreCase(dbType) || DBType.ORACLE_DB.equalsIgnoreCase(dbType)) {
 				sql = sql.replace("${condition}", " WHERE " + condition);
 			} else {
 				sql = sql.replace("${condition}", " AND " + condition);

@@ -1,7 +1,6 @@
 package org.eweb4j.orm;
 
 import java.util.Collection;
-import java.util.List;
 
 public interface Query {
 

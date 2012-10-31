@@ -28,8 +28,7 @@ public interface SelectDAO {
 	 *            排序类型
 	 * @return 查询成功返回类集否则返回null
 	 */
-	public <T> List<T> selectAll(Class<T> clazz, String orderField,
-			int orderType) throws DAOException;
+	public <T> List<T> selectAll(Class<T> clazz, String orderField, int orderType) throws DAOException;
 
 	/**
 	 * <b>查询所有，默认id排序</b> <code>
@@ -46,8 +45,7 @@ public interface SelectDAO {
 	 *            排序类型 1升序，-1降序
 	 * @return
 	 */
-	public <T> List<T> selectAll(Class<T> clazz, int orderType)
-			throws DAOException;
+	public <T> List<T> selectAll(Class<T> clazz, int orderType) throws DAOException;
 
 	/**
 	 * <b>查询所有，默认id排序且降序</b> <code>
