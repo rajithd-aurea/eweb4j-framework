@@ -326,14 +326,6 @@ public class ManyToManyDAO {
 			if (tarGetter == null)
 				continue;
 
-			OrderBy orderAnn = tarGetter.getAnnotation(OrderBy.class);
-			if (orderAnn == null) 
-				orderAnn = f.getAnnotation(OrderBy.class);
-			
-			String orderBy = "";
-			if (orderAnn != null)
-				orderBy = " ORDER BY "+orderAnn.value();
-			
 			ManyToMany ann = tarGetter.getAnnotation(ManyToMany.class);
 			if (ann == null) {
 				ann = f.getAnnotation(ManyToMany.class);
@@ -363,6 +355,15 @@ public class ManyToManyDAO {
 			}
 			
 			String tarTable = ORMConfigBeanUtil.getTable(tarClass, true);
+			
+			OrderBy orderAnn = tarGetter.getAnnotation(OrderBy.class);
+			if (orderAnn == null) 
+				orderAnn = f.getAnnotation(OrderBy.class);
+			
+			String orderBy = "";
+			if (orderAnn != null)
+				orderBy = " ORDER BY "+orderAnn.value().replace("t.", tarClass.getSimpleName().toLowerCase()+".");
+			
 			// 目标类对应的数据库表Id字段
 			String toRefCol = tos[0].referencedColumnName();
 			if (toRefCol == null || toRefCol.trim().length() == 0)
