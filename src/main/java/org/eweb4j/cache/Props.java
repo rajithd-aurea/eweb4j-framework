@@ -28,6 +28,7 @@ import org.eweb4j.util.FileUtil;
 import org.eweb4j.util.RegexList;
 import org.eweb4j.util.CommonUtil;
 
+@SuppressWarnings("all")
 public class Props {
 
 	private static Log log = LogFactory.getConfigLogger(Props.class);
