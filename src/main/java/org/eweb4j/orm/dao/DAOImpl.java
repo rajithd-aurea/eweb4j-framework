@@ -95,6 +95,8 @@ public class DAOImpl implements DAO {
 		if (selectAllColumn == null || selectAllColumn.trim().length() == 0)
 			selectAllColumn = "*";
 		
+		if (ORMConfigBeanUtil.getIdField(clazz) == null)
+			return ;
 		this.buffer.put("orderField", ORMConfigBeanUtil.getIdField(clazz));
 		this.buffer.put("orderType", OrderType.DESC_ORDER);
 	}
@@ -551,11 +553,10 @@ public class DAOImpl implements DAO {
 	}
 
 	public int execute() {
-		int id = -1;
+		int rs = 0;
 		String sql = this.sql.toString().replace("${_where_}", this.condition.toString()).replace("'?'", "?");
 		DataSource ds = DataSourceWrapCache.get(dsName);
 		try {
-			int rs = 0;
 			if (args != null && args.size() > 0) {
 				rs = (Integer) JdbcUtil.updateWithArgs(ds.getConnection(), sql, args.toArray(new Object[] {}));
 			} else {
@@ -572,9 +573,11 @@ public class DAOImpl implements DAO {
 						map.put("idColumn", "id");
 					}
 
-					id = (Integer) DAOUtil.selectMaxId(map, ds.getConnection(),dbType);
+					Number id = DAOUtil.selectMaxId(map, ds.getConnection(),dbType);
+					return id == null ? 0 : id.intValue();
 				} else {
-					id = (Integer) DAOUtil.selectMaxId(clazz,ds.getConnection(), dbType);
+					Number id = DAOUtil.selectMaxId(clazz,ds.getConnection(), dbType);
+					return id == null ? 0 : id.intValue();
 				}
 			}
 
@@ -584,7 +587,7 @@ public class DAOImpl implements DAO {
 		}
 
 		//this.clear();
-		return id;
+		return rs;
 	}
 
 	public DAO update(String... fields) {
@@ -734,8 +737,10 @@ public class DAOImpl implements DAO {
 		this.sql = null;
 		this.sql = new StringBuilder();
 		this.buffer.clear();
-		this.buffer.put("orderField", ORMConfigBeanUtil.getIdField(clazz));
-		this.buffer.put("orderType", OrderType.DESC_ORDER);
+		if (ORMConfigBeanUtil.getIdField(clazz) != null){
+			this.buffer.put("orderField", ORMConfigBeanUtil.getIdField(clazz));
+			this.buffer.put("orderType", OrderType.DESC_ORDER);
+		}
 		this.condition = null;
 		this.condition = new StringBuilder();
 		this.args.clear();

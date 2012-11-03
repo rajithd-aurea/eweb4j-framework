@@ -195,7 +195,6 @@ public class PojoAnnotationConfig extends ScanPackage {
 				p.setAutoIncrement("1");
 				p.setPk("1");
 				p.setSize("20");
-
 			}
 
 			Column colAnn = getter.getAnnotation(Column.class);
@@ -242,13 +241,13 @@ public class PojoAnnotationConfig extends ScanPackage {
 					 else 
 						p.setColumn(f.getName() + "_id");
 					
-					String relProperty = null;
+					String refCol = null;
 					if (joinColumn != null && joinColumn.referencedColumnName().trim().length() > 0){
-						relProperty = joinColumn.referencedColumnName();
+						refCol = joinColumn.referencedColumnName();
 					}else
-						relProperty = ORMConfigBeanUtil.getIdField(f.getType());
+						refCol = ORMConfigBeanUtil.getIdColumn(f.getType());
 					
-					p.setRelProperty(relProperty);
+					p.setRelProperty(ORMConfigBeanUtil.getField(f.getType(), refCol));
 					p.setRelClass(f.getType());
 					p.setSize("20");
 				}

@@ -12,7 +12,6 @@ import java.util.Map;
 
 import org.eweb4j.cache.ORMConfigBeanCache;
 import org.eweb4j.orm.PropType;
-import org.eweb4j.orm.config.ORMConfigBeanUtil;
 import org.eweb4j.orm.config.bean.ORMConfigBean;
 import org.eweb4j.orm.config.bean.Property;
 import org.eweb4j.util.ClassUtil;
@@ -143,11 +142,9 @@ public class RowMapping {
 							Field field = ru.getField(p.getName());
 							Class<?> tarClass = field.getType();
 
-							String tarFKField = null;
-							
-							tarFKField = p.getRelProperty();
+							String refField = p.getRelProperty();
 							Object tarObj = tarClass.newInstance();
-							tarObj = ClassUtil.injectFieldValue(tarObj,tarFKField, new String[] { v });
+							tarObj = ClassUtil.injectFieldValue(tarObj, refField, new String[] { v });
 							
 							m.invoke(t, tarObj);
 

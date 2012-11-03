@@ -10,7 +10,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OrderBy;
 
-import org.eweb4j.orm.Models;
 import org.eweb4j.orm.config.ORMConfigBeanUtil;
 import org.eweb4j.orm.dao.DAOException;
 import org.eweb4j.orm.dao.DAOFactory;
@@ -39,19 +38,21 @@ public class ManyToManyDAO {
 		this.table = ORMConfigBeanUtil.getTable(this.t.getClass(), true);
 		
 		String idField = ORMConfigBeanUtil.getIdField(this.t.getClass());
-		Method idSetter = ru.getSetter(idField);
-		if (idSetter == null)
-			throw new DAOException("can not get idSetter.", null);
+//		Method idSetter = ru.getSetter(idField);
+//		if (idSetter == null)
+//			throw new DAOException("can not get idSetter.", null);
 
 		Method idGetter = ru.getGetter(idField);
-		if (idGetter == null)
-			throw new DAOException("can not get idGetter.", null);
+//		if (idGetter == null)
+//			throw new DAOException("can not get idGetter.", null);
 
-		try {
-			Object _idVal = idGetter.invoke(this.t);
-			this.idVal = _idVal == null ? null : String.valueOf(_idVal);
-		} catch (Exception e) {
-			throw new DAOException(idGetter + " invoke exception ", e);
+		if (idGetter != null){
+			try {
+				Object _idVal = idGetter.invoke(this.t);
+				this.idVal = _idVal == null ? null : String.valueOf(_idVal);
+			} catch (Exception e) {
+				throw new DAOException(idGetter + " invoke exception ", e);
+			}
 		}
 	}
 
@@ -74,7 +75,8 @@ public class ManyToManyDAO {
 					Number _idVal = DAOFactory.getInsertDAO(dsName).insert(t);
 					if (_idVal == null || _idVal.intValue() <= 0)
 						throw new Exception("can not inster the main obj into db");
-				} else if (Models.inst(t).load() == null) {
+					idVal = _idVal.toString();
+				} else if (DAOFactory.getSelectDAO(dsName).selectOneById(t) == null) {
 					throw new Exception("the main object'id val is invalid!");
 				}
 
@@ -122,7 +124,6 @@ public class ManyToManyDAO {
 					} catch (Exception e) {
 						throw new DAOException(tarGetter + " invoke exception ", e);
 					}
-					
 					if (_tarObj == null)
 						continue;
 					
@@ -163,7 +164,7 @@ public class ManyToManyDAO {
 					
 		
 						// 如果目标对象不存在于数据库，则将目标对象插入到数据库
-						Object tempObj = Models.inst(tarObj).load();
+						Object tempObj = DAOFactory.getSelectDAO(dsName).selectOneById(tarObj);
 						if (tempObj == null) {
 							Number _tarIdVal = DAOFactory.getInsertDAO(dsName).insert(tarObj);
 							if (_tarIdVal == null || _tarIdVal.intValue() <= 0)

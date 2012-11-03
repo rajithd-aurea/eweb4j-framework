@@ -52,17 +52,18 @@ public class OneToManyDAO {
 		// 主类的ID属性名
 		String idField = ORMConfigBeanUtil.getIdField(this.t.getClass());
 		Method idGetter = ru.getGetter(idField);
-		if (idGetter == null)
-			throw new DAOException("can not find idGetter.", null);
+//		if (idGetter == null)
+//			throw new DAOException("can not find idGetter.", null);
 
 		Object idVal = null;
-		try {
-			idVal = idGetter.invoke(this.t);
-			this.idVal = idVal == null ? null : String.valueOf(idVal);
-		} catch (Exception e) {
-			throw new DAOException(idGetter + " invoke exception ", e);
+		if (idGetter != null) {
+			try {
+				idVal = idGetter.invoke(this.t);
+				this.idVal = idVal == null ? null : String.valueOf(idVal);
+			} catch (Exception e) {
+				throw new DAOException(idGetter + " invoke exception ", e);
+			}
 		}
-
 	}
 
 	/**
@@ -88,7 +89,7 @@ public class OneToManyDAO {
 					Number _idVal = DAOFactory.getInsertDAO(dsName).insert(t);
 					if (_idVal == null || _idVal.intValue() <= 0)
 						throw new Exception("can not inster the main obj into db");
-				} else if (Models.inst(t).load() == null) {
+				} else if (DAOFactory.getSelectDAO(dsName).selectOneById(t) == null) {
 					throw new Exception("the main object'id val is invalid!");
 				}
 				
