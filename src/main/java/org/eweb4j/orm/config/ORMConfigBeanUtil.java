@@ -18,6 +18,7 @@ import org.eweb4j.util.ClassUtil;
 import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.ReflectUtil;
 
+@SuppressWarnings("all")
 public class ORMConfigBeanUtil {
 
 	public static String[] getToOneField(Class<?> clazz){

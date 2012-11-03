@@ -11,7 +11,7 @@ import org.eweb4j.i18n.Lang;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
+@SuppressWarnings("all")
 public class TestI18N {
 	
 	@BeforeClass

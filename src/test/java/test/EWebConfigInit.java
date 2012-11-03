@@ -1,14 +1,6 @@
 package test;
 
-import org.eweb4j.config.ConfigBeanCreator;
-import org.eweb4j.config.ConfigConstant;
 import org.eweb4j.config.EWeb4JConfig;
-import org.eweb4j.config.bean.ConfigBean;
-import org.eweb4j.config.bean.I18N;
-import org.eweb4j.config.bean.Locale;
-import org.eweb4j.config.bean.LogConfigBean;
-import org.eweb4j.config.bean.LogsConfigBean;
-import org.eweb4j.config.bean.Prop;
 
 public class EWebConfigInit {
 

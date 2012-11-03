@@ -20,6 +20,7 @@ import org.dom4j.io.OutputFormat;
 import org.eweb4j.util.ClassUtil;
 import org.eweb4j.util.ReflectUtil;
 
+@SuppressWarnings("all")
 public class BeanXMLWriter implements XMLWriter {
 
 	private boolean isCheckStatck = false;

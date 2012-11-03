@@ -21,6 +21,7 @@ import org.eweb4j.util.ReflectUtil;
  * @author cfuture.wg
  * @since v1.a.0
  */
+@SuppressWarnings("all")
 public class DeleteSqlCreator<T> {
 	private T[] ts;
 

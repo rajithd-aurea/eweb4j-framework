@@ -12,6 +12,7 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.eweb4j.util.JsonConverter;
 
+@SuppressWarnings("all")
 public class XmlUtil {
 
 	public static void main(String[] args) throws DocumentException {

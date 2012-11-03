@@ -12,7 +12,6 @@ import java.util.Map;
 
 import org.eweb4j.cache.ORMConfigBeanCache;
 import org.eweb4j.orm.PropType;
-import org.eweb4j.orm.config.ORMConfigBeanUtil;
 import org.eweb4j.orm.config.bean.ORMConfigBean;
 import org.eweb4j.orm.config.bean.Property;
 import org.eweb4j.util.ClassUtil;
@@ -25,6 +24,7 @@ import org.eweb4j.util.ReflectUtil;
  * @author cfuture.aw
  * @since v1.a.0
  */
+@SuppressWarnings("all")
 public class RowMapping {
 
 	public static <T> T mapOneRow(ResultSet rs, Class<T> cls) throws Exception {

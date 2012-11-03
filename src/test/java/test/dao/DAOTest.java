@@ -1,6 +1,5 @@
 package test.dao;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -19,7 +18,7 @@ import test.User;
 import test.po.Master;
 import test.po.Pet;
 
-
+@SuppressWarnings("all")
 public class DAOTest {
 	private static DAO dao = null;
 

@@ -6,7 +6,6 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.eweb4j.cache.SingleBeanCache;
-import org.eweb4j.config.ConfigConstant;
 import org.eweb4j.config.bean.ConfigBean;
 import org.eweb4j.orm.dao.config.bean.DBInfoConfigBean;
 import org.eweb4j.orm.dao.config.bean.Property;
