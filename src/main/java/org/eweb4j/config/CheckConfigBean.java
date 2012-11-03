@@ -46,6 +46,7 @@ import org.eweb4j.util.CommonUtil;
  * @since v1.a.0
  * 
  */
+@SuppressWarnings("all")
 public class CheckConfigBean {
 	public static String checkEWeb4JConfigBean(ConfigBean cb) {
 		String error = null;
