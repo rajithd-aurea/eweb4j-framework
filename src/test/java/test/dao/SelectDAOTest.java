@@ -14,6 +14,7 @@ import org.junit.Test;
 import test.po.Pet;
 
 public class SelectDAOTest {
+	
 	@BeforeClass
 	public static void prepare() throws Exception {
 		String err = EWeb4JConfig.start("start.eweb.xml");
