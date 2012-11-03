@@ -29,6 +29,7 @@ import org.eweb4j.util.CommonUtil;
  * @since 1.b.8
  * 
  */
+@SuppressWarnings("all")
 public class EWebServlet extends HttpServlet {
 	private static ServletContext servletContext;
 
