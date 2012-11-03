@@ -117,20 +117,22 @@ public class ThumbUtil {
 	}
 	
 	public static void main(String[] args) throws Exception{
-		String outputFormat = "png";
-		String name = "ada";
-		String remoteImageUrl = "d:/"+name+".png";
-		int outputWidth = 16;
-		int outputHeight = 16;
-		
-		File file = new File("d:/"+name+"_w"+outputWidth+"h"+outputHeight+"."+outputFormat);
-		
-		ByteArrayOutputStream os = ThumbUtil.generateThumb(remoteImageUrl, outputFormat, 1, 1*1000, outputWidth, outputHeight);
-		FileOutputStream writer = new FileOutputStream(file);
-		writer.write(os.toByteArray());
-		File _f = new File(file.getAbsolutePath());
-		
-		System.out.println("generate file -> " + _f.getAbsolutePath() + " " + _f.exists());
+		String xx = (String)(null);
+		System.out.println(xx);
+//		String outputFormat = "jpg";
+//		String name = CommonUtil.getNowTime("yyyyMMddHHmmss");
+//		String remoteImageUrl = "http://www.lootloot.sg/deal-image.php?id=527&type=main";
+//		int outputWidth = 470;
+//		int outputHeight = 0;
+//		
+//		File file = new File("d:/"+name+"_w"+outputWidth+"h"+outputHeight+"."+outputFormat);
+//		
+//		ByteArrayOutputStream os = ThumbUtil.generateThumb(remoteImageUrl, outputFormat, 1, 1*1000, outputWidth, outputHeight);
+//		FileOutputStream writer = new FileOutputStream(file);
+//		writer.write(os.toByteArray());
+//		File _f = new File(file.getAbsolutePath());
+//		
+//		System.out.println("generate file -> " + _f.getAbsolutePath() + " " + _f.exists());
 	}
 	
 }
