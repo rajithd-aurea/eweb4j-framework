@@ -691,23 +691,17 @@ public class SelectSqlCreator<T> {
 					"do not support dataBase. only mysql | mssql");
 	}
 
-	/**
-	 * 
-	 * @param currPage
-	 * @param numPerPage
-	 * @param orderField
-	 * @param oType
-	 * @param condition
-	 * @return
-	 * @throws SqlCreateException
-	 */
 	public String divPage(int currPage, int numPerPage, String orderField, int oType, String condition) throws SqlCreateException {
+		return this.divPage(currPage, numPerPage, orderField, clazz, oType, condition);
+	}
+	
+	public String divPage(int currPage, int numPerPage, String orderField, Class<?> orderFieldCls, int oType, String condition) throws SqlCreateException {
 		String sql = null;
 		if (orderField == null) {
 			orderField = idColumn;
 			orderField = OrderColumnUtil.getOrderColumn(orderField, dbType);
 		} else {
-			orderField = ORMConfigBeanUtil.getColumn(clazz, orderField);
+			orderField = ORMConfigBeanUtil.getColumn(orderFieldCls, orderField);
 		}
 
 		String orderType = OrderType.ASC_ORDER == oType ? "ASC" : "DESC";

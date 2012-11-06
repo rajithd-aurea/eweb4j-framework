@@ -1,6 +1,5 @@
 package test.dao;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -41,11 +40,10 @@ public class DAOTest {
 //		Collection<Object> ms = DAOFactory.getDAO(Master.class).enableExpress(false).select("*").join("pets").where().field("pet.name").equal("xiaohei").groupBy("pet.name").query();
 //		System.out.println(ms);
 		
-		DAO dao = DAOFactory.getDAO(Master.class);
+		DAO dao = DAOFactory.getDAO(Pet.class).alias("p");
 		User master = dao
-						.alias("m")
-						.join("pets")
-						.join("pets.user", "p.u")
+						.join("master", "m")
+						.join("user", "u")
 						.select(User.class)
 						.where()
 							.field("m.name").like("wei")
