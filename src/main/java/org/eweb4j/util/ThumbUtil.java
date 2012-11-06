@@ -16,10 +16,16 @@ import net.coobird.thumbnailator.geometry.Positions;
  *
  */
 public class ThumbUtil {
-
+	
+	public static ByteArrayOutputStream generateThumb(String imagePath, String outputFormat, int failRetryTimes, long sleep, int outputWidth, int outputHeight) throws Exception{
+		return generateThumb(imagePath, 1.2f, 1.0f, outputFormat, failRetryTimes, sleep, outputWidth, outputHeight);
+	}
+	
 	/**
 	 * 注意！当宽度和高度都给定的情况下会进行裁剪。裁剪规则是：先按照比例压缩，然后将多出的部分分两边裁剪。
 	 * @param imagePath 图片path，如果是以 http:// || https:// 开头则认为是远程图片
+	 * @param contrast 对比度 默认1.2f
+	 * @param brightness 亮度 默认 1.0f
 	 * @param outputFormat 希望生成的缩略图格式
 	 * @param failRetryTimes 图片获取失败尝试次数
 	 * @param sleep 重试间隔时间 单位 毫秒
@@ -28,7 +34,9 @@ public class ThumbUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public static ByteArrayOutputStream generateThumb(String imagePath, String outputFormat, int failRetryTimes, long sleep, int outputWidth, int outputHeight) throws Exception{
+	public static ByteArrayOutputStream generateThumb(
+			String imagePath, float contrast, float brightness, String outputFormat, 
+			int failRetryTimes, long sleep, int outputWidth, int outputHeight) throws Exception{
 		if (imagePath == null || imagePath.trim().length() == 0)
 			throw new Exception("ImageURL required");
 		
@@ -101,38 +109,52 @@ public class ThumbUtil {
 		
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		
+		//对比度、亮度过滤
+		ImageFilter filter = new ImageFilter();
+		if (contrast > 0)
+			filter.setContrast(contrast);
+		if (brightness > 0)
+			filter.setBrightness(brightness);
+		bi = filter.filter(bi, null);
+		
 		//如果给了两个参数，则剪裁
 		if (output.containsKey(W) && output.containsKey(H)){
 			//压缩
-			BufferedImage _bi = Thumbnails.of(bi).size(sW, sH).outputFormat(outputFormat).asBufferedImage();
+			BufferedImage _bi = 
+				Thumbnails.of(bi).size(sW, sH)
+					.outputFormat(outputFormat)
+					.asBufferedImage();
+			
 			//scale必须为 1 的时候图片才不被放大
-			Thumbnails.of(_bi).scale(1).sourceRegion(Positions.CENTER, output.get(W), output.get(H)).outputFormat(outputFormat).toOutputStream(os);
+			Thumbnails.of(_bi).scale(1)
+				.sourceRegion(Positions.CENTER, output.get(W), output.get(H))
+				.outputFormat(outputFormat)
+				.toOutputStream(os);
 			
 		}else{
 			//压缩
-			Thumbnails.of(bi).size(sW, sH).outputFormat(outputFormat).toOutputStream(os);
+			Thumbnails.of(bi).size(sW, sH)
+				.outputFormat(outputFormat)
+				.toOutputStream(os);
 		}
 		
 		return os;
 	}
 	
 	public static void main(String[] args) throws Exception{
-		String xx = (String)(null);
-		System.out.println(xx);
-//		String outputFormat = "jpg";
-//		String name = CommonUtil.getNowTime("yyyyMMddHHmmss");
-//		String remoteImageUrl = "http://www.lootloot.sg/deal-image.php?id=527&type=main";
-//		int outputWidth = 470;
-//		int outputHeight = 0;
-//		
-//		File file = new File("d:/"+name+"_w"+outputWidth+"h"+outputHeight+"."+outputFormat);
-//		
-//		ByteArrayOutputStream os = ThumbUtil.generateThumb(remoteImageUrl, outputFormat, 1, 1*1000, outputWidth, outputHeight);
-//		FileOutputStream writer = new FileOutputStream(file);
-//		writer.write(os.toByteArray());
-//		File _f = new File(file.getAbsolutePath());
-//		
-//		System.out.println("generate file -> " + _f.getAbsolutePath() + " " + _f.exists());
+		String outputFormat = "jpg";
+		String name = CommonUtil.getNowTime("yyyyMMddHHmmss");
+		String remoteImageUrl = "http://www.shoplay.com/cache/bigpic/20121106/470/c162a55a7f_w470.jpg";
+		int outputWidth = 470;
+		int outputHeight = 0;
+		
+		File file = new File("d:/"+name+"_w"+outputWidth+"h"+outputHeight+"."+outputFormat);
+		
+		ByteArrayOutputStream os = ThumbUtil.generateThumb(remoteImageUrl, outputFormat, 1, 1*1000, outputWidth, outputHeight);
+		FileOutputStream writer = new FileOutputStream(file);
+		writer.write(os.toByteArray());
+		File _f = new File(file.getAbsolutePath());
+		System.out.println("generate file -> " + _f.getAbsolutePath() + " " + _f.exists());
 	}
 	
 }
