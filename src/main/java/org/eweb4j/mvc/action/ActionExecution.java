@@ -10,7 +10,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -33,11 +32,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadBase.InvalidContentTypeException;
-import org.apache.commons.fileupload.ProgressListener;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.eweb4j.cache.ActionConfigBeanCache;
@@ -45,8 +39,6 @@ import org.eweb4j.cache.SingleBeanCache;
 import org.eweb4j.config.ConfigConstant;
 import org.eweb4j.config.Log;
 import org.eweb4j.config.LogFactory;
-import org.eweb4j.config.bean.ConfigBean;
-import org.eweb4j.config.bean.UploadConfigBean;
 import org.eweb4j.ioc.IOC;
 import org.eweb4j.mvc.ActionMethod;
 import org.eweb4j.mvc.Context;
@@ -80,7 +72,6 @@ import org.eweb4j.orm.jdbc.transaction.Trans;
 import org.eweb4j.orm.jdbc.transaction.Transaction;
 import org.eweb4j.util.ClassUtil;
 import org.eweb4j.util.CommonUtil;
-import org.eweb4j.util.FileUtil;
 import org.eweb4j.util.JsonConverter;
 import org.eweb4j.util.ReflectUtil;
 import org.eweb4j.util.xml.BeanXMLUtil;
@@ -122,8 +113,6 @@ public class ActionExecution {
 		this.context = context;
 		this.context.setUri(uri);
 		this.context.setHttpMethod(httpMethod);
-		this.context.setQueryParamMap(new HashMap<String, String[]>());
-		this.context.setPathParamMap(new HashMap<String, String[]>());
 	}
 
 	public boolean findAction() throws Exception {
@@ -140,9 +129,6 @@ public class ActionExecution {
 				this.context.getQueryParamMap().putAll(this.context.getPathParamMap());
 			} else
 				this.context.setActionConfigBean(ActionConfigBeanCache.get(this.context.getUri()));
-
-			// 将request的请求参数转到另外一个map中去
-			this.context.getQueryParamMap().putAll(ParamUtil.copyReqParams(this.context.getRequest()));
 
 			if (this.context.getActionConfigBean() != null)
 				return true;
@@ -310,8 +296,8 @@ public class ActionExecution {
 
             // 视图模型
             if (queryParamAnn == null && Map.class.isAssignableFrom(paramClass)) {
-                    params[i] = this.context.getModel();
-                    continue;
+                params[i] = this.context.getModel();
+                continue;
             }
 
             if (queryParamAnn != null) {
@@ -870,15 +856,13 @@ public class ActionExecution {
 		context.getWriter().print(form + js);
 	}
 
-	private void handleUpload() throws Exception{
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
-		
-		Upload upload = method.getAnnotation(Upload.class);
-		UploadConfigBean ucb = cb.getMvc().getUpload();
-		String tmpDir = ucb.getTmp();
-		int memoryMax = CommonUtil.strToInt(CommonUtil.parseFileSize(ucb.getMaxMemorySize())+"");
-		long sizeMax = CommonUtil.parseFileSize(ucb.getMaxRequestSize());
+	public void validateUpload() throws Exception{
+		String tmpDir = null;
+		long memoryMax = 0;
+		long allSizeMax = 0;
+		long oneSizeMax = 0;
 		String[] suffixArray = null;
+		Upload upload = method.getAnnotation(Upload.class);
 		if (upload != null){
 			if (upload.tmpDir().trim().length() > 0)
 				tmpDir = upload.tmpDir();
@@ -887,83 +871,58 @@ public class ActionExecution {
 				memoryMax =  CommonUtil.strToInt(CommonUtil.parseFileSize(upload.maxMemorySize())+"");
 			
 			if (upload.maxRequestSize().trim().length() > 0)
-				sizeMax = CommonUtil.parseFileSize(upload.maxRequestSize());
+				allSizeMax = CommonUtil.parseFileSize(upload.maxRequestSize());
+			
+			if (upload.maxFileSize().trim().length() > 0)
+				oneSizeMax = CommonUtil.parseFileSize(upload.maxFileSize());
 			
 			if (upload.suffix().length > 0)
 				suffixArray = upload.suffix();
 		}
 		
-		if (tmpDir.trim().length() == 0)
-			tmpDir = "${RootPath}"+File.separator+"WEB-INF"+File.separator+"tmp";
-		
-		tmpDir = tmpDir.replace("${RootPath}", ConfigConstant.ROOT_PATH);
-		
-		DiskFileItemFactory factory = new DiskFileItemFactory();
-		factory.setSizeThreshold(memoryMax);
-		factory.setRepository(new File(tmpDir));
-		
-		ServletFileUpload _upload = new ServletFileUpload(factory);
-		if (!_upload.isMultipartContent(this.context.getRequest()))
-			return ;
-		
-		_upload.setSizeMax(sizeMax);
-		
-		if (upload != null){
-			Class<?> clazz = upload.listener();
-			if (!clazz.getName().equals(ProgressListener.class.getName()) && ProgressListener.class.isAssignableFrom(clazz))
-				_upload.setProgressListener((ProgressListener) clazz.newInstance());
-		}
-		
-		try{
-			List<FileItem> items = _upload.parseRequest(this.context.getRequest());
-			
-			Iterator<FileItem> it = items.iterator();
-			while (it.hasNext()){
-				FileItem item = it.next();
-				String fieldName = item.getFieldName();
-				if (item.isFormField()){
-					String value = item.getString();
-					this.context.getQueryParamMap().put(fieldName, new String[]{value});
-				} else {
-					String fileName = item.getName();
-					if (fileName == null || fileName.trim().length() == 0)
-						continue;
-					boolean isOk = false;
-					for (String suffix : suffixArray){
-						if (fileName.endsWith("."+suffix)){
-							isOk = true;
-							break;
-						}
-					}
-					
-					if (!isOk){
-						String err = "your upload file "+fileName+" type invalid ! only allow " + Arrays.asList(suffixArray);
-						Map<String,String> errMap = new HashMap<String,String>();
-						errMap.put(fieldName, err);
-						this.context.getValidation().getErrors().put("upload", errMap);
-						return ;
-					}
-					
-					item.getSize();
-					item.getContentType();
-					String stamp = CommonUtil.getNowTime("yyyyMMddHHmmss");
-					File tmpFile = new File(tmpDir + File.separator + stamp + "_" + fileName);
-					item.write(tmpFile);
-					
-					UploadFile uploadFile = new UploadFile(tmpFile, fileName, fieldName, item.getSize(), item.getContentType());
-					
-					if (this.context.getUploadMap().containsKey(fieldName)){
-						this.context.getUploadMap().get(fieldName).add(uploadFile);
-					}else{
-						List<UploadFile> uploads = new ArrayList<UploadFile>();
-						uploads.add(uploadFile);
-						this.context.getUploadMap().put(fieldName, uploads);
+		long countAllSize = 0;
+		for (Iterator<Entry<String, List<UploadFile>>> it = this.context.getUploadMap().entrySet().iterator(); it.hasNext(); ){
+			Entry<String, List<UploadFile>> e = it.next();
+			String fieldName = e.getKey();
+			List<UploadFile> files = e.getValue(); 
+			for (UploadFile file : files) {
+				String fileName = file.getFileName();
+				String fileContentType = file.getContentType();	
+				boolean isOk = false;
+				for (String suffix : suffixArray){
+					if (fileName.endsWith("."+suffix)){
+						isOk = true;
+						break;
 					}
 				}
+				
+				if (!isOk){
+					String err = "your upload file "+fileName+" type invalid ! only allow " + Arrays.asList(suffixArray);
+					Map<String,String> errMap = new HashMap<String,String>();
+					errMap.put(fieldName, err);
+					context.getValidation().getErrors().put("upload", errMap);
+					return ;
+				}
+				
+				long fileSize = file.getSize();
+				if (fileSize > oneSizeMax){
+					Map<String,String> errMap = new HashMap<String,String>();
+					String err = "your upload file "+fileName+" size overflow, only allow less than " + upload.maxFileSize();
+					errMap.put(fieldName, err);
+					context.getValidation().getErrors().put("upload", errMap);
+					return ;
+				}
+				
+				countAllSize += fileSize;
+				if (countAllSize > allSizeMax){
+					Map<String,String> errMap = new HashMap<String,String>();
+					String err = "your upload files all size overflow, only allow less than " + upload.maxRequestSize();
+					errMap.put(fieldName, err);
+					context.getValidation().getErrors().put("upload", errMap);
+					return ;
+				}
 			}
-		}catch(InvalidContentTypeException e){
-			throw new Exception("upload file error", e);
-		} 
+		}
 	}
 	
 	/**
@@ -973,18 +932,6 @@ public class ActionExecution {
 	 * @throws Exception
 	 */
 	private void excuteMethod(String methodName) throws Exception{
-
-		/* 对于外部配置的前置拦截器，方法体内的前置拦截器较后执行  */
-		Before before = method.getAnnotation(Before.class);
-		if (before != null){
-			InterExecution before_interExe = new InterExecution("before", context);
-			before_interExe.execute(before.value());
-			if (before_interExe.getError() != null){
-				before_interExe.showErr();
-				return ;
-			}
-		}
-		
 		boolean isTrans = false;
 		if (method.getAnnotation(Transactional.class) != null)
 			isTrans = true;
@@ -1106,16 +1053,27 @@ public class ActionExecution {
 		// 执行验证器
 		this.handleValidator();
 		try{
-			// upload files
-			this.handleUpload();
+			// upload validation
+			this.validateUpload();
 			
 			// 注入mvc action 请求参数
 			ParamUtil.injectParam(this.context, this.ru, null);
 	
+			/* 方法体内的前置拦截器执行  */
+			Before before = method.getAnnotation(Before.class);
+			if (before != null){
+				InterExecution before_interExe = new InterExecution("before", context);
+				before_interExe.execute(before.value());
+				if (before_interExe.getError() != null){
+					before_interExe.showErr();
+					return ;
+				}
+			}
+			
 			// execute the action method
 			excuteMethod(methodName);
 			
-			/* 方法体内的后置拦截器先执行  */
+			/* 方法体内的后置拦截器执行  */
 			After after = method.getAnnotation(After.class);
 			if (after != null){
 				// 后置拦截器
@@ -1138,18 +1096,6 @@ public class ActionExecution {
 			this.handleResult();
 		}catch(Exception e){
 			throw e;
-		}finally{
-			// Action方法执行之后，清空临时文件
-			if (!this.context.getUploadMap().isEmpty())
-				for (Iterator<Entry<String, List<UploadFile>>> it = this.context.getUploadMap().entrySet().iterator(); it.hasNext(); ){
-					Entry<String, List<UploadFile>> en = it.next();
-					if (en.getValue() == null)
-						continue;
-					
-					for (UploadFile f : en.getValue()){
-						FileUtil.deleteFile(f.getTmpFile());
-				}
-			}
 		}
 		
 	}

@@ -144,7 +144,7 @@ public class ThumbUtil {
 	public static void main(String[] args) throws Exception{
 		String outputFormat = "jpg";
 		String name = CommonUtil.getNowTime("yyyyMMddHHmmss");
-		String remoteImageUrl = "http://www.shoplay.com/cache/bigpic/20121106/470/c162a55a7f_w470.jpg";
+		String remoteImageUrl = "http://www.sytime.com/cache/bigpic/20121107/470/ff14464c59_w470.jpg";
 		int outputWidth = 470;
 		int outputHeight = 0;
 		

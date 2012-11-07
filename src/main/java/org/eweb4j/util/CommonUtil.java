@@ -677,7 +677,6 @@ public class CommonUtil {
 		try {
 			result = Integer.parseInt(source);
 		} catch (NumberFormatException e) {
-			System.out.println(source + "无法转换为数字");
 			result = 0;
 			e.printStackTrace();
 		}
@@ -876,7 +875,6 @@ public class CommonUtil {
 		try {
 			str = new String(str.getBytes("ISO-8859-1"), encoding);
 		} catch (UnsupportedEncodingException e) {
-			System.out.println("不支持转换编码错误");
 			e.printStackTrace();
 		}
 
@@ -945,7 +943,6 @@ public class CommonUtil {
 				try {
 					b = Character.toString(c).getBytes("utf-8");
 				} catch (Exception ex) {
-					System.out.println(ex);
 					b = new byte[0];
 				}
 				for (int j = 0; j < b.length; j++) {
