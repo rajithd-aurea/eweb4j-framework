@@ -18,7 +18,7 @@ import net.coobird.thumbnailator.geometry.Positions;
 public class ThumbUtil {
 	
 	public static ByteArrayOutputStream generateThumb(String imagePath, String outputFormat, int failRetryTimes, long sleep, int outputWidth, int outputHeight) throws Exception{
-		return generateThumb(imagePath, 1.2f, 1.0f, outputFormat, failRetryTimes, sleep, outputWidth, outputHeight);
+		return generateThumb(imagePath, 0, 0, outputFormat, failRetryTimes, sleep, outputWidth, outputHeight);
 	}
 	
 	/**
@@ -115,7 +115,8 @@ public class ThumbUtil {
 			filter.setContrast(contrast);
 		if (brightness > 0)
 			filter.setBrightness(brightness);
-		bi = filter.filter(bi, null);
+		if (contrast > 0 || brightness > 0)
+			bi = filter.filter(bi, null);
 		
 		//如果给了两个参数，则剪裁
 		if (output.containsKey(W) && output.containsKey(H)){
@@ -144,13 +145,13 @@ public class ThumbUtil {
 	public static void main(String[] args) throws Exception{
 		String outputFormat = "jpg";
 		String name = CommonUtil.getNowTime("yyyyMMddHHmmss");
-		String remoteImageUrl = "http://www.sytime.com/cache/bigpic/20121107/470/ff14464c59_w470.jpg";
-		int outputWidth = 470;
+		String remoteImageUrl = "http://static.zalora.sg/p/palette-8494-03928-1-zoom.jpg";
+		int outputWidth = 210;
 		int outputHeight = 0;
 		
 		File file = new File("d:/"+name+"_w"+outputWidth+"h"+outputHeight+"."+outputFormat);
 		
-		ByteArrayOutputStream os = ThumbUtil.generateThumb(remoteImageUrl, outputFormat, 1, 1*1000, outputWidth, outputHeight);
+		ByteArrayOutputStream os = ThumbUtil.generateThumb(remoteImageUrl,outputFormat, 1, 1*1000, outputWidth, outputHeight);
 		FileOutputStream writer = new FileOutputStream(file);
 		writer.write(os.toByteArray());
 		File _f = new File(file.getAbsolutePath());
