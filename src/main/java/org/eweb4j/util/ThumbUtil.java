@@ -110,13 +110,15 @@ public class ThumbUtil {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		
 		//对比度、亮度过滤
-		ImageFilter filter = new ImageFilter();
-		if (contrast > 0)
-			filter.setContrast(contrast);
-		if (brightness > 0)
-			filter.setBrightness(brightness);
-		if (contrast > 0 || brightness > 0)
+		
+		if (contrast > 0 || brightness > 0){
+			ImageFilter filter = new ImageFilter();
+			if (contrast > 0)
+				filter.setContrast(contrast);
+			if (brightness > 0)
+				filter.setBrightness(brightness);
 			bi = filter.filter(bi, null);
+		}
 		
 		//如果给了两个参数，则剪裁
 		if (output.containsKey(W) && output.containsKey(H)){
