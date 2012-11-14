@@ -19,7 +19,7 @@ import net.coobird.thumbnailator.geometry.Positions;
 public class ThumbUtil {
 
 	public static ByteArrayOutputStream generateThumb(String imagePath, String outputFormat, int failRetryTimes, long sleep, int outputWidth, int outputHeight) throws Exception {
-		return generateThumb(imagePath, 2, 0.8f, 1.1f, 0, outputFormat, failRetryTimes, sleep, outputWidth, outputHeight);
+		return generateThumb(imagePath, 0, 0.9f, 0, 0, outputFormat, failRetryTimes, sleep, outputWidth, outputHeight);
 	}
 
 	/**
@@ -183,19 +183,19 @@ public class ThumbUtil {
 	public static void main(String[] args) throws Exception {
 
 		//锐化次数
-		int sharpenTimes = 2;
+		int sharpenTimes = 0;
 		
 		// 质量
-		float quality = 0.8f;
+		float quality = 0.9f;
 		String outputFormat = "jpg";
 		String name = CommonUtil.getNowTime("yyyyMMddHHmmss");
 
 		// 原图，也可以是本地的d:/xx.jpg
-		String remoteImageUrl = "http://www.shoplay.com/cache/bigpic/20121011/470/c7e78ab662_w470.png";
-		int outputWidth = 210;
+		String remoteImageUrl = "http://static.deal.com.sg/sites/default/files/Langkawi-Sheraton-revised.jpg";
+		int outputWidth = 400;
 		int outputHeight = 0;
 
-		float contrast = 1.1f; // 对比度
+		float contrast = 0f; // 对比度
 		float brightness = 0f; // 亮度 0 表示不调整
 
 		File file = new File("d:/" + name + "_w" + outputWidth + "h" + outputHeight + "_sharpen" + sharpenTimes 
