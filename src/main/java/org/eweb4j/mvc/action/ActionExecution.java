@@ -73,7 +73,6 @@ import org.eweb4j.orm.jdbc.transaction.Trans;
 import org.eweb4j.orm.jdbc.transaction.Transaction;
 import org.eweb4j.util.ClassUtil;
 import org.eweb4j.util.CommonUtil;
-import org.eweb4j.util.JsonConverter;
 import org.eweb4j.util.ReflectUtil;
 import org.eweb4j.util.xml.BeanXMLUtil;
 import org.eweb4j.util.xml.XMLWriter;
@@ -867,22 +866,22 @@ public class ActionExecution {
 		long allSizeMax = 0;
 		long oneSizeMax = 0;
 		String[] suffixArray = null;
-		Upload upload = method.getAnnotation(Upload.class);
-		if (upload != null){
-			if (upload.tmpDir().trim().length() > 0)
-				tmpDir = upload.tmpDir();
+		Upload _upload = method.getAnnotation(Upload.class);
+		if (_upload != null){
+			if (_upload.tmpDir().trim().length() > 0)
+				tmpDir = _upload.tmpDir();
 			
-			if (upload.maxMemorySize().trim().length() > 0)
-				memoryMax =  CommonUtil.strToInt(CommonUtil.parseFileSize(upload.maxMemorySize())+"");
+			if (_upload.maxMemorySize().trim().length() > 0)
+				memoryMax =  CommonUtil.strToInt(CommonUtil.parseFileSize(_upload.maxMemorySize())+"");
 			
-			if (upload.maxRequestSize().trim().length() > 0)
-				allSizeMax = CommonUtil.parseFileSize(upload.maxRequestSize());
+			if (_upload.maxRequestSize().trim().length() > 0)
+				allSizeMax = CommonUtil.parseFileSize(_upload.maxRequestSize());
 			
-			if (upload.maxFileSize().trim().length() > 0)
-				oneSizeMax = CommonUtil.parseFileSize(upload.maxFileSize());
+			if (_upload.maxFileSize().trim().length() > 0)
+				oneSizeMax = CommonUtil.parseFileSize(_upload.maxFileSize());
 			
-			if (upload.suffix().length > 0)
-				suffixArray = upload.suffix();
+			if (_upload.suffix().length > 0)
+				suffixArray = _upload.suffix();
 		}
 		
 		long countAllSize = 0;
@@ -893,26 +892,27 @@ public class ActionExecution {
 			for (UploadFile file : files) {
 				String fileName = file.getFileName();
 				String fileContentType = file.getContentType();	
-				boolean isOk = false;
-				for (String suffix : suffixArray){
-					if (fileName.endsWith("."+suffix)){
-						isOk = true;
-						break;
+				if (suffixArray != null && suffixArray.length > 0) {
+					boolean isOk = false;
+					for (String suffix : suffixArray){
+						if (fileName.endsWith("."+suffix)){
+							isOk = true;
+							break;
+						}
+					}
+					
+					if (!isOk){
+						String err = "your upload file "+fileName+" type invalid ! only allow " + Arrays.asList(suffixArray);
+						Map<String,String> errMap = new HashMap<String,String>();
+						errMap.put(fieldName, err);
+						context.getValidation().getErrors().put("upload", errMap);
+						return ;
 					}
 				}
-				
-				if (!isOk){
-					String err = "your upload file "+fileName+" type invalid ! only allow " + Arrays.asList(suffixArray);
-					Map<String,String> errMap = new HashMap<String,String>();
-					errMap.put(fieldName, err);
-					context.getValidation().getErrors().put("upload", errMap);
-					return ;
-				}
-				
 				long fileSize = file.getSize();
 				if (fileSize > oneSizeMax){
 					Map<String,String> errMap = new HashMap<String,String>();
-					String err = "your upload file "+fileName+" size overflow, only allow less than " + upload.maxFileSize();
+					String err = "your upload file "+fileName+" size overflow, only allow less than " + oneSizeMax;
 					errMap.put(fieldName, err);
 					context.getValidation().getErrors().put("upload", errMap);
 					return ;
@@ -921,7 +921,7 @@ public class ActionExecution {
 				countAllSize += fileSize;
 				if (countAllSize > allSizeMax){
 					Map<String,String> errMap = new HashMap<String,String>();
-					String err = "your upload files all size overflow, only allow less than " + upload.maxRequestSize();
+					String err = "your upload files all size overflow, only allow less than " + allSizeMax;
 					errMap.put(fieldName, err);
 					context.getValidation().getErrors().put("upload", errMap);
 					return ;

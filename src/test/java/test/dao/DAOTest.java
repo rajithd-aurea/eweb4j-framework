@@ -41,10 +41,12 @@ public class DAOTest {
 //		System.out.println(ms);
 		
 		DAO dao = DAOFactory.getDAO(Pet.class).alias("p");
-		User master = dao
+		Pet pet = dao
 						.join("master", "m")
 						.join("user", "u")
-						.select(User.class)
+						.unfetch("user")
+						.fetch("master")
+						.select(Pet.class)
 						.where()
 							.field("m.name").like("wei")
 							.and("p.name").likeLeft("xiao")
@@ -52,7 +54,8 @@ public class DAOTest {
 						.groupBy("u.account")
 						.queryOne();
 		
-		System.out.println("master->"+master);
+		System.out.println("pet -> "+pet);
+		System.out.println("master->"+pet.getMaster());
 		System.out.println("count->"+dao.count());
 		String sql = dao.toSql();
 		
@@ -64,7 +67,6 @@ public class DAOTest {
 		}
 	}
 	
-	@Test
 	public void testUpdate() throws Exception{
 		int i = DAOFactory.getDAO(Pet.class)
 				.update("name", "age")
@@ -102,7 +104,6 @@ public class DAOTest {
 		// }
 	}
 	
-	@Test
 	public void testDAO(){
 		DAO dao = DAOFactory.getDAO(Pet.class);
 		Pet pet = dao.clear()
