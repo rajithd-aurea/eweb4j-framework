@@ -1021,7 +1021,7 @@ public class DAOImpl implements DAO {
 				if (cls == null)
 					throw new Exception("can not get the field->"+fieldName+" class");
 				if (!ORMConfigBeanCache.containsKey(cls.getName()))
-					throw new Exception("field->" + fieldName + cls.getName() + " is not a entity");
+					throw new Exception("field->" + fieldName + " of " +cls.getName() + " is not entity");
 				String table = ORMConfigBeanUtil.getTable(cls, true);
 				joins.add(table);
 				_AliasField a = new _AliasField(alias, cls.getSimpleName().toLowerCase(), cls);
