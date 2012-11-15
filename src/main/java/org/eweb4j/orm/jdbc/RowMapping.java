@@ -144,6 +144,7 @@ public class RowMapping {
 
 							String refField = p.getRelProperty();
 							Object tarObj = tarClass.newInstance();
+							
 							tarObj = ClassUtil.injectFieldValue(tarObj, refField, new String[] { v });
 							
 							m.invoke(t, tarObj);

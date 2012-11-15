@@ -150,9 +150,10 @@ public class ManyToManyDAO {
 						String to = tos[0].name();
 						String toRefCol = tos[0].referencedColumnName();
 						if (toRefCol == null || toRefCol.trim().length() == 0)
-							toRefCol = ORMConfigBeanUtil.getIdColumn(t);
-						String toRefField = ORMConfigBeanUtil.getField(t.getClass(), fromRefCol);
+							toRefCol = ORMConfigBeanUtil.getIdColumn(tarClass);
+						String toRefField = ORMConfigBeanUtil.getField(tarClass, toRefCol);
 						Method toRefFieldGetter = tarRu.getGetter(toRefField);
+						
 						if (toRefFieldGetter == null)
 							throw new Exception("can not find the 'to ref field -> "+toRefField+"' of "+tarClass + " 's getter method");
 						

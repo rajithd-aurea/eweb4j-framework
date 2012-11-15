@@ -30,6 +30,7 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import org.apache.velocity.VelocityContext;
@@ -593,24 +594,28 @@ public class ActionExecution {
 		}
 		
 		if (!String.class.isAssignableFrom(retn.getClass())) {
-			String mimeType = this.context.getRequest().getParameter(MVCConfigConstant.HTTP_HEADER_ACCEPT_PARAM);
-			if (mimeType == null){
+			String mimeType = null;
+			Produces prod = this.method.getAnnotation(Produces.class);
+			if (prod != null && prod.value() != null && prod.value().length > 0)
+				mimeType = prod.value()[0];
+			
+			if (mimeType == null || mimeType.trim().length() == 0)
+				mimeType = this.context.getRequest().getParameter(MVCConfigConstant.HTTP_HEADER_ACCEPT_PARAM);
+			
+			if (mimeType == null || mimeType.trim().length() == 0){
 				String contentType = this.context.getRequest().getContentType();
 				if (contentType != null){
 					this.context.getResponse().setContentType(contentType);
 					mimeType = contentType.split(";")[0];
 				}
 			}
-
-			if (mimeType == null)
-				mimeType = MIMEType.JSON;
-
+			
 			if (this.context.getWriter() == null)
 				this.context.setWriter(this.context.getResponse().getWriter());
 			
 			if (MIMEType.JSON.equals(mimeType) || "json".equalsIgnoreCase(mimeType)) {
 				this.context.getResponse().setContentType(MIMEType.JSON);
-				this.context.getWriter().print(JsonConverter.convert(retn));
+				this.context.getWriter().print(CommonUtil.toJson(retn));
 			} else if (MIMEType.XML.equals(mimeType) || "xml".equalsIgnoreCase(mimeType)) {
 				Class<?> cls = retn.getClass();
 				if (Collection.class.isAssignableFrom(cls)) {
