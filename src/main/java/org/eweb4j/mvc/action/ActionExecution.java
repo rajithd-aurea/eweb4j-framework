@@ -182,8 +182,7 @@ public class ActionExecution {
 
 	private void exeActionLog() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("execute ").append(this.context.getUri()).append(ActionMethod.CON)
-			.append(this.context.getHttpMethod()).append("[Action]; ");
+		sb.append("execute action -> ").append(this.context.getActionConfigBean()).append("; ");
 
 		log.debug(sb.toString());
 	}
