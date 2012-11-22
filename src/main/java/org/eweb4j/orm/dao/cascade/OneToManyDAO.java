@@ -473,6 +473,8 @@ public class OneToManyDAO {
 			if (orderAnn != null)
 				orderBy = " ORDER BY "+orderAnn.value();
 			
+			String mappedBy = ann.mappedBy();
+			
 			Class<?> tarClass = ann.targetEntity();
 			if (void.class.isAssignableFrom(tarClass))
 				tarClass = ClassUtil.getGenericType(f);
@@ -481,93 +483,89 @@ public class OneToManyDAO {
 				
 				List<?> tarList = null;
 				
-				String mappedBy = ann.mappedBy();
-				if (mappedBy != null && mappedBy.trim().length() > 0) {
-					Method ownFieldSetter = tarRu.getSetter(mappedBy);
-					if (ownFieldSetter == null)
+				JoinTable joinTable = null;
+				if (f.isAnnotationPresent(JoinTable.class)) {
+					joinTable = f.getAnnotation(JoinTable.class);
+				} else if (tarGetter.isAnnotationPresent(JoinTable.class)) {
+					joinTable = tarGetter.getAnnotation(JoinTable.class);
+				}
+				
+				// 如果用户填写了 JoinTable注解，说明是第三方表建立的关联关系，需要查询第三方表和字段才能获取到targetList
+				if (joinTable != null){
+					JoinColumn[] froms = joinTable.joinColumns();
+					if (froms == null || froms.length == 0)
 						continue;
-				} else {
-					JoinTable joinTable = null;
-					if (f.isAnnotationPresent(JoinTable.class)) {
-						joinTable = f.getAnnotation(JoinTable.class);
-					} else if (tarGetter.isAnnotationPresent(JoinTable.class)) {
-						joinTable = tarGetter.getAnnotation(JoinTable.class);
-					} else {
-						// find ownclass in tarObj fields
-						for (Field tarObjField : tarRu.getFields()) {
-							if (!tarObjField.getType().getName().equals(ownClass.getName()))
+	
+					String tarTable = joinTable.name();
+					String from = froms[0].name();
+					String fromRefCol = froms[0].referencedColumnName();
+					if (fromRefCol == null || fromRefCol.trim().length() == 0)
+						fromRefCol = ORMConfigBeanUtil.getIdColumn(t);
+					
+					String fromRefField = ORMConfigBeanUtil.getField(t.getClass(), fromRefCol);
+					Method fromRefFieldGetter = ru.getGetter(fromRefField);
+					if (fromRefFieldGetter == null)
+						throw new Exception("can not find the 'from ref field -> "+fromRefField+"' of "+t.getClass() + " 's getter method");
+					
+					Object _obj = fromRefFieldGetter.invoke(t);
+					if (_obj == null)
+						continue;
+					
+					fromRefVal = String.valueOf(_obj);
+					
+					String format = "select %s from %s where %s = ?  ;";
+					String sql = String.format(format, ORMConfigBeanUtil.getSelectAllColumn(tarClass), tarTable, from) + orderBy;
+	
+					// finished
+					tarList = DAOFactory.getSelectDAO(dsName).selectBySQL(tarClass, sql, fromRefVal);
+				}else {
+					// 否则的话按照ManyToOne去查询
+					// 如果给定了 mappedBy，直接用这个mappedBy来获取filed，否则遍历。
+					Field mappedField = null;
+					if (mappedBy != null && mappedBy.trim().length() > 0){
+						mappedField = tarRu.getField(mappedBy);
+					}else{
+						for (Field field : tarRu.getFields()) {
+							if (!field.getType().getName().equals(ownClass.getName()))
 								continue;
-							
-							Method tarObjFieldGetter = tarRu.getGetter(tarObjField.getName());
-							if (tarObjFieldGetter == null)
-								continue;
-							
-							ManyToOne manyToOne = tarObjField.getAnnotation(ManyToOne.class);
-							if (manyToOne == null)
-								manyToOne = tarObjFieldGetter.getAnnotation(ManyToOne.class);
-							if (manyToOne == null)
-								continue;
-							
-							String fromRefCol = null;
-							JoinColumn joinCol = tarObjField.getAnnotation(JoinColumn.class);
-							if (joinCol == null)
-								joinCol = tarObjFieldGetter.getAnnotation(JoinColumn.class);
-							if (joinCol != null)
-								fromRefCol = joinCol.referencedColumnName();
-							
-							if (fromRefCol == null || fromRefCol.trim().length() == 0)
-								fromRefCol = ORMConfigBeanUtil.getIdColumn(t);
-							
-							String fromRefField = ORMConfigBeanUtil.getField(ownClass, fromRefCol);
-							Method fromRefFieldGetter = ru.getGetter(fromRefField);
-							if (fromRefFieldGetter == null)
-								throw new Exception("can not find the 'from ref field field -> "+fromRefField+"' of "+ownClass + " 's getter method");
-							
-							Object _obj = fromRefFieldGetter.invoke(t);
-							if (_obj != null)
-								fromRefVal = String.valueOf(_obj);
-							
-							// finished
-							mappedBy = tarObjField.getName(); 
+							mappedField = field;
+							mappedBy = mappedField.getName(); 
 							break;
 						}
 					}
-	
-					if (joinTable != null){
-						JoinColumn[] froms = joinTable.joinColumns();
-						if (froms == null || froms.length == 0)
-							continue;
-		
-						JoinColumn[] tos = joinTable.inverseJoinColumns();
-						if (tos == null || tos.length == 0)
-							continue;
-						
-						String tarTable = joinTable.name();
-						String from = froms[0].name();
-						String fromRefCol = froms[0].referencedColumnName();
-						if (fromRefCol == null || fromRefCol.trim().length() == 0)
-							fromRefCol = ORMConfigBeanUtil.getIdColumn(t);
-						
-						String fromRefField = ORMConfigBeanUtil.getField(t.getClass(), fromRefCol);
-						Method fromRefFieldGetter = ru.getGetter(fromRefField);
-						if (fromRefFieldGetter == null)
-							throw new Exception("can not find the 'from ref field -> "+fromRefField+"' of "+t.getClass() + " 's getter method");
-						
-						Object _obj = fromRefFieldGetter.invoke(t);
-						if (_obj == null)
-							continue;
-						
+					
+					if (mappedField == null)
+						throw new Exception("mapped field of " + tarClass + " not found");
+					
+					Method tarObjFieldGetter = tarRu.getGetter(mappedBy);
+					if (tarObjFieldGetter == null)
+						continue;
+					
+					ManyToOne manyToOne = mappedField.getAnnotation(ManyToOne.class);
+					if (manyToOne == null)
+						manyToOne = tarObjFieldGetter.getAnnotation(ManyToOne.class);
+					if (manyToOne == null)
+						continue;
+					
+					String fromRefCol = null;
+					JoinColumn joinCol = mappedField.getAnnotation(JoinColumn.class);
+					if (joinCol == null)
+						joinCol = tarObjFieldGetter.getAnnotation(JoinColumn.class);
+					if (joinCol != null)
+						fromRefCol = joinCol.referencedColumnName();
+					
+					if (fromRefCol == null || fromRefCol.trim().length() == 0)
+						fromRefCol = ORMConfigBeanUtil.getIdColumn(t);
+					
+					String fromRefField = ORMConfigBeanUtil.getField(ownClass, fromRefCol);
+					Method fromRefFieldGetter = ru.getGetter(fromRefField);
+					if (fromRefFieldGetter == null)
+						throw new Exception("can not find the 'from ref field field -> "+fromRefField+"' of "+ownClass + " 's getter method");
+					
+					Object _obj = fromRefFieldGetter.invoke(t);
+					if (_obj != null)
 						fromRefVal = String.valueOf(_obj);
-						
-						String format = "select %s from %s where %s = ?  ;";
-						String sql = String.format(format, ORMConfigBeanUtil.getSelectAllColumn(tarClass), tarTable, from) + orderBy;
-		
-						// finished
-						tarList = DAOFactory.getSelectDAO(dsName).selectBySQL(tarClass, sql, fromRefVal);
-					}
-				}
-				
-				if (tarList == null){
+					
 					String format = "select %s from %s where %s = ?  ;";
 					String sql = String.format(format, ORMConfigBeanUtil.getSelectAllColumn(tarClass), ORMConfigBeanUtil.getTable(tarClass, true), ORMConfigBeanUtil.getColumn(tarClass, mappedBy)) + orderBy;
 					// finished
