@@ -78,25 +78,25 @@ public class ThumbUtil {
 			throw new Exception("can not get the image file from -> "
 					+ imagePath);
 
-		int w = bi.getWidth();
-		int h = bi.getHeight();
-
+		//原图大小
+		int sw = bi.getWidth();
+		int sh = bi.getHeight();
+		
 		// 如果原图比目标长宽要少，用原图大小,这样就不会进行放大了
-		if (w < outputWidth)
-			outputWidth = w;
-		if (h < outputHeight)
-			outputHeight = h;
+		if (sw < outputWidth)
+			outputWidth = sw;
+		if (sh < outputHeight)
+			outputHeight = sh;
 
 		// 原图宽高
 		final Map<String, Integer> source = new HashMap<String, Integer>();
-		source.put(W, w);
-		source.put(H, h);
+		source.put(W, sw);
+		source.put(H, sh);
 
-		// 比较W与H，找出小的，记住小的那个
 		// 如果给出的长宽不大于0的话，用原图大小
 		if (outputWidth <= 0 && outputHeight <= 0) {
-			outputWidth = w;
-			outputHeight = h;
+			outputWidth = sw;
+			outputHeight = sh;
 		}
 
 		// 目标宽高
@@ -106,9 +106,10 @@ public class ThumbUtil {
 
 		if (outputHeight > 0)
 			output.put(H, outputHeight);
-
+		
+		// 比较W与H，找出小的，记住小的那个
 		String min = W;
-		if (h < w)
+		if (sh < sw)
 			min = H;
 		// 如果小值不存在，则小值取给过来的其中一个值
 		if (!output.containsKey(min)) {
@@ -117,11 +118,6 @@ public class ThumbUtil {
 			else
 				min = H;
 		}
-
-		// 算出比例
-		double scale = (double) source.get(min) / output.get(min);
-		int sW = new Double(w / scale).intValue();
-		int sH = new Double(h / scale).intValue();
 
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 
@@ -141,9 +137,13 @@ public class ThumbUtil {
 
 		// 如果给了两个参数，则剪裁
 		if (output.containsKey(W) && output.containsKey(H)) {
-			// 压缩
-			BufferedImage _bi = Thumbnails.of(bi).size(sW, sH)
-					.outputFormat(outputFormat).asBufferedImage();
+			
+			// 裁剪的话因为要保留最大区域，因此要按最大长度那端的比例压缩
+			String max = outputWidth >= outputHeight ? W : H;
+			double scale = (double) source.get(max) / output.get(max);
+			int sW = new Double(sw / scale).intValue();
+			int sH = new Double(sh / scale).intValue();
+			BufferedImage _bi = Thumbnails.of(bi).size(sW, sH).outputFormat(outputFormat).asBufferedImage();
 
 			// scale必须为 1 的时候图片才不被放大
 			Thumbnails
@@ -154,6 +154,10 @@ public class ThumbUtil {
 					.outputFormat(outputFormat).toOutputStream(os);
 
 		} else {
+			// 算出比例
+			double scale = (double) source.get(min) / output.get(min);
+			int sW = new Double(sw / scale).intValue();
+			int sH = new Double(sh / scale).intValue();
 			// 压缩
 			Thumbnails.of(bi).size(sW, sH).outputQuality(quality)
 					.outputFormat(outputFormat).toOutputStream(os);
@@ -191,9 +195,9 @@ public class ThumbUtil {
 		String name = CommonUtil.getNowTime("yyyyMMddHHmmss");
 
 		// 原图，也可以是本地的d:/xx.jpg
-		String remoteImageUrl = "http://static.deal.com.sg/sites/default/files/Langkawi-Sheraton-revised.jpg";
-		int outputWidth = 400;
-		int outputHeight = 0;
+		String remoteImageUrl = "http://test.shoplay.com/cache/thumb/index/20121108/Ts4HYuSS8j4338_w210.jpg";
+		int outputWidth = 50;
+		int outputHeight = 100;
 
 		float contrast = 0f; // 对比度
 		float brightness = 0f; // 亮度 0 表示不调整
