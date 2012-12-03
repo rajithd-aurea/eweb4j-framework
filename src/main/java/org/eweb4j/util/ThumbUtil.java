@@ -138,11 +138,18 @@ public class ThumbUtil {
 		// 如果给了两个参数，则剪裁
 		if (output.containsKey(W) && output.containsKey(H)) {
 			
-			// 裁剪的话因为要保留最大区域，因此要按最大长度那端的比例压缩
-			String max = outputWidth >= outputHeight ? W : H;
-			double scale = (double) source.get(max) / output.get(max);
-			int sW = new Double(sw / scale).intValue();
-			int sH = new Double(sh / scale).intValue();
+			// 裁剪的话因为要保留最大区域所以按照比例最小的那端进行裁剪
+			double scale ;
+			double wScale = Double.parseDouble(String.valueOf(source.get(W))) / Double.parseDouble(String.valueOf(output.get(W)));
+			double hScale = Double.parseDouble(String.valueOf(source.get(H))) / Double.parseDouble(String.valueOf(output.get(H)));
+			if (wScale < hScale)
+				scale = wScale;
+			else
+				scale = hScale;
+			
+			int sW = new Double(source.get(W) / scale).intValue();
+			int sH = new Double(source.get(H) / scale).intValue();
+			
 			BufferedImage _bi = Thumbnails.of(bi).size(sW, sH).outputFormat(outputFormat).asBufferedImage();
 
 			// scale必须为 1 的时候图片才不被放大
@@ -155,7 +162,7 @@ public class ThumbUtil {
 
 		} else {
 			// 算出比例
-			double scale = (double) source.get(min) / output.get(min);
+			double scale = Double.parseDouble(String.valueOf(source.get(min))) / Double.parseDouble(String.valueOf(output.get(min)));
 			int sW = new Double(sw / scale).intValue();
 			int sH = new Double(sh / scale).intValue();
 			// 压缩
@@ -195,9 +202,11 @@ public class ThumbUtil {
 		String name = CommonUtil.getNowTime("yyyyMMddHHmmss");
 
 		// 原图，也可以是本地的d:/xx.jpg
-		String remoteImageUrl = "http://test.shoplay.com/cache/thumb/index/20121108/Ts4HYuSS8j4338_w210.jpg";
-		int outputWidth = 50;
-		int outputHeight = 100;
+		//String remoteImageUrl = "http://d10abt682efc89.cloudfront.net/p/evie-1713-20557-1-zoom.jpg";
+//		String remoteImageUrl = "http://gd.image-gmkt.com/mi/830/443/414443830.jpg";
+		String remoteImageUrl = "http://test.shoplay.com/cache/bigpic/20121108/470/55c5b78e5c_w470.jpg";
+		int outputWidth = 210;
+		int outputHeight = 250;
 
 		float contrast = 0f; // 对比度
 		float brightness = 0f; // 亮度 0 表示不调整
