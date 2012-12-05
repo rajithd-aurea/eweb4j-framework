@@ -653,3 +653,9 @@ ioc.xml
 (17)feature：改善，增加对JPA @JoinColumn(referenceColumnName)的支持，使得表关系的外键可以映射到非ID字段。
 (18)feature：MVC增加对上传文件的验证配置。只要在上传处理方法添加@Upload注解，可以填写限制的后缀名、文件大小等参数。
 (19)feature: 增加Models帮助类，实现了类似 ActiveRecord 功能。
+
+1.9.2 2012-12-1
+(1) bug fix: IOC ref 引用问题导致获取bean失败
+(2) bug fix: ThumbUtil 当给定outputWidth和outputHeight的图片的时候有些情况裁剪范围不正确。
+(3) bug fix: 有些时候 properties 文件的${}变量引用没有被渲染出来
+(4) feature: 给 properties 增加嵌套变量引用。 key1=${key2}_iamkey1 key2=${key3}_iamkey2 key3=iamkey3 

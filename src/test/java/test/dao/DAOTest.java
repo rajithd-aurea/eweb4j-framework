@@ -14,7 +14,6 @@ import org.eweb4j.orm.dao.DAOFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import test.User;
 import test.po.Master;
 import test.po.Pet;
 
@@ -55,14 +54,18 @@ public class DAOTest {
 						.queryOne();
 		
 		System.out.println("pet -> "+pet);
-		System.out.println("master->"+pet.getMaster());
-		System.out.println("count->"+dao.count());
+		if (pet != null){
+			System.out.println("master->"+pet.getMaster());
+			System.out.println("count->"+dao.count());
+		}
 		String sql = dao.toSql();
 		
 		List<Map> maps = DAOFactory.getSelectDAO().selectBySQL(Map.class, sql);
-		for (Map<String, Object> map : maps){
-			for (String key : map.keySet()){
-				System.out.println(key + "=>" + map.get(key));
+		if (maps != null) {
+			for (Map<String, Object> map : maps){
+				for (String key : map.keySet()){
+					System.out.println(key + "=>" + map.get(key));
+				}
 			}
 		}
 	}

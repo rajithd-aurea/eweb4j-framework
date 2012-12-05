@@ -577,21 +577,6 @@ public class CommonUtil {
 	}
 	
 
-	public static String parseSingleProp(String source, Map<String, String> map) {
-		Pattern pattern = Pattern.compile(RegexList.property_single_regexp);
-
-		Matcher matcher = pattern.matcher(source);
-		if (matcher.find()) {
-			String g = matcher.group();
-			String key = g.replace("${", "").replace("}", "");
-			String value = map.get(key);
-
-			source = source.replace(g, value);
-		}
-
-		return source;
-	}
-
 	public static String parsePropValue(String source) {
 		return parsePropValue(source, null);
 	}
