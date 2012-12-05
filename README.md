@@ -448,8 +448,8 @@
     	<locale language="zh" country="CN" />
     </locales>
     
-    将 message.properties 重命名为 zh_CN.properties 作为简体中文资源
-    然后拷贝一份，重命名为 en_US.properties 作为美式英语资源，接着把这个文件内容修改为：
+    将 message.properties 重命名为 message_zh_CN.properties 作为简体中文资源
+    然后拷贝一份，重命名为 message_en_US.properties 作为美式英语资源，接着把这个文件内容修改为：
     welcome=Welcome to EWeb4J Framework！
     version=1.9-SNAPSHOT
     author=Lai Weiwei
