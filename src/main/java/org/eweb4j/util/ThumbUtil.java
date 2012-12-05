@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
+
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
 
@@ -21,7 +23,18 @@ public class ThumbUtil {
 	public static ByteArrayOutputStream generateThumb(String imagePath, String outputFormat, int failRetryTimes, long sleep, int outputWidth, int outputHeight) throws Exception {
 		return generateThumb(imagePath, 0, 0.9f, 0, 0, outputFormat, failRetryTimes, sleep, outputWidth, outputHeight);
 	}
-
+	
+	public static ByteArrayOutputStream generateThumb(String imagePath,
+			int sharpenTimes,
+			float quality, float contrast, float brightness,
+			String outputFormat, int failRetryTimes, long sleep,
+			int outputWidth, int outputHeight) throws Exception {
+		BufferedImage img = generate(imagePath, sharpenTimes, quality, contrast, brightness, outputFormat, failRetryTimes, sleep, outputWidth, outputHeight);
+		
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		ImageIO.write(img, outputFormat, os);
+		return os;
+	}
 	/**
 	 * 注意！当宽度和高度都给定的情况下会进行裁剪。裁剪规则是：先按照比例压缩，然后将多出的部分分两边裁剪。
 	 * 
@@ -43,10 +56,8 @@ public class ThumbUtil {
 	 *            希望生成的缩略图宽度
 	 * @param outputHeight
 	 *            希望生成的缩略图高度
-	 * @return
-	 * @throws Exception
 	 */
-	public static ByteArrayOutputStream generateThumb(String imagePath,
+	public static BufferedImage generate(String imagePath,
 			int sharpenTimes,
 			float quality, float contrast, float brightness,
 			String outputFormat, int failRetryTimes, long sleep,
@@ -119,8 +130,6 @@ public class ThumbUtil {
 				min = H;
 		}
 
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-
 		// 锐化
 		if (sharpenTimes > 0)
 			bi = sharpen(bi, sharpenTimes);
@@ -153,12 +162,12 @@ public class ThumbUtil {
 			BufferedImage _bi = Thumbnails.of(bi).size(sW, sH).outputFormat(outputFormat).asBufferedImage();
 
 			// scale必须为 1 的时候图片才不被放大
-			Thumbnails
+			return Thumbnails
 					.of(_bi)
 					.scale(1)
 					.sourceRegion(Positions.CENTER, output.get(W),
 							output.get(H)).outputQuality(quality)
-					.outputFormat(outputFormat).toOutputStream(os);
+					.outputFormat(outputFormat).asBufferedImage();
 
 		} else {
 			// 算出比例
@@ -166,11 +175,9 @@ public class ThumbUtil {
 			int sW = new Double(sw / scale).intValue();
 			int sH = new Double(sh / scale).intValue();
 			// 压缩
-			Thumbnails.of(bi).size(sW, sH).outputQuality(quality)
-					.outputFormat(outputFormat).toOutputStream(os);
+			return Thumbnails.of(bi).size(sW, sH).outputQuality(quality)
+					.outputFormat(outputFormat).asBufferedImage();
 		}
-
-		return os;
 	}
 
 	//锐化
@@ -192,7 +199,6 @@ public class ThumbUtil {
     }
 
 	public static void main(String[] args) throws Exception {
-
 		//锐化次数
 		int sharpenTimes = 0;
 		
@@ -202,9 +208,9 @@ public class ThumbUtil {
 		String name = CommonUtil.getNowTime("yyyyMMddHHmmss");
 
 		// 原图，也可以是本地的d:/xx.jpg
-		//String remoteImageUrl = "http://d10abt682efc89.cloudfront.net/p/evie-1713-20557-1-zoom.jpg";
 //		String remoteImageUrl = "http://gd.image-gmkt.com/mi/830/443/414443830.jpg";
-		String remoteImageUrl = "http://test.shoplay.com/cache/bigpic/20121108/470/55c5b78e5c_w470.jpg";
+		String remoteImageUrl = "http://www.shoplay.com/cache/bigpic/20121130/470/aaeed8a8dd_w470.jpg";
+//		String remoteImageUrl = "http://test.shoplay.com/cache/bigpic/20121108/470/55c5b78e5c_w470.jpg";
 		int outputWidth = 210;
 		int outputHeight = 250;
 
@@ -213,20 +219,21 @@ public class ThumbUtil {
 
 		File file = new File("d:/" + name + "_w" + outputWidth + "h" + outputHeight + "_sharpen" + sharpenTimes 
 				+ "_contrat" + contrast + "_quality"+quality + "." + outputFormat);
-
-		ByteArrayOutputStream os = ThumbUtil.generateThumb(
+		
+		BufferedImage image = ThumbUtil.generate(
 				remoteImageUrl, 
 				sharpenTimes,
 				quality, contrast, brightness, outputFormat, 1, // 远程图片下载失败重试次数
 				1 * 1000, // 失败后休眠时间
 				outputWidth, outputHeight);
-
-		FileOutputStream writer = new FileOutputStream(file);
-		writer.write(os.toByteArray());
-
+		
+		System.out.println(image.getWidth()+ ", "+image.getHeight());
+		boolean isOK = ImageIO.write(image, outputFormat, new FileOutputStream(file));
+		if (!isOK)
+			throw new Exception("create image fail ");
+		
 		File _f = new File(file.getAbsolutePath());
-		System.out.println("generate file -> " + _f.getAbsolutePath() + " "
-				+ _f.exists());
+		System.out.println("generate file -> " + _f.getAbsolutePath() + " " + _f.exists());
 	}
 
 }
