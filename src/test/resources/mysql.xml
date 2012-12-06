@@ -4,8 +4,8 @@
 	<dataSource dsName="myDBInfo">
 		<dataBaseType>MYSQL</dataBaseType>
 		<property key="driverClass" value="com.mysql.jdbc.Driver" />
-		<property key="jdbcUrl" value="jdbc:mysql://localhost:3306/pet_store_db" />
-		<property key="user" value="admin" />
-		<property key="password" value="admin" />
+		<property key="jdbcUrl" value="jdbc:mysql://localhost:3306/petstore_db" />
+		<property key="user" value="root" />
+		<property key="password" value="root" />
 	</dataSource>
 </beans>
