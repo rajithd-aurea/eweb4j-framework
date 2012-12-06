@@ -9,6 +9,7 @@ import javax.persistence.MappedSuperclass;
 
 import org.eweb4j.orm.dao.DAO;
 
+@SuppressWarnings("all")
 @MappedSuperclass
 public class Model<T>{
 	

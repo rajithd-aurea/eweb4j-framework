@@ -18,6 +18,7 @@ import org.dom4j.io.SAXReader;
 import org.eweb4j.util.ClassUtil;
 import org.eweb4j.util.ReflectUtil;
 
+@SuppressWarnings("all")
 public class BeanXMLReader implements XMLReader {
 	private String rootElementName;
 	private String beanName;

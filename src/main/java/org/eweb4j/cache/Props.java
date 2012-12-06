@@ -33,6 +33,7 @@ import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.FileUtil;
 import org.eweb4j.util.RegexList;
 
+@SuppressWarnings("all")
 public class Props {
 
 	private static Log log = LogFactory.getConfigLogger(Props.class);

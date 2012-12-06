@@ -37,6 +37,7 @@ import org.eweb4j.util.ClassUtil;
 import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.ReflectUtil;
 
+@SuppressWarnings("all")
 public class DAOImpl implements DAO {
 
 	private static Log log = LogFactory.getORMLogger(DAO.class);

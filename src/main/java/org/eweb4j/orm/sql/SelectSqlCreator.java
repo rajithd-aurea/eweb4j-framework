@@ -23,6 +23,7 @@ import org.eweb4j.util.ReflectUtil;
  * @since v1.a.0
  * @param <T>
  */
+@SuppressWarnings("all")
 public class SelectSqlCreator<T> {
 	private T t;
 	private Class<?> clazz;

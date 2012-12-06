@@ -24,6 +24,7 @@ import org.eweb4j.util.ReflectUtil;
  * @author cfuture.aw
  * @since v1.a.0
  */
+@SuppressWarnings("all")
 public class IOC {
 	private static Log log = LogFactory.getConfigLogger(IOC.class);
 

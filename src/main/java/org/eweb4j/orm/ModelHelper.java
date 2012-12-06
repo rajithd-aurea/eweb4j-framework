@@ -9,6 +9,7 @@ import org.eweb4j.orm.dao.DAO;
 import org.eweb4j.orm.dao.DAOFactory;
 import org.eweb4j.util.ReflectUtil;
 
+@SuppressWarnings("all")
 public class ModelHelper<T> implements IModel<T>{
 
 	private T model;

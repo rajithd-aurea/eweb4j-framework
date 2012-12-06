@@ -19,6 +19,7 @@ import org.eweb4j.util.ReflectUtil;
  * @author cfuture.aw
  * @since v1.a.0
  */
+@SuppressWarnings("all")
 public class InsertSqlCreator<T> {
 	private T[] ts;
 

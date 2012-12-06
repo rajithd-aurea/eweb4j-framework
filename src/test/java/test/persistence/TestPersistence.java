@@ -4,9 +4,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.junit.Test;
-
 import test.po.Pet;
+
 
 public class TestPersistence {
 	

@@ -17,7 +17,7 @@ import org.junit.Test;
 import test.po.Master;
 import test.po.Pet;
 
-
+@SuppressWarnings("all")
 public class DAOTest {
 	private static DAO dao = null;
 

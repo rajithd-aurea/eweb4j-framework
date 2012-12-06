@@ -88,6 +88,7 @@ import freemarker.template.Template;
  * @since 1.b.8
  * 
  */
+@SuppressWarnings("all")
 public class ActionExecution {
 
 	private static Log log = LogFactory.getMVCLogger(ActionExecution.class);

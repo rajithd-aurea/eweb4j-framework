@@ -36,6 +36,7 @@ import org.eweb4j.util.ReflectUtil;
  * @author weiwei
  * 
  */
+@SuppressWarnings("all")
 public class ParamUtil {
 
 	private static Object getLastPojo(Object parentPojo, String pojoParamName,

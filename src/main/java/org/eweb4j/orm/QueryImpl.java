@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import org.eweb4j.orm.dao.DAO;
 
+@SuppressWarnings("all")
 public class QueryImpl implements Query {
 	private DAO dao;
 
