@@ -255,10 +255,16 @@ public class Props {
 		if (matcher.find()) {
 			String g = matcher.group();
 			String _key = g.replace("${", "").replace("}", "");
-			String value = tmpHt.get(_key);
+			String value = "";
+			if(tmpHt.containsKey(_key)){
+				value = tmpHt.get(_key);
+			}else{
+				value = "[Can't find this variable in the Localization properties]:"+_key;
+				log.error("Variable [ "+ g +" ] not found in the Localization (properties) config file!");
+			}
 			String result = renderVarable(pattern, _key, value, tmpHt);
 			if (result == null)
-				tmpHt.put(key, property.replace(g, tmpHt.get(_key)));
+				tmpHt.put(key, property.replace(g, value));
 		}
 		
 		return null;
