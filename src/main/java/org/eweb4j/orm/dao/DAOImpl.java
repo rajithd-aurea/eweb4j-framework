@@ -237,9 +237,43 @@ public class DAOImpl implements DAO {
 		
 		return this;
 	}
+	
+	public DAO moreEqual(Object value) {
+		this.condition.append(" >= ");
+		
+		if (!this.express)
+			condition.append("'").append(value).append("' ");
+		else {
+			Map<String, Object> map = handleFieldAlias(String.valueOf(value));
+			String _fieldName = (String)map.get("field");
+			Class<?> cls = (Class<?>)map.get("class");
+			
+			condition.append(ORMConfigBeanUtil.getColumn(cls, _fieldName));
+		}
+		
+		return this;
+	}
 
 	public DAO lessThan(Object value) {
 		this.condition.append(" < ");
+		
+		if (!this.express)
+			condition.append("'").append(value).append("' ");
+		else {
+			Map<String, Object> map = handleFieldAlias(String.valueOf(value));
+			if (map == null)
+				return this;
+			
+			String _fieldName = (String)map.get("field");
+			Class<?> cls = (Class<?>)map.get("class");
+			condition.append(ORMConfigBeanUtil.getColumn(cls, _fieldName));
+		}
+		
+		return this;
+	}
+	
+	public DAO lessEqual(Object value) {
+		this.condition.append(" <= ");
 		
 		if (!this.express)
 			condition.append("'").append(value).append("' ");

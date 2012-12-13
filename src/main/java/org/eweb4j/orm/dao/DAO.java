@@ -526,5 +526,9 @@ public interface DAO {
 	public <T> Page<T> getPage(int pageIndex, int pageSize);
 
 	public DAO order(String sortBy, String order);
+
+	public DAO lessEqual(Object value);
+	
+	public DAO moreEqual(Object value);
 	
 }

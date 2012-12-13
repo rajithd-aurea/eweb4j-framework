@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.Thumbnails.Builder;
 import net.coobird.thumbnailator.geometry.Positions;
 
 /**
@@ -35,6 +36,51 @@ public class ThumbUtil {
 		ImageIO.write(img, outputFormat, os);
 		return os;
 	}
+	
+	public static Builder<BufferedImage> build(
+			String imagePath, 
+			int sharpenTimes,
+			float contrast, 
+			float brightness, 
+			int x1, int y1, int x2, int y2) throws Exception{
+		if (imagePath == null || imagePath.trim().length() == 0)
+			throw new Exception("ImageURL required");
+
+		int	failRetryTimes = 1;
+
+
+		BufferedImage bi = null;
+		try {
+			bi = FileUtil.getBufferedImage(imagePath, failRetryTimes, 1*1000);
+		} catch (Exception e) {
+			throw e;
+		}
+
+		if (bi == null)
+			throw new Exception("can not get the image file from -> "
+					+ imagePath);
+
+		// 锐化
+		if (sharpenTimes > 0)
+			bi = sharpen(bi, sharpenTimes);
+
+		// 对比度、亮度过滤
+		if (contrast > 0 || brightness > 0) {
+			ContrastFilter filter = new ContrastFilter();
+			if (contrast > 0)
+				filter.setContrast(contrast);
+			if (brightness > 0)
+				filter.setBrightness(brightness);
+			bi = filter.filter(bi, null);
+		}
+
+		// scale必须为 1 的时候图片才不被放大
+		return Thumbnails
+				.of(bi)
+				.scale(1)
+				.sourceRegion(x1, y1, x2-x1, y2-y1);
+	}
+	
 	/**
 	 * 注意！当宽度和高度都给定的情况下会进行裁剪。裁剪规则是：先按照比例压缩，然后将多出的部分分两边裁剪。
 	 * 
@@ -209,7 +255,8 @@ public class ThumbUtil {
 
 		// 原图，也可以是本地的d:/xx.jpg
 //		String remoteImageUrl = "http://gd.image-gmkt.com/mi/830/443/414443830.jpg";
-		String remoteImageUrl = "http://www.shoplay.com/cache/bigpic/20121130/470/aaeed8a8dd_w470.jpg";
+//		String remoteImageUrl = "http://www.shoplay.com/cache/bigpic/20121130/470/aaeed8a8dd_w470.jpg";
+		String remoteImageUrl = "http://www.malijuthemeshop.com/live_previews/mws-admin/example/scottwills_squirrel.jpg";
 //		String remoteImageUrl = "http://test.shoplay.com/cache/bigpic/20121108/470/55c5b78e5c_w470.jpg";
 		int outputWidth = 210;
 		int outputHeight = 250;
@@ -220,12 +267,23 @@ public class ThumbUtil {
 		File file = new File("d:/" + name + "_w" + outputWidth + "h" + outputHeight + "_sharpen" + sharpenTimes 
 				+ "_contrat" + contrast + "_quality"+quality + "." + outputFormat);
 		
-		BufferedImage image = ThumbUtil.generate(
-				remoteImageUrl, 
-				sharpenTimes,
-				quality, contrast, brightness, outputFormat, 1, // 远程图片下载失败重试次数
-				1 * 1000, // 失败后休眠时间
-				outputWidth, outputHeight);
+//		BufferedImage image = ThumbUtil.generate(
+//				remoteImageUrl, 
+//				sharpenTimes,
+//				quality, contrast, brightness, outputFormat, 1, // 远程图片下载失败重试次数
+//				1 * 1000, // 失败后休眠时间
+//				outputWidth, outputHeight);
+		
+		int x1 = 55;
+		int y1 = 90;
+		int x2 = 173;
+		int y2 = 215;
+		
+		BufferedImage image = 
+			ThumbUtil
+				.build(remoteImageUrl, sharpenTimes, contrast, brightness, x1, y1, x2, y2)
+				.outputFormat(outputFormat)
+				.asBufferedImage();
 		
 		System.out.println(image.getWidth()+ ", "+image.getHeight());
 		boolean isOK = ImageIO.write(image, outputFormat, new FileOutputStream(file));

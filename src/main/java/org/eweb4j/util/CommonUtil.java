@@ -981,6 +981,9 @@ public class CommonUtil {
 	}
 
 	public static String getExceptionString(Throwable e) {
+		if (e == null)
+			return "";
+		
 		StringBuilder sb = new StringBuilder(e.toString());
 		sb.append(getStack(e.getStackTrace()));
 		Throwable t = e.getCause();
