@@ -659,3 +659,7 @@ ioc.xml
 (2) bug fix: ThumbUtil 当给定outputWidth和outputHeight的图片的时候有些情况裁剪范围不正确。
 (3) bug fix: 有些时候 properties 文件的${}变量引用没有被渲染出来
 (4) feature: 给 properties 增加嵌套变量引用。 key1=${key2}_iamkey1 key2=${key3}_iamkey2 key3=iamkey3 
+(5) bug fix: 解决properties 错误的${}变量名字报null pointer异常 by https://github.com/nothing-whoami
+(6) feature: DAO 接口新增 lessEqual 和 moreEqual 方法，实现 <= 和 >= 连接符操作
+(7) feature: ThumbUtil 添加 build 方法，可以用来创建一个Thumbnails的Builder类对象，并且可以传入图片的左上角和右下角两个顶点的坐标进行裁剪
+
