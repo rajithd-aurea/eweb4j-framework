@@ -28,7 +28,7 @@ public class TestI18N {
 		Map map = Props.getMap("Message");
 		
 		Lang.set(Locale.US);
-		Assert.assertEquals("Welcome to eweb4j !", map.get("welcome"));
+		Assert.assertEquals("Welcome to eweb4j ! , nothing", map.get("welcome"));
 		
 		Lang.set(Locale.SIMPLIFIED_CHINESE);
 		Assert.assertEquals("欢迎使用 eweb4j 框架 !", map.get("welcome"));

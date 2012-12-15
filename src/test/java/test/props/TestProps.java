@@ -25,7 +25,7 @@ public class TestProps {
 		//测试变量嵌套引用
 		Assert.assertEquals("FUCK!", Props.get("K4"));
 		Assert.assertEquals("FUCK!+3", Props.get("K3"));
-		Assert.assertEquals("FUCK!+3+2", Props.get("K2"));
-		Assert.assertEquals("FUCK!+3+2+1", Props.get("K1"));
+		Assert.assertEquals("FUCK!+3+2+weiwei", Props.get("K2"));
+		Assert.assertEquals("FUCK!+3+2+weiwei+1", Props.get("K1"));
 	}
 }
