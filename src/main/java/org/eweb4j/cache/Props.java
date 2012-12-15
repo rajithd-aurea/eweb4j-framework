@@ -263,8 +263,13 @@ public class Props {
 //				log.error("Variable [ "+ g +" ] not found in the Localization (properties) config file!");
 //			}
 			String result = renderVarable(pattern, _key, value, tmpHt);
-			if (result == null)
-				tmpHt.put(key, property.replace(g, tmpHt.get(_key)));
+			if (result == null){
+				String _property = tmpHt.get(key);
+				if (_property != null && _property.trim().length() > 0)
+					tmpHt.put(key, _property.replace(g, tmpHt.get(_key)));
+				else
+					tmpHt.put(key, property.replace(g, tmpHt.get(_key)));
+			}
 		}
 		
 		return null;
