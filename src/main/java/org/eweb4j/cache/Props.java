@@ -251,19 +251,22 @@ public class Props {
 	 * @date 2012-12-5 下午08:04:35
 	 */
 	private static String renderVarable(Pattern pattern, String key, String property, Map<String,String> tmpHt){
+		if (property == null || key == null)
+			return null;
+		
 		Matcher matcher = pattern.matcher(property);
 		while (matcher.find()) {
 			String g = matcher.group();
 			String _key = g.replace("${", "").replace("}", "");
-			String value = "";
-			if(tmpHt.containsKey(_key)){
-				value = tmpHt.get(_key);
-			}else{
-				value = "[Can't find this variable in the Localization properties]:"+_key;
-				log.error("Variable [ "+ g +" ] not found in the Localization (properties) config file!");
+			String value = tmpHt.get(_key);
+			String result = renderVarable(pattern, _key, value, tmpHt);
+			if (result == null){
+				String _property = tmpHt.get(key);
+				if (_property != null && _property.trim().length() > 0)
+					tmpHt.put(key, _property.replace(g, tmpHt.get(_key)));
+				else
+					tmpHt.put(key, property.replace(g, tmpHt.get(_key)));
 			}
-			property = property.replace(g, value);
-			tmpHt.put(key, property);
 		}
 		return null;
 	}
