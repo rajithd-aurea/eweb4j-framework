@@ -31,7 +31,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 public class CommonUtil {
 	
 	public static void main(String[] args){
-		System.out.println("http://www.dealprimo.com/a248.e.akamai.net/origin-cdn.volusion.com/gmtrx.mqpsr/v/vspfiles/photos/DP-FringePerm-3.jpg?1349736248".matches("^.*\\.(jpg|png|gif).*$"));
+		System.out.println(1010101/1024.0);
 	}
 	
 	public static Float toSeconds(String strTime){
@@ -539,6 +539,35 @@ public class CommonUtil {
 		Matcher m = p.matcher(mail);
 
 		return m.find();
+	}
+	
+	/**
+	 * 
+	 * 1204,K => 1K
+	 * @date 2012-12-16 上午10:13:01
+	 * @param size
+	 * @param format K,M,G,T
+	 * @return
+	 */
+	public static String formatFileSize(long size, String format) {
+		
+		if (format.equals("K")){
+			return size / 1024.0 + "K";
+		}
+		
+		if (format.equals("M")){
+			return size / 1024.0 / 1024.0 + "M";
+		}
+		
+		if (format.equals("G")){
+			return size / 1024.0 / 1024.0 / 1024.0 + "G";
+		}
+		
+		if (format.equals("T")){
+			return size / 1024.0 / 1024.0 / 1024.0 / 1024.0 + "T";
+		}
+		
+		return size + "B";
 	}
 	
 	public static long parseFileSize(String _size){

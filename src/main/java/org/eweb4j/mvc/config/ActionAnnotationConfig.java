@@ -483,14 +483,14 @@ public class ActionAnnotationConfig extends ScanPackage{
 	}
 
 	private static String parseHttpMethodByAnnotation(Class<?> cls, Method m) {
-		String clazzHttpMethod = parseHttpMethodByClazz(cls);
+		//String clazzHttpMethod = parseHttpMethodByClazz(cls);
 
 		String methodHttpMethod = parseHttpMethodByMethodAnnotation(m);
 
-		if (methodHttpMethod != null)
+		//if (methodHttpMethod != null)
 			return methodHttpMethod;
 
-		return clazzHttpMethod;
+		//return clazzHttpMethod;
 	}
 
 	private static String parseHttpMethodByMethodAnnotation(Method m) {
@@ -511,7 +511,7 @@ public class ActionAnnotationConfig extends ScanPackage{
 		}
 
 		if (_sb.length() == 0)
-			return null;
+			return "GET|POST|PUT|DELETE";
 
 		return _sb.toString();
 	}

@@ -271,7 +271,7 @@ public class ParamUtil {
 			String[] val = e.getValue();
 			String[] values = new String[val.length];
 			for (int i = 0; i < values.length; i++) 
-				values[i] = URLDecoder.decode(val[i], "utf-8");
+				values[i] = val[i];
 			
 			map.put(key, values);
 		}
