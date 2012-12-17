@@ -662,4 +662,5 @@ ioc.xml
 (5) bug fix: 解决properties 错误的${}变量名字报null pointer异常 by https://github.com/nothing-whoami
 (6) feature: DAO 接口新增 lessEqual 和 moreEqual 方法，实现 <= 和 >= 连接符操作
 (7) feature: ThumbUtil 添加 build 方法，可以用来创建一个Thumbnails的Builder类对象，并且可以传入图片的左上角和右下角两个顶点的坐标进行裁剪
-
+(8) feature: FileUtil 增加writeFile、readFile等方法
+(9) improve: 改善MVC模块的Freemarker和Velocity模板引擎

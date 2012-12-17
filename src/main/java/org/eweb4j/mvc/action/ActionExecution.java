@@ -698,34 +698,18 @@ public class ActionExecution {
 			return;
 		} else if (re.startsWith(RenderType.FREEMARKER + ":")) {
 			String location = re.substring((RenderType.FREEMARKER + ":").length());
-			// FreeMarker 渲染
-			Configuration cfg = new Configuration();
-			// 指定模板从何处加载的数据源，这里设置成一个文件目录。
-			cfg.setDirectoryForTemplateLoading(new File(ConfigConstant.ROOT_PATH + MVCConfigConstant.FORWARD_BASE_PATH));
-			// 指定模板如何检索数据模型
-			cfg.setObjectWrapper(new DefaultObjectWrapper());
-			cfg.setDefaultEncoding("utf-8");
-
+			Configuration cfg =  (Configuration) context.getServletContext().getAttribute("ftlConfig");
 			Template template = cfg.getTemplate(location);
-			template.setEncoding("utf-8");
+			template.setEncoding("UTF-8");
 
 			template.process(this.context.getModel(), this.context.getWriter());
 
 			return;
 		}else if (re.startsWith(RenderType.VELOCITY + ":")) {
 			String location = re.substring((RenderType.VELOCITY + ":").length());
-			File viewsDir = new File(ConfigConstant.ROOT_PATH + MVCConfigConstant.FORWARD_BASE_PATH);
-			 // 初始化Velocity模板引擎
-	        Properties p = new Properties();
-	        p.setProperty("resource.loader", "file");
-	        p.setProperty("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.FileResourceLoader");
-	        p.setProperty("file.resource.loader.path", viewsDir.getAbsolutePath());
-	        p.setProperty("file.resource.loader.cache", "true");
-	        p.setProperty("file.resource.loader.modificationCheckInterval", "2");
-	        p.setProperty("input.encoding", "utf-8");
-	        p.setProperty("output.encoding", "utf-8");
-	        VelocityEngine ve = new VelocityEngine(p);
+			
 	        // Velocity获取模板文件，得到模板引用
+			VelocityEngine ve = (VelocityEngine) context.getServletContext().getAttribute("vmEngine");
 	        org.apache.velocity.Template t = ve.getTemplate(location);
 			VelocityContext velocityCtx = new VelocityContext();
 			for (Iterator<Entry<String, Object>> it = this.context.getModel().entrySet().iterator(); it.hasNext(); ){
