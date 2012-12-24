@@ -1,8 +1,15 @@
 package org.eweb4j.mvc;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Map.Entry;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -12,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.HttpMethod;
 
+import org.apache.velocity.app.VelocityEngine;
 import org.eweb4j.config.ConfigConstant;
 import org.eweb4j.config.EWeb4JConfig;
 import org.eweb4j.config.LogFactory;
@@ -20,7 +28,12 @@ import org.eweb4j.mvc.action.ActionExecution;
 import org.eweb4j.mvc.config.ActionConfig;
 import org.eweb4j.mvc.config.MVCConfigConstant;
 import org.eweb4j.mvc.interceptor.InterExecution;
+import org.eweb4j.mvc.upload.UploadFile;
 import org.eweb4j.util.CommonUtil;
+import org.eweb4j.util.FileUtil;
+
+import freemarker.template.Configuration;
+import freemarker.template.DefaultObjectWrapper;
 
 /**
  * eweb4j.MVC filter
@@ -42,6 +55,8 @@ public class EWebServlet extends HttpServlet {
 
 		EWeb4JConfig.setCONFIG_BASE_PATH(config.getInitParameter(MVCCons.CONFIG_BASE_PATH));
 
+		EWeb4JConfig.setCHECK_START_FILE_EXIST(config.getInitParameter(MVCCons.CHECK_START_FILE_EXIST));
+		
 		EWeb4JConfig.setSTART_FILE_NAME(config.getInitParameter(MVCCons.START_FILE_NAME));
 
 		ActionConfig.setFORWARD_BASE_PATH(config.getInitParameter(MVCCons.FORWARD_BASE_PATH));
@@ -68,20 +83,20 @@ public class EWebServlet extends HttpServlet {
 	}
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)throws IOException {
+		Context context = null;
 		try {
-			Context context = this.initContext(request, response);// 1 初始化环境
-			
-			MVC.getThreadLocal().set(context);// 最主要的还是提供给 org.eweb4j.i18n.Lang.java 类使用
-			
 			String err = EWeb4JConfig.start(ConfigConstant.START_FILE_NAME);// 2
-																			// 启动eweb4j
+			// 启动eweb4j
 			if (err != null) {
 				this.printHtml(err, response.getWriter());
 				return;
 			}
+
+			context = this.initContext(request, response);// 1 初始化环境
+			MVC.getThreadLocal().set(context);// 最主要的还是提供给 org.eweb4j.i18n.Lang.java 类使用
 			
 			Lang.change(request.getLocale());// 设置国际化语言
-
+			
 			String uri = this.parseURL(request);// 3.URI解析
 			context.setUri(uri);
 
@@ -90,8 +105,8 @@ public class EWebServlet extends HttpServlet {
 
 			String reqMethod = this.parseMethod(request);// HTTP Method 解析
 			context.setHttpMethod(reqMethod);
-
-			InterExecution before_interExe = new InterExecution("before", context);// 4.前置拦截器
+			
+			InterExecution before_interExe = new InterExecution("before", context);// 4.外部前置拦截器
 			if (before_interExe.findAndExecuteInter()) {
 				before_interExe.showErr();
 				return;
@@ -103,13 +118,25 @@ public class EWebServlet extends HttpServlet {
 				actionExe.execute();// 5.execute the action
 				return;
 			}
-
+			
 			this.normalReqLog(uri);// log
 		} catch (Exception e) {
 			e.printStackTrace();
 			String info = CommonUtil.getExceptionString(e);
 			LogFactory.getMVCLogger(EWebFilter.class).error(info);
 			this.printHtml(info, response.getWriter());
+		}finally{
+			// 清空临时文件
+			if (context != null && !context.getUploadMap().isEmpty())
+				for (Iterator<Entry<String, List<UploadFile>>> it = context.getUploadMap().entrySet().iterator(); it.hasNext(); ){
+					Entry<String, List<UploadFile>> en = it.next();
+					if (en.getValue() == null)
+						continue;
+					
+					for (UploadFile f : en.getValue()){
+						FileUtil.deleteFile(f.getTmpFile());
+				}
+			}
 		}
 	}
 	
@@ -124,13 +151,47 @@ public class EWebServlet extends HttpServlet {
 	 * @param res
 	 * @throws Exception
 	 */
-	private Context initContext(HttpServletRequest request,
-			HttpServletResponse response) throws Exception {
+	private Context initContext(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		request.setCharacterEncoding("utf-8");
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html");
-		return new Context(servletContext, request, response, null, null, null,
-				null);
+		Context context = new Context(servletContext, request, response, null, null, null, null);
+		// 将request的请求参数转到另外一个map中去
+		Map<String, String[]> qpMap = new HashMap<String, String[]>();
+		qpMap.putAll(ParamUtil.copyReqParams(context.getRequest()));
+		context.setQueryParamMap(qpMap);
+		
+		// FreeMarker 渲染
+		Configuration cfg = (Configuration) servletContext.getAttribute("ftlConfig");
+		if (cfg == null){
+			cfg = new Configuration();
+			// 指定模板从何处加载的数据源，这里设置成一个文件目录。
+			cfg.setDirectoryForTemplateLoading(new File(ConfigConstant.ROOT_PATH + MVCConfigConstant.FORWARD_BASE_PATH));
+			// 指定模板如何检索数据模型
+			cfg.setObjectWrapper(new DefaultObjectWrapper());
+			cfg.setDefaultEncoding("UTF-8");
+			servletContext.setAttribute("ftlConfig", cfg);
+		}
+		
+		// 初始化Velocity模板引擎
+		VelocityEngine ve = (VelocityEngine) servletContext.getAttribute("vmEngine");
+		if (ve == null) {
+			File viewsDir = new File(ConfigConstant.ROOT_PATH + MVCConfigConstant.FORWARD_BASE_PATH);
+	        Properties p = new Properties();
+	        p.setProperty("resource.loader", "file");
+	        p.setProperty("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.FileResourceLoader");
+	        p.setProperty("file.resource.loader.path", viewsDir.getAbsolutePath());
+	        p.setProperty("file.resource.loader.cache", "true");
+	        p.setProperty("file.resource.loader.modificationCheckInterval", "2");
+	        p.setProperty("input.encoding", "UTF-8");
+	        p.setProperty("output.encoding", "UTF-8");
+	        ve = new VelocityEngine(p);
+	        servletContext.setAttribute("vmEngine", ve);
+		}
+		
+		//将上传的表单元素注入到context中
+		ParamUtil.handleUpload(context);
+		return context;
 	}
 
 	/**

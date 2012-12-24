@@ -8,8 +8,9 @@ public class EWebConfigInit {
                 
                 String err = EWeb4JConfig.start();
                 if (err != null)
-                        throw new RuntimeException(err);
+                	throw new RuntimeException(err);
                 
+                System.out.println("start success!!!!!!!!!!!");
 //              ConfigBean cb = ConfigBeanCreator.getConfigBean();
 //
 //              // 设置是否每次启动框架都重新读取配置文件

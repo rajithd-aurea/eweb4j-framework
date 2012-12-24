@@ -57,6 +57,8 @@ public class EWebFilter implements Filter, Servlet {
 		servletContext = config.getServletContext();
 
 		EWeb4JConfig.setCONFIG_BASE_PATH(config.getInitParameter(MVCCons.CONFIG_BASE_PATH));
+		
+		EWeb4JConfig.setCHECK_START_FILE_EXIST(config.getInitParameter(MVCCons.CHECK_START_FILE_EXIST));
 
 		EWeb4JConfig.setSTART_FILE_NAME(config.getInitParameter(MVCCons.START_FILE_NAME));
 

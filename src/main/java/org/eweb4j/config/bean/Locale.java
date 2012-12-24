@@ -5,10 +5,10 @@ import org.eweb4j.util.xml.AttrTag;
 public class Locale {
 
 	@AttrTag
-	private String language;
+	private String language = "";
 
 	@AttrTag
-	private String country;
+	private String country = "";
 
 	public String getLanguage() {
 		return language;

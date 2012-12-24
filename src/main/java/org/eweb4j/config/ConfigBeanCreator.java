@@ -13,10 +13,12 @@ import org.eweb4j.config.bean.I18N;
 import org.eweb4j.config.bean.IOCXmlFiles;
 import org.eweb4j.config.bean.InterXmlFile;
 import org.eweb4j.config.bean.Locale;
+import org.eweb4j.config.bean.LogsConfigBean;
 import org.eweb4j.config.bean.ORMXmlFiles;
 import org.eweb4j.config.bean.Prop;
 import org.eweb4j.config.bean.Properties;
 import org.eweb4j.config.bean.ScanActionPackage;
+import org.eweb4j.config.bean.ScanInterceptorPackage;
 import org.eweb4j.config.bean.ScanPojoPackage;
 import org.eweb4j.config.bean.UploadConfigBean;
 
@@ -58,27 +60,31 @@ public class ConfigBeanCreator {
 	}
 	
 	public static ConfigBean getConfigBean() {
-		ConfigBean configBean = new ConfigBean();
+		ConfigBean cb = new ConfigBean();
 		
 		I18N i18n = new I18N();
 		Locale locale = new Locale();
 		locale.setLanguage(java.util.Locale.CHINA.getLanguage());
 		locale.setCountry(java.util.Locale.CHINA.getCountry());
 		i18n.getLocale().add(locale);
-		configBean.setLocales(i18n);
+		cb.setLocales(i18n);
 		
 		Properties props = new Properties();
 		Prop file = new Prop();
 		props.getFile().add(file);
-		configBean.setProperties(props);
+		cb.setProperties(props);
+		
+		LogsConfigBean lcb = new LogsConfigBean();
 		
 		ConfigIOC ioc = new ConfigIOC();
 		IOCXmlFiles iocXmlFiles = new IOCXmlFiles();
 		iocXmlFiles.setPath(new ArrayList<String>());
 		ioc.setIocXmlFiles(iocXmlFiles);
-		configBean.setIoc(ioc);
+		ioc.setLogs(lcb);
+		cb.setIoc(ioc);
 
 		ConfigORM orm = new ConfigORM();
+		orm.setLogs(lcb);
 		Ddl ddl = new Ddl();
 		orm.setDdl(ddl);
 		ORMXmlFiles ormXmlFiles = new ORMXmlFiles();
@@ -90,9 +96,10 @@ public class ConfigBeanCreator {
 		dbInfoXmlFiles.setPath(new ArrayList<String>());
 		orm.setDbInfoXmlFiles(dbInfoXmlFiles);
 
-		configBean.setOrm(orm);
+		cb.setOrm(orm);
 
 		ConfigMVC mvc = new ConfigMVC();
+		mvc.setLogs(lcb);
 		UploadConfigBean upload = new UploadConfigBean();
 		mvc.setUpload(upload);
 		
@@ -105,11 +112,13 @@ public class ConfigBeanCreator {
 		mvc.setInterXmlFiles(intFiles);
 		
 		ScanActionPackage sap = new ScanActionPackage();
-		sap.setPath(new ArrayList<String>());
 		mvc.setScanActionPackage(sap);
 		
-		configBean.setMvc(mvc);
+		ScanInterceptorPackage sip = new ScanInterceptorPackage();
+		mvc.setScanInterceptorPackage(sip);
+		
+		cb.setMvc(mvc);
 
-		return configBean;
+		return cb;
 	}
 }

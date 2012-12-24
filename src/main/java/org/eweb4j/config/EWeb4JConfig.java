@@ -81,14 +81,27 @@ public class EWeb4JConfig {
 			// 1.读取配置文件
 			try {
 				file = new File(startXmlPath);
-				XMLReader reader = BeanXMLUtil.getBeanXMLReader(file);
-				reader.setBeanName("eweb4j");
-				reader.setClass("eweb4j", ConfigBean.class);
-				ConfigBean cb = reader.readOne();
+				ConfigBean cb = null;
+				boolean readFile = true;
+				final String check = ConfigConstant.CHECK_START_FILE_EXIST;
+				if (!file.exists()){
+					if (!"true".equals(check) && !"1".equals(check)){
+						log.warn("Skip the Start Configuation file !!!");
+						cb = ConfigBeanCreator.getConfigBean();
+						readFile = false;
+					}
+				}
+				
+				if (readFile){
+					XMLReader reader = BeanXMLUtil.getBeanXMLReader(file);
+					reader.setBeanName("eweb4j");
+					reader.setClass("eweb4j", ConfigBean.class);
+					cb = reader.readOne();
+				}
+				
 				if (cb == null) {
 					error = " can not read any configuration info! But now have bean repaired, please restart.";
 				} else {
-
 					StringBuilder infos = new StringBuilder("EWeb4JConfig.start \n");
 					infos.append("start-config-xml-path --> ").append(ConfigConstant.START_FILE_PATH()).append("\n");
 					infos.append("${RootPath} --> ").append(ConfigConstant.ROOT_PATH).append("\n");
@@ -369,10 +382,8 @@ public class EWeb4JConfig {
 		return error;
 	}
 
-	public static void createStartXml(String path, ConfigBean cb)
-			throws Exception {
-		XMLWriter writer = BeanXMLUtil.getBeanXMLWriter(
-				new File(ConfigConstant.CONFIG_BASE_PATH() + path), cb);
+	public static void createStartXml(String path, ConfigBean cb) throws Exception {
+		XMLWriter writer = BeanXMLUtil.getBeanXMLWriter(new File(ConfigConstant.CONFIG_BASE_PATH() + path), cb);
 		writer.setBeanName("eweb4j");
 		writer.setClass("eweb4j", ConfigBean.class);
 		writer.write();
@@ -393,5 +404,10 @@ public class EWeb4JConfig {
 			return;
 		ConfigConstant.CONFIG_BASE_PATH = CONFIG_BASE_PATH;
 	}
-
+	
+	public static void setCHECK_START_FILE_EXIST(String CHECK_START_FILE_EXIST){
+		if (CHECK_START_FILE_EXIST == null || CHECK_START_FILE_EXIST.trim().length() == 0)
+			return;
+		ConfigConstant.CHECK_START_FILE_EXIST = CHECK_START_FILE_EXIST;
+	}
 }

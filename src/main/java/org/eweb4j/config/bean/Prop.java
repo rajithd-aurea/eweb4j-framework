@@ -4,10 +4,10 @@ import org.eweb4j.util.xml.AttrTag;
 
 public class Prop {
 	@AttrTag
-	private String id;
+	private String id = "";
 
 	@AttrTag
-	private String path;
+	private String path = "";
 
 	@AttrTag
 	private String global = "false";

@@ -7,6 +7,7 @@ public interface MVCCons {
 	String LOCALE = "Locale";
 	String START_FILE_NAME = "StartFileName";
 	String CONFIG_BASE_PATH = "ConfigBasePath";
+	String CHECK_START_FILE_EXIST = "CheckStartFileExist";
 	String WEB_ROOT_KEY = "WebRootKey";
 	String FORWARD_BASE_PATH = "ForwardBasePath";
 	String BASE_URL_KEY = "BaseURLKey";

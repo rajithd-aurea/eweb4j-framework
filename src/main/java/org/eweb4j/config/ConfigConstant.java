@@ -14,6 +14,7 @@ public class ConfigConstant {
 	public static String ROOT_PATH = FileUtil.getParent(CLASS_PATH, 2);
 	public static String CONFIG_BASE_PATH = FileUtil.getParent(CLASS_PATH, 0); //
 	public static String START_FILE_NAME = "eweb4j-start-config.xml";
+	public static String CHECK_START_FILE_EXIST = "true";
 	
 	public static String CONFIG_BASE_PATH(){
 		CONFIG_BASE_PATH = CONFIG_BASE_PATH.replace("${RootPath}", ROOT_PATH);

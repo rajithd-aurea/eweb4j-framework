@@ -664,3 +664,4 @@ ioc.xml
 (7) feature: ThumbUtil 添加 build 方法，可以用来创建一个Thumbnails的Builder类对象，并且可以传入图片的左上角和右下角两个顶点的坐标进行裁剪
 (8) feature: FileUtil 增加writeFile、readFile等方法
 (9) improve: 改善MVC模块的Freemarker和Velocity模板引擎
+(10)improve: 增加CheckStartFileExist参数，用来让框架启动的时候开启检查start.xml是否存在的行为，默认如果不存在的话不检查。
