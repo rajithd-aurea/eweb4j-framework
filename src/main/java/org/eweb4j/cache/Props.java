@@ -365,30 +365,89 @@ public class Props {
 		writeProperties(filePath, data);
 	}
 	
+	public synchronized static void remove(String propId, String key) {
+		try {
+			removeProp(propId, key);
+		} catch (IOException e) {
+			e.printStackTrace();
+			log.error("remove property which key="+key+" of file which id="+propId+" throws exception");
+		}
+	}
+	
+	public synchronized static void removeProp(String propId, String key) throws IOException {
+		if (propId == null)
+			return;
+
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
+		List<Prop> files = cb.getProperties().getFile();
+		for (Prop f : files) {
+			if (propId.equals(f.getId())) {
+				Map<String, String> map = props.get(propId);
+				if (map == null) 
+					break;
+				
+				String filePath = ConfigConstant.CONFIG_BASE_PATH + f.getPath();
+
+				removeProperties(filePath, key);
+
+				break;
+			}
+		}
+	}
+	
+	public synchronized static void removeProperties(String filePath, String key) throws IOException{
+		Properties prop = new Properties();
+		BufferedReader fis = null;
+		BufferedWriter fos = null;
+
+		try {
+			fis = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "utf-8"));
+			// 从输入流中读取属性列表（键和元素对）
+			prop.load(fis);
+			// 调用 Hashtable 的方法 put。使用 getProperty 方法提供并行性。
+			// 强制要求为属性的键和值使用字符串。返回值是 Hashtable 调用 put 的结果。
+			fos = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), "utf-8"));;
+			prop.remove(key);
+			// 以适合使用 load 方法加载到 Properties 表中的格式，
+			// 将此 Properties 表中的属性列表（键和元素对）写入输出流
+			prop.store(fos, "Last updated at " + CommonUtil.getNowTime() + " by EWeb4J");
+			fos.flush();
+		} catch (IOException e){
+			throw new IOException(e);
+		} finally {
+			if (fis != null)
+				fis.close();
+			if (fos != null)
+				fos.close();
+		}
+	}
+	
 	// 写入properties信息
 	public synchronized static void writeProperties(String filePath, Map<String, String> data) throws IOException {
 		Properties prop = new Properties();
 		BufferedReader fis = null;
 		BufferedWriter fos = null;
 
-		fis = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "utf-8"));
-		// 从输入流中读取属性列表（键和元素对）
-		prop.load(fis);
-		// 调用 Hashtable 的方法 put。使用 getProperty 方法提供并行性。
-		// 强制要求为属性的键和值使用字符串。返回值是 Hashtable 调用 put 的结果。
-		fos = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), "utf-8"));;
-		prop.putAll(data);
-		// 以适合使用 load 方法加载到 Properties 表中的格式，
-		// 将此 Properties 表中的属性列表（键和元素对）写入输出流
-		prop.store(fos, "Last updated at " + CommonUtil.getNowTime() + " by EWeb4J");
-
-		fos.flush();
-
-		if (fis != null)
-			fis.close();
-		if (fos != null)
-			fos.close();
-
+		try {
+			fis = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "utf-8"));
+			// 从输入流中读取属性列表（键和元素对）
+			prop.load(fis);
+			// 调用 Hashtable 的方法 put。使用 getProperty 方法提供并行性。
+			// 强制要求为属性的键和值使用字符串。返回值是 Hashtable 调用 put 的结果。
+			fos = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), "utf-8"));;
+			prop.putAll(data);
+			// 以适合使用 load 方法加载到 Properties 表中的格式，
+			// 将此 Properties 表中的属性列表（键和元素对）写入输出流
+			prop.store(fos, "Last updated at " + CommonUtil.getNowTime() + " by EWeb4J");
+			fos.flush();
+		} catch (IOException e){
+			throw new IOException(e);
+		} finally {
+			if (fis != null)
+				fis.close();
+			if (fos != null)
+				fos.close();
+		}
 	}
 
 	public static Map<String, Map<String, String>> getProps() {
