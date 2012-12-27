@@ -24,8 +24,8 @@ public class ActionProp {
 		return map.get(key);
 	}
 	
-	public void write(String key, Object value) throws IOException{
-		Props.writeProp(key, key, value);
+	public void write(String key, String value) throws IOException{
+		Props.write(propId, key, value);
 	}
 
 	public Map<String, String> getMap() {

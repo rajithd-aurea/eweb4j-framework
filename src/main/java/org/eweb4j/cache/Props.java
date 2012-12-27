@@ -1,15 +1,21 @@
 package org.eweb4j.cache;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -148,9 +154,35 @@ public class Props {
 		return props.get(id);
 	}
 
+	/**
+	 * 重新加载目标properties文件的内容
+	 * @date 2012-12-26 下午09:31:04
+	 * @param propId
+	 */
+	public static synchronized void reload(String propId){
+		if (propId == null || propId.trim().length() == 0)
+			return ;
+		
+		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
+		for (Prop p : cb.getProperties().getFile()){
+			if (propId.equals(p.getId())){
+				String err;
+				try {
+					err = readProperties(p, false);
+					if (err != null)
+						log.error(err);
+				} catch (IOException e) {
+					e.printStackTrace();
+					log.error("reload properties id=" + propId + " throws exception");
+				}
+				
+				break;
+			}
+		}
+	}
+	
 	// 读取properties的全部信息
-	public static synchronized String readProperties(Prop f, boolean isCreate)
-			throws IOException {
+	public static synchronized String readProperties(Prop f, boolean isCreate) throws IOException {
 		if (f == null || f.getPath().length() == 0)
 			return null;
 
@@ -287,8 +319,22 @@ public class Props {
 		}
 	}
 
-	public synchronized static void writeProp(String propId, String key,
-			Object value) throws IOException {
+	public synchronized static void write(String propId, String key, String value) {
+		Map<String, String> data = new HashMap<String, String>();
+		data.put(key, value);
+		write(propId, data);
+	}
+	
+	public synchronized static void write(String propId, Map<String, String> data) {
+		try {
+			writeProp(propId, data);
+		} catch (IOException e) {
+			e.printStackTrace();
+			log.error("write property value to properties id="+propId+" throws exception");
+		}
+	}
+	
+	public synchronized static void writeProp(String propId, Map<String, String> data) throws IOException {
 		if (propId == null)
 			return;
 
@@ -302,11 +348,10 @@ public class Props {
 					map = new Hashtable<String, String>();
 					props.put(propId, map);
 				}
-				String val = String.valueOf(value);
-				map.put(key, val);
+				map.putAll(data);
 				String filePath = ConfigConstant.CONFIG_BASE_PATH + f.getPath();
 
-				writeProperties(filePath, key, val);
+				writeProperties(filePath, data);
 
 				break;
 			}
@@ -314,23 +359,28 @@ public class Props {
 
 	}
 
+	public synchronized static void writeProperties(String filePath, String key, String value) throws IOException {
+		Map<String, String> data = new HashMap<String, String>();
+		data.put(key, value);
+		writeProperties(filePath, data);
+	}
+	
 	// 写入properties信息
-	public synchronized static void writeProperties(String filePath,
-			String parameterName, String parameterValue) throws IOException {
+	public synchronized static void writeProperties(String filePath, Map<String, String> data) throws IOException {
 		Properties prop = new Properties();
-		InputStream fis = null;
-		OutputStream fos = null;
+		BufferedReader fis = null;
+		BufferedWriter fos = null;
 
-		fis = new FileInputStream(filePath);
+		fis = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "utf-8"));
 		// 从输入流中读取属性列表（键和元素对）
 		prop.load(fis);
 		// 调用 Hashtable 的方法 put。使用 getProperty 方法提供并行性。
 		// 强制要求为属性的键和值使用字符串。返回值是 Hashtable 调用 put 的结果。
-		fos = new FileOutputStream(filePath);
-		prop.setProperty(parameterName, parameterValue);
+		fos = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), "utf-8"));;
+		prop.putAll(data);
 		// 以适合使用 load 方法加载到 Properties 表中的格式，
 		// 将此 Properties 表中的属性列表（键和元素对）写入输出流
-		prop.store(fos, "eweb4j last update '" + parameterName + "' value");
+		prop.store(fos, "Last updated at " + CommonUtil.getNowTime() + " by EWeb4J");
 
 		fos.flush();
 

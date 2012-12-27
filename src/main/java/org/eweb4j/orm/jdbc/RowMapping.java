@@ -27,6 +27,10 @@ import org.eweb4j.util.ReflectUtil;
 @SuppressWarnings("all")
 public class RowMapping {
 
+	public static void main(String[] args){
+		System.out.println(Byte.class.getName());
+	}
+	
 	public static <T> T mapOneRow(ResultSet rs, Class<T> cls) throws Exception {
 		return mapOneRow(rs, null, cls);
 	}
@@ -135,6 +139,12 @@ public class RowMapping {
 								m.invoke(t, false);
 							}
 						} else if ("date".equalsIgnoreCase(type) || "java.sql.Date".equalsIgnoreCase(type) || "java.util.Date".equalsIgnoreCase(type)) {
+							m.invoke(t, value);
+						} else if ("timestamp".equalsIgnoreCase(type) || "java.sql.Timestamp".equalsIgnoreCase(type)) {
+							m.invoke(t, value);
+						} else if ("time".equalsIgnoreCase(type) || "java.sql.Time".equalsIgnoreCase(type)) {
+							m.invoke(t, value);
+						} else if ("byte[]".equalsIgnoreCase(type) || "[Ljava.lang.Byte;".equalsIgnoreCase(type)) {
 							m.invoke(t, value);
 						} else if (PropType.ONE_ONE.equalsIgnoreCase(type) || PropType.MANY_ONE.equalsIgnoreCase(type)) {
 							if ("".equals(v))

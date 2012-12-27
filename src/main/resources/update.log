@@ -665,3 +665,8 @@ ioc.xml
 (8) feature: FileUtil 增加writeFile、readFile等方法
 (9) improve: 改善MVC模块的Freemarker和Velocity模板引擎
 (10)improve: 增加CheckStartFileExist参数，用来让框架启动的时候开启检查start.xml是否存在的行为，默认如果不存在的话不检查。
+(11)improve: Props增加write(propId,k,v)写入参数到某个properties文件、reload(propId)重新载入某个properties文件、等方法
+(12)improve: CommonUtil添加calculateTime(start, end)、calculateTime(start)等方法，用来计算时间耗时，例子：
+             System.out.println(CommonUtil.calculateTime(CommonUtil.parse("2011-02-03 05:33:21").getTime()));
+             693d 7h18m9s
+(13)improve: ORM的Entity增加对Date、Timestamp、Time、byte[]的数据类型支持

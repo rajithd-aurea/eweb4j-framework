@@ -1,5 +1,8 @@
 package test.props;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import junit.framework.Assert;
 
 import org.eweb4j.cache.Props;
@@ -27,5 +30,12 @@ public class TestProps {
 		Assert.assertEquals("FUCK!+3", Props.get("K3"));
 		Assert.assertEquals("FUCK!+3+2+weiwei", Props.get("K2"));
 		Assert.assertEquals("FUCK!+3+2+weiwei+1", Props.get("K1"));
+		
+		//测试写值
+		Map<String, String> data = new HashMap<String,String>();
+		data.put("name", "赖伟威");
+		data.put("email", "l.weiwei@163.com");
+		data.put("website", "http://laiweiweihi.iteye.com");
+		Props.write("Message", data);
 	}
 }

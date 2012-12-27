@@ -31,7 +31,35 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 public class CommonUtil {
 	
 	public static void main(String[] args){
-		System.out.println(1010101/1024.0);
+		System.out.println(CommonUtil.calculateTime(CommonUtil.parse("2011-02-03 05:33:21").getTime()));
+	}
+	
+	public static String calculateTime(long start){
+		return calculateTime(start, System.currentTimeMillis(), "${d}d ${h}h${m}m${s}s");
+	}
+	
+	public static String calculateTime(long start, String format) {
+		return calculateTime(start, System.currentTimeMillis(), format);
+	}
+	
+	public static String calculateTime(long start,int end){
+		return calculateTime(start, end, "${d}d ${h}h${m}m${s}s");
+	}
+	
+	public static String calculateTime(long start, long end, String format){
+		if (format == null)
+			format = "${d}d ${h}h${m}m${s}s";
+        long between = (end - start);// 得到两者的毫秒数
+        long d = between / (24 * 60 * 60 * 1000);
+        long h = (between / (60 * 60 * 1000) - d * 24);
+        long m = ((between / (60 * 1000)) - d * 24 * 60 - h * 60);
+        long s = (between / 1000 - d * 24 * 60 * 60 - h * 60 * 60 - m * 60);
+        
+		return format
+				.replace("${d}", String.valueOf(d))
+				.replace("${h}", String.valueOf(h))
+				.replace("${m}", String.valueOf(m))
+				.replace("${s}", String.valueOf(s));
 	}
 	
 	public static Float toSeconds(String strTime){
