@@ -1,6 +1,9 @@
 package org.eweb4j.util;
 
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -10,6 +13,7 @@ import java.text.Normalizer.Form;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -22,8 +26,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
+import org.eweb4j.cache.ORMConfigBeanCache;
 import org.eweb4j.cache.Props;
+import org.eweb4j.orm.PropType;
+import org.eweb4j.orm.config.bean.ORMConfigBean;
+import org.eweb4j.orm.config.bean.Property;
+import org.w3c.dom.Node;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -31,7 +44,265 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 public class CommonUtil {
 	
 	public static void main(String[] args){
-		System.out.println(CommonUtil.calculateTime(CommonUtil.parse("2011-02-03 05:33:21").getTime()));
+		String html = "<p style=\"text-align: center;\">As the quip goes, a<span>ll power corrupts, but we need the electricity. Coming to our power-scarce rescue is the&nbsp;11200mAh Pineng LCD Display Power Bank,&nbsp;<span>a smart little device to have in your purse, pocket, or backpack for those inevitable times when a mobile phone, tablet, PSP handheld crosses the great electrical divide for want of juice.</span></span></p><p style=\"text-align: center;\"><span><span><img src=\"/sites/default/files/upload/pineng-detail6.jpg\" height=\"464\" width=\"600\" /><br /></span></span></p><p style=\"text-align: center;\">&nbsp;It's small, <span>110 x 72 x 23mm, but packs a punch</span>&nbsp;with <span>11200mAh&nbsp;</span>of power held in reserve. An enviable amount of energy that should recharge just about any respectably sized mobile device, or generate a tiny Pacific island village's energy supply.&nbsp;</p><p style=\"text-align: center;\"><img src=\"http://www.alldealsasia.com/sites/default/files/upload_imce_ops/pineng-detail13.jpg\" height=\"621\" width=\"750\" /></p><p style=\"text-align: center;\"><img src=\"/sites/default/files/upload/pineng-detail5.jpg\" height=\"392\" width=\"600\" /></p><p style=\"text-align: center;\"><span>You will also receive 5 connectors with the battery charger which makes it compatible with 95% of the mobile devices in the market. It also supports iPhone 5 charging. Lightning connector required.&nbsp;So get one while stocks last!</span></p><p style=\"text-align: center;\">Compatible with your most of your favorite mobile phones, this power bank fully justifies its appellation, with each full charge powering an&nbsp;iPhone and a comparable smartphone 4-5 times. A most nifty dual output interface also allows the simultaneous charging of an iPhone and an iPad, or two such similar devices.</p><p style=\"text-align: center;\"><img src=\"/sites/default/files/upload/pineng-detail14.jpg\" height=\"398\" width=\"600\" /></p><p style=\"text-align: center;\">Not keeping track of your power use? No matter, the&nbsp;LED display flashes a warning light when battery levels dip dangerously low. The impact-resistant&nbsp;aviation aluminium alloy shell can take the hard knocks of life and comes in 4 classy colors (Gray, Blue, Silver, Gold) of which you can take your pick.</p><p style=\"text-align: center;\"><img src=\"/sites/default/files/upload/pineng-detail19.jpg\" height=\"367\" width=\"600\" /></p><p style=\"text-align: center;\"><img src=\"/sites/default/files/upload_imce_ops/pineng-detail10.jpg\" height=\"450\" width=\"600\" /></p><p style=\"text-align: center;\"><span>What's more, it also has a dual USB output so mobile phones / iPads can be charged at the same time resulting in greater efficiency!</span></p>";
+		System.out.println(html);
+		System.out.println(CommonUtil.removeXmlTagAttr(html, "img", Arrays.asList("src", "style")));//删除指定img标签的src
+		System.out.println(CommonUtil.removeXmlTagAttr(html, Arrays.asList("style", "id")));//删除所有标签的style, id属性
+		System.out.println(CommonUtil.cleanOtherXmlTags(html, "p"));//只留下p标签，其他都删除
+		System.out.println(CommonUtil.cleanXmlTags(html, "span"));//删除p和span标签
+		
+//		System.out.println(CommonUtil.calculateTime(CommonUtil.parse("2011-02-03 05:33:21").getTime()));
+	}
+	
+	/**
+	 * 如果不给定keepTags会删除所有Tag，否则删除给定之外的Tag
+	 * @date 2013-1-5 下午05:24:06
+	 * @param html
+	 * @param keepTags
+	 * @return
+	 */
+	public static String cleanOtherXmlTags(String html, String... keepTags) {
+		return html.replaceAll(CommonUtil.inverseXmlTagsRegex(keepTags), "");
+	}
+	
+	/**
+	 * 如果不给定delTags，会删除所有Tag，否则删除给定的Tag
+	 * @date 2013-1-5 下午05:35:27
+	 * @param html
+	 * @param delTags
+	 * @return
+	 */
+	public static String cleanXmlTags(String html, String... delTags) {
+		return html.replaceAll(CommonUtil.xmlTagsRegex(delTags), "");
+	}
+	
+	/**
+	 * 
+	 * TODO
+	 * @date 2013-1-5 下午05:30:30
+	 * @param excludeTags
+	 * @return
+	 */
+	public static String inverseXmlTagsRegex(String... excludeTags) {
+		if (excludeTags == null || excludeTags.length == 0)
+			return "<[!/]?\\b\\w+\\b\\s*[^>]*>";
+		String fmt = "\\b%s\\b";
+		StringBuilder sb = new StringBuilder();
+		for (String kt : excludeTags){
+			if (kt == null || kt.trim().length() == 0)
+				continue;
+			
+			if (sb.length() > 0)
+				sb.append("|");
+			sb.append(String.format(fmt, kt));
+		}
+		if (sb.length() == 0)
+			return "<[!/]?\\b\\w+\\b\\s*[^>]*>";
+		
+		String pattern = "<[!/]?\\b(?!("+sb.toString()+"))+\\b\\s*[^>]*>";
+		
+		return pattern;
+	}
+	
+	public static String xmlTagsRegex(String... excludeTags) {
+		if (excludeTags == null || excludeTags.length == 0)
+			return "<[!/]?\\b\\w+\\b\\s*[^>]*>";
+		String fmt = "\\b%s\\b";
+		StringBuilder sb = new StringBuilder();
+		for (String kt : excludeTags){
+			if (kt == null || kt.trim().length() == 0)
+				continue;
+			
+			if (sb.length() > 0)
+				sb.append("|");
+			sb.append(String.format(fmt, kt));
+		}
+		if (sb.length() == 0)
+			return "<[!/]?\\b\\w+\\b\\s*[^>]*>";
+		
+		String pattern = "<[!/]?("+sb.toString()+")\\s*[^>]*>";
+		
+		return pattern;
+	}
+	
+	public static String removeXmlTagAttr(String html, Collection<String> attrs){
+		return removeXmlTagAttr(html, null, attrs);
+	}
+	/**
+	 * 
+	 * TODO
+	 * @date 2013-1-5 下午06:55:42
+	 * @param html
+	 * @param tag
+	 * @param attrs
+	 * @return
+	 */
+	public static String removeXmlTagAttr(String html, String tag, Collection<String> attrs){
+		String fmt = "(?<=<%s{1,255})\\s+%s=[\"'][^'\"]*[\"']";
+		
+		if (tag == null || tag.trim().length() == 0)
+			tag = ".";//all tags
+		
+		if (attrs == null || attrs.size() == 0)
+			return html.replaceAll(String.format(fmt, tag, "\\w+"), "");//all attributes
+		
+		for (String attr : attrs){
+			if (attr == null || attr.trim().length() == 0)
+				continue;
+			
+			String regex = String.format(fmt, tag, attr);
+			html = html.replaceAll(regex, "");
+		}
+		
+		return html;
+	}
+	
+	public static String toXml(Node node, boolean keepHeader) throws Exception{
+		Transformer transformer;
+    	DOMSource xmlSource = new DOMSource(node);
+    	transformer = TransformerFactory.newInstance().newTransformer();
+    	StringWriter writer = new StringWriter();
+    	StreamResult outputTarget = new StreamResult(writer);
+    	transformer.transform(xmlSource, outputTarget);
+    	String str = writer.getBuffer().toString();
+    	
+    	if (!keepHeader)
+    		return str.substring(str.indexOf("?>")+2);
+    	else
+    		return str;
+	}
+	
+	public static <T> T mappingPojo(Map<String, Object> data, Class<T> cls) throws Exception {
+		if (data == null)
+			return null;
+		
+		List<Map<String, Object>> _list = new ArrayList<Map<String, Object>>(1);
+		_list.add(data);
+		List<T> list = mappingPojo(_list, cls);
+		return list == null ? null : list.get(0);
+	}
+	
+	public static <T> List<T> mappingPojo(List<Map<String, Object>> datas, Class<T> cls) throws Exception {
+		if (datas == null || datas.isEmpty()) 
+			return null;
+		
+		List<String> columns = new ArrayList<String>();
+		for (String col : datas.get(0).keySet()) 
+			columns.add(col);
+		
+		List<T> list = new ArrayList<T>();
+		T t = null;
+		for (Map<String, Object> data : datas) {
+			t = cls.newInstance();
+			ReflectUtil ru = new ReflectUtil(t);
+			ORMConfigBean ormBean = ORMConfigBeanCache.get(cls.getName());
+
+			for (Iterator<Property> it = ormBean.getProperty().iterator(); it.hasNext();) {
+				Property p = it.next();
+				String type = p.getType();
+				if (type == null)
+					continue;
+
+				// 如果查询出来的字段名字没有,则不进行值注入
+				boolean flag = false;
+				for (String col : columns) {
+					if (col.equalsIgnoreCase(p.getColumn())) {
+						flag = true;
+						continue;
+					}
+				}
+
+				if (!flag)
+					continue;
+
+				Method m = ru.getSetter(p.getName());
+				if (m == null)
+					continue;
+
+				Object value = data.get(p.getColumn());
+				if (value == null)
+					continue;
+
+				String v = String.valueOf(value);
+				if (v == null) {
+					v = "";
+				}
+				
+				if ("int".equalsIgnoreCase(type) || "java.lang.Integer".equalsIgnoreCase(type)) {
+					if ("".equals(v.trim())) {
+						v = "0";
+					}
+					if (value instanceof Boolean)
+						v = ((Boolean)value ? "1" : "0");
+					
+					m.invoke(t, Integer.parseInt(v));
+				} else if ("long".equalsIgnoreCase(type) || "java.lang.Long".equalsIgnoreCase(type)) {
+					if ("".equals(v.trim())) {
+						v = "0";
+					}
+					if (value instanceof Boolean)
+						v = ((Boolean)value ? "1" : "0");
+					
+					m.invoke(t, Long.parseLong(v));
+				} else if ("float".equalsIgnoreCase(type) || "java.lang.Float".equalsIgnoreCase(type)) {
+					if ("".equals(v.trim())) {
+						v = "0.0";
+					}
+					if (value instanceof Boolean)
+						v = ((Boolean)value ? "1.0" : "0.0");
+					
+					m.invoke(t, Float.parseFloat(v));
+				} else if ("double".equalsIgnoreCase(type) || "java.lang.Double".equalsIgnoreCase(type)) {
+					if ("".equals(v.trim())) {
+						v = "0.0";
+					}
+					if (value instanceof Boolean)
+						v = ((Boolean)value ? "1.0" : "0.0");
+					m.invoke(t, Float.parseFloat(v));
+				} else if ("string".equalsIgnoreCase(type) || "java.lang.String".equalsIgnoreCase(type)) {
+					m.invoke(t, v);
+				} else if ("boolean".equalsIgnoreCase(type) || "java.lang.Boolean".equalsIgnoreCase(type)){
+					if ("1".equals(v.trim()) || "true".equals(v.trim())){
+						m.invoke(t, true);
+					}else if ("0".equals(v.trim()) || "false".equals(v.trim())){
+						m.invoke(t, false);
+					}
+				} else if ("date".equalsIgnoreCase(type) || "java.sql.Date".equalsIgnoreCase(type) || "java.util.Date".equalsIgnoreCase(type)) {
+					m.invoke(t, value);
+				} else if ("timestamp".equalsIgnoreCase(type) || "java.sql.Timestamp".equalsIgnoreCase(type)) {
+					m.invoke(t, value);
+				} else if ("time".equalsIgnoreCase(type) || "java.sql.Time".equalsIgnoreCase(type)) {
+					m.invoke(t, value);
+				} else if ("byte[]".equalsIgnoreCase(type) || "[Ljava.lang.Byte;".equalsIgnoreCase(type)) {
+					m.invoke(t, value);
+				} else if (PropType.ONE_ONE.equalsIgnoreCase(type) || PropType.MANY_ONE.equalsIgnoreCase(type)) {
+					if ("".equals(v))
+						continue;
+
+					Field field = ru.getField(p.getName());
+					Class<?> tarClass = field.getType();
+
+					String refField = p.getRelProperty();
+					Object tarObj = tarClass.newInstance();
+					
+					tarObj = ClassUtil.injectFieldValue(tarObj, refField, new String[] { v });
+					
+					m.invoke(t, tarObj);
+
+				} else if (PropType.ONE_MANY.equalsIgnoreCase(type)) {
+
+				} else if (PropType.MANY_MANY.equalsIgnoreCase(type)) {
+
+				} else if (!"".equals(type)) {
+					m.invoke(t, String.valueOf(value));
+				}
+
+			}
+			
+			list.add(t);
+		}
+
+		return list.isEmpty() ? null : list;
 	}
 	
 	public static String calculateTime(long start){
