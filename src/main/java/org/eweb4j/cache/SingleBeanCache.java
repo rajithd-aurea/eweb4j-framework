@@ -16,7 +16,7 @@ public class SingleBeanCache {
 
 	private static final HashMap<Object, Object> ht = new HashMap<Object, Object>();
 
-	private static Log log = LogFactory.getConfigLogger(SingleBeanCache.class);
+	private static Log log = LogFactory.getIOCLogger(SingleBeanCache.class);
 
 	public static boolean containsKey(String beanID) {
 		return ht.containsKey(beanID);

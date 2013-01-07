@@ -184,7 +184,7 @@ public class Model2Table {
 			writer.write(script);
 			writer.flush();
 			writer.close();
-			LogFactory.getConfigLogger(Model2Table.class).debug("create models sql script file success -> " + file.getAbsoluteFile());
+			LogFactory.getORMLogger(Model2Table.class).debug("create models sql script file success -> " + file.getAbsoluteFile());
 			
 		} catch (IOException e1) {
 			return CommonUtil.getExceptionString(e1);

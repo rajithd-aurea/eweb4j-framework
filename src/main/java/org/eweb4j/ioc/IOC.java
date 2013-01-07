@@ -26,7 +26,7 @@ import org.eweb4j.util.ReflectUtil;
  */
 @SuppressWarnings("all")
 public class IOC {
-	private static Log log = LogFactory.getConfigLogger(IOC.class);
+	private static Log log = LogFactory.getIOCLogger(IOC.class);
 
 	/**
 	 * 查找beanID的bean是否存在

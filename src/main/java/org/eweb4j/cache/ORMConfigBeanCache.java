@@ -17,7 +17,7 @@ import org.eweb4j.orm.config.bean.ORMConfigBean;
  * 
  */
 public class ORMConfigBeanCache {
-	private static Log log = LogFactory.getConfigLogger(ORMConfigBeanCache.class);
+	private static Log log = LogFactory.getORMLogger(ORMConfigBeanCache.class);
 	
 	private static final HashMap<Object, ORMConfigBean> ht = new HashMap<Object, ORMConfigBean>();
 

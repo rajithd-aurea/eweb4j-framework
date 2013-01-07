@@ -25,7 +25,7 @@ import org.eweb4j.util.RegexList;
  */
 public final class ActionConfigBeanCache {
 
-	private static Log log = LogFactory.getConfigLogger(ActionConfigBeanCache.class);
+	private static Log log = LogFactory.getMVCLogger(ActionConfigBeanCache.class);
 
 	/**
 	 * This is a map for save the action_config_bean

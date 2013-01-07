@@ -12,7 +12,7 @@ import org.eweb4j.util.FileUtil;
 
 public abstract class ScanPackage {
 	
-	public final static Log log = LogFactory.getConfigLogger(ScanPackage.class);
+	public final static Log log = LogFactory.getLogger(ScanPackage.class, true);
 	
 	private Collection<String> packages = new HashSet<String>();
 	private Collection<String> jars = new HashSet<String>();

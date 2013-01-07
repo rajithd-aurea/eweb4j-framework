@@ -14,7 +14,7 @@ import org.eweb4j.mvc.config.bean.InterConfigBean;
  */
 public class InterConfigBeanCache {
 	
-	private static Log log = LogFactory.getConfigLogger(InterConfigBeanCache.class);
+	private static Log log = LogFactory.getMVCLogger(InterConfigBeanCache.class);
 	
 	private static final List<InterConfigBean> ht = new ArrayList<InterConfigBean>();
 

@@ -59,7 +59,7 @@ public class ConfigBeanCreator {
 		return this;
 	}
 	
-	public static ConfigBean getConfigBean() {
+	public static ConfigBean create() {
 		ConfigBean cb = new ConfigBean();
 		
 		I18N i18n = new I18N();

@@ -30,26 +30,24 @@ public class LogFactory {
 		return new LogImpl(logs, "ORM", clazz);
 	}
 
-	public static Log getConfigLogger(Class<?> clazz) {
-		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
-
+	public static Log getLogger(Class<?> clazz){
+		return getLogger(clazz, true);
+	}
+	
+	public static Log getLogger(Class<?> clazz, boolean isConsole){
 		LogConfigBean log = new LogConfigBean();
 		log.setLevel("debug");
 		log.setFile(null);
 		log.setSize("0");
+		log.setConsole(String.valueOf(isConsole));
 		LogsConfigBean logs = new LogsConfigBean();
 		logs.getLog().add(log);
-		if (cb == null)
-			return new LogImpl(logs, "CONFIG", clazz);
-
-		String debug = cb.getDebug();
-		if ("true".equals(debug) || "1".equals(debug)) {
-			log.setConsole("1");
-			return new LogImpl(logs, "CONFIG", clazz);
-		} else {
-			log.setConsole("0");
-			return new LogImpl(logs, "CONFIG", clazz);
-		}
+		return new LogImpl(logs, "CONFIG", clazz);
+	}
+	
+	@Deprecated
+	public static Log getConfigLogger(Class<?> clazz) {
+		return getLogger(clazz);
 	}
 
 }

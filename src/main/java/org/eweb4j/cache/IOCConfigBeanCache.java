@@ -15,7 +15,7 @@ import org.eweb4j.ioc.config.bean.IOCConfigBean;
  * 
  */
 public class IOCConfigBeanCache {
-	private static Log log = LogFactory.getConfigLogger(IOCConfigBeanCache.class);
+	private static Log log = LogFactory.getIOCLogger(IOCConfigBeanCache.class);
 	
 	private static final Hashtable<Object, IOCConfigBean> ht = new Hashtable<Object, IOCConfigBean>();
 
