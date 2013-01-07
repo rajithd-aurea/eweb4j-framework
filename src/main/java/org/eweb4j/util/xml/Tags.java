@@ -43,6 +43,16 @@ public class Tags {
 		String sRs2 = Attrs.me().xml(xml).rm("href").Tags().kp("div", "a").ok();
 		System.out.println("<div>This is div.</div>This is p.This is li.<a>This is link.</a>".equals(sRs2));
 
+		
+		String html = "<dd class=\"frinfo line_blue\">2013-01-07 08:40:03      <a style=\"font-weight:bold;padding:5px 0px 5px 20px;background:url('http://www.2cto.com/statics/images/icon/user_comment.png') left center no-repeat\" href=\"#comment_iframe\">我来说两句 </a>    来源：雨简 的BLOG    </dd>";
+		
+//		List<String> tag = Tags.findByRegex(html, Tags.xmlTagsRegex("a"));
+//		String regex = tag.get(0) + ".*" + tag.get(1);
+//		System.out.println(regex);
+//		html = html.replaceAll(regex, "");
+//		System.out.println(html);
+		System.out.println(Attrs.me().xml(html).tag("a").rm().Tags().rm("a").empty().exe().rm("dd").ok());
+//		System.out.println(Attrs.regex("a", "style"));
 	}
 	
 	private String xml = null;//需要操作的xml文本

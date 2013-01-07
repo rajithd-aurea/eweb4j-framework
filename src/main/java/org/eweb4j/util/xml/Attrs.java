@@ -152,8 +152,8 @@ public class Attrs {
 	 * @return
 	 */
 	public static String removeXmlTagAttr(String xml, String tag, Collection<String> attrs){
-		String fmt = "(?<=<%s{1,255})\\s+%s=[\"'][^'\"]*[\"']";
-		
+//		String fmt = "(?<=<%s{1,255})\\s+%s=[\"'][^'\"]*[\"']";
+		final String fmt = "(?<=<%s{1,255})\\s+%s=([\"'=])[^=]*\\1";
 		if (tag == null || tag.trim().length() == 0)
 			tag = ".";//all tags
 		
@@ -169,6 +169,12 @@ public class Attrs {
 		}
 		
 		return xml;
+	}
+	
+	public static final String regex(String tag, String attr){
+		String fmt = "(?<=<%s{1,255})\\s+%s=([\"'=])[^=]*\\1";
+		String regex = String.format(fmt, tag, attr);
+		return regex;
 	}
 	
 }
