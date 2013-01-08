@@ -44,6 +44,18 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 public class CommonUtil {
 	
 	public static void main(String[] args){
+		String source = "2013-01-14-12-00-00";
+		Date date = CommonUtil.parse("yyyy-MM-dd-HH-mm-ss", source);
+		System.out.println(CommonUtil.formatTime(new Date(1357660800000L)));
+		System.out.println(String.valueOf(date.getTime()).substring(0, 10));
+	}
+	
+	public static String String(){
+		return String("");
+	}
+	
+	public static String String(Object obj){
+		return String.valueOf(obj);
 	}
 	
 	public static String toXml(Node node, boolean keepHeader) throws Exception{
