@@ -206,13 +206,23 @@ public class Tags {
 		if (isRMCnt){
 			for (String delTag : delTags){
 				List<String> tag = findByRegex(html, xmlTagsRegex(delTag));
-				String regex = tag.get(0) + ".*" + tag.get(1);
+				if (tag == null || tag.isEmpty() || tag.size() != 2)
+					continue;
+				String regex = resolveRegex(tag.get(0)) + ".*" + resolveRegex(tag.get(1));
 				html = html.replaceAll(regex, "");
 			}
 			return html;
 		}
 		
 		return html.replaceAll(xmlTagsRegex(delTags), "");
+	}
+	
+	public static String resolveRegex(String regex){
+		List<String> cc = Arrays.asList("\\", "^", "$", "*", "+", "?", "{", "}", "(", ")", ".", "[", "]", "|");
+		for (String c : cc) {
+			regex = regex.replace(c, "\\"+c);
+		}
+		return regex;
 	}
 	
 	/**

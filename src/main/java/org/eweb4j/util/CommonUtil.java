@@ -44,117 +44,6 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 public class CommonUtil {
 	
 	public static void main(String[] args){
-		String html = "<p style=\"text-align: center;\">As the quip goes, a<span>ll power corrupts, but we need the electricity. Coming to our power-scarce rescue is the&nbsp;11200mAh Pineng LCD Display Power Bank,&nbsp;<span>a smart little device to have in your purse, pocket, or backpack for those inevitable times when a mobile phone, tablet, PSP handheld crosses the great electrical divide for want of juice.</span></span></p><p style=\"text-align: center;\"><span><span><img src=\"/sites/default/files/upload/pineng-detail6.jpg\" height=\"464\" width=\"600\" /><br /></span></span></p><p style=\"text-align: center;\">&nbsp;It's small, <span>110 x 72 x 23mm, but packs a punch</span>&nbsp;with <span>11200mAh&nbsp;</span>of power held in reserve. An enviable amount of energy that should recharge just about any respectably sized mobile device, or generate a tiny Pacific island village's energy supply.&nbsp;</p><p style=\"text-align: center;\"><img src=\"http://www.alldealsasia.com/sites/default/files/upload_imce_ops/pineng-detail13.jpg\" height=\"621\" width=\"750\" /></p><p style=\"text-align: center;\"><img src=\"/sites/default/files/upload/pineng-detail5.jpg\" height=\"392\" width=\"600\" /></p><p style=\"text-align: center;\"><span>You will also receive 5 connectors with the battery charger which makes it compatible with 95% of the mobile devices in the market. It also supports iPhone 5 charging. Lightning connector required.&nbsp;So get one while stocks last!</span></p><p style=\"text-align: center;\">Compatible with your most of your favorite mobile phones, this power bank fully justifies its appellation, with each full charge powering an&nbsp;iPhone and a comparable smartphone 4-5 times. A most nifty dual output interface also allows the simultaneous charging of an iPhone and an iPad, or two such similar devices.</p><p style=\"text-align: center;\"><img src=\"/sites/default/files/upload/pineng-detail14.jpg\" height=\"398\" width=\"600\" /></p><p style=\"text-align: center;\">Not keeping track of your power use? No matter, the&nbsp;LED display flashes a warning light when battery levels dip dangerously low. The impact-resistant&nbsp;aviation aluminium alloy shell can take the hard knocks of life and comes in 4 classy colors (Gray, Blue, Silver, Gold) of which you can take your pick.</p><p style=\"text-align: center;\"><img src=\"/sites/default/files/upload/pineng-detail19.jpg\" height=\"367\" width=\"600\" /></p><p style=\"text-align: center;\"><img src=\"/sites/default/files/upload_imce_ops/pineng-detail10.jpg\" height=\"450\" width=\"600\" /></p><p style=\"text-align: center;\"><span>What's more, it also has a dual USB output so mobile phones / iPads can be charged at the same time resulting in greater efficiency!</span></p>";
-		System.out.println(html);
-		System.out.println(CommonUtil.removeXmlTagAttr(html, "img", Arrays.asList("src", "style")));//删除指定img标签的src
-		System.out.println(CommonUtil.removeXmlTagAttr(html, Arrays.asList("style", "id")));//删除所有标签的style, id属性
-		System.out.println(CommonUtil.cleanOtherXmlTags(html, "p"));//只留下p标签，其他都删除
-		System.out.println(CommonUtil.cleanXmlTags(html, "span"));//删除p和span标签
-		
-//		System.out.println(CommonUtil.calculateTime(CommonUtil.parse("2011-02-03 05:33:21").getTime()));
-	}
-	
-	/**
-	 * 如果不给定keepTags会删除所有Tag，否则删除给定之外的Tag
-	 * @date 2013-1-5 下午05:24:06
-	 * @param html
-	 * @param keepTags
-	 * @return
-	 */
-	public static String cleanOtherXmlTags(String html, String... keepTags) {
-		return html.replaceAll(CommonUtil.inverseXmlTagsRegex(keepTags), "");
-	}
-	
-	/**
-	 * 如果不给定delTags，会删除所有Tag，否则删除给定的Tag
-	 * @date 2013-1-5 下午05:35:27
-	 * @param html
-	 * @param delTags
-	 * @return
-	 */
-	public static String cleanXmlTags(String html, String... delTags) {
-		return html.replaceAll(CommonUtil.xmlTagsRegex(delTags), "");
-	}
-	
-	/**
-	 * 
-	 * TODO
-	 * @date 2013-1-5 下午05:30:30
-	 * @param excludeTags
-	 * @return
-	 */
-	public static String inverseXmlTagsRegex(String... excludeTags) {
-		if (excludeTags == null || excludeTags.length == 0)
-			return "<[!/]?\\b\\w+\\b\\s*[^>]*>";
-		String fmt = "\\b%s\\b";
-		StringBuilder sb = new StringBuilder();
-		for (String kt : excludeTags){
-			if (kt == null || kt.trim().length() == 0)
-				continue;
-			
-			if (sb.length() > 0)
-				sb.append("|");
-			sb.append(String.format(fmt, kt));
-		}
-		if (sb.length() == 0)
-			return "<[!/]?\\b\\w+\\b\\s*[^>]*>";
-		
-		String pattern = "<[!/]?\\b(?!("+sb.toString()+"))+\\b\\s*[^>]*>";
-		
-		return pattern;
-	}
-	
-	public static String xmlTagsRegex(String... excludeTags) {
-		if (excludeTags == null || excludeTags.length == 0)
-			return "<[!/]?\\b\\w+\\b\\s*[^>]*>";
-		String fmt = "\\b%s\\b";
-		StringBuilder sb = new StringBuilder();
-		for (String kt : excludeTags){
-			if (kt == null || kt.trim().length() == 0)
-				continue;
-			
-			if (sb.length() > 0)
-				sb.append("|");
-			sb.append(String.format(fmt, kt));
-		}
-		if (sb.length() == 0)
-			return "<[!/]?\\b\\w+\\b\\s*[^>]*>";
-		
-		String pattern = "<[!/]?("+sb.toString()+")\\s*[^>]*>";
-		
-		return pattern;
-	}
-	
-	public static String removeXmlTagAttr(String html, Collection<String> attrs){
-		return removeXmlTagAttr(html, null, attrs);
-	}
-	/**
-	 * 
-	 * TODO
-	 * @date 2013-1-5 下午06:55:42
-	 * @param html
-	 * @param tag
-	 * @param attrs
-	 * @return
-	 */
-	public static String removeXmlTagAttr(String html, String tag, Collection<String> attrs){
-		String fmt = "(?<=<%s{1,255})\\s+%s=[\"'][^'\"]*[\"']";
-		
-		if (tag == null || tag.trim().length() == 0)
-			tag = ".";//all tags
-		
-		if (attrs == null || attrs.size() == 0)
-			return html.replaceAll(String.format(fmt, tag, "\\w+"), "");//all attributes
-		
-		for (String attr : attrs){
-			if (attr == null || attr.trim().length() == 0)
-				continue;
-			
-			String regex = String.format(fmt, tag, attr);
-			html = html.replaceAll(regex, "");
-		}
-		
-		return html;
 	}
 	
 	public static String toXml(Node node, boolean keepHeader) throws Exception{
@@ -170,6 +59,102 @@ public class CommonUtil {
     		return str.substring(str.indexOf("?>")+2);
     	else
     		return str;
+	}
+	
+	/**
+	 * 删除标签
+	 * @date 2013-1-5 下午05:24:06
+	 * @param html
+	 * @param keepTags 保留的标签，如果不给定则删除所有标签
+	 * @return
+	 */
+	public static String cleanOtherXmlTags(String html, String... keepTags) {
+		return html.replaceAll(inverseXmlTagsRegex(keepTags), "");
+	}
+	
+	/**
+	 * 删除标签
+	 * @date 2013-1-5 下午05:35:27
+	 * @param html
+	 * @param isRMCnt 是否删除标签内的所有内容 <p>This is p.<a href="#">This is a.</a></p>如果干掉a标签，就变成=><p>This is p.</p>
+	 * @param delTags 需要删除的Tag，如果不给定则删除所有标签
+	 * @return
+	 */
+	public static String cleanXmlTags(String html, boolean isRMCnt, String... delTags) {
+		if (isRMCnt){
+			for (String delTag : delTags){
+				List<String> tag = findByRegex(html, xmlTagsRegex(delTag));
+				if (tag == null || tag.isEmpty() || tag.size() != 2)
+					continue;
+				String regex = resolveRegex(tag.get(0)) + ".*" + resolveRegex(tag.get(1));
+				html = html.replaceAll(regex, "");
+			}
+			return html;
+		}
+		
+		return html.replaceAll(xmlTagsRegex(delTags), "");
+	}
+	
+	public static String resolveRegex(String regex){
+		List<String> cc = Arrays.asList("\\", "^", "$", "*", "+", "?", "{", "}", "(", ")", ".", "[", "]", "|");
+		for (String c : cc) {
+			regex = regex.replace(c, "\\"+c);
+		}
+		return regex;
+	}
+	
+	/**
+	 * 匹配除了给定标签意外其他标签的正则表达式
+	 * @date 2013-1-7 下午03:45:29
+	 * @param keepTags 如果不给定则匹配所有标签
+	 * @return
+	 */
+	public static String inverseXmlTagsRegex(String... keepTags) {
+		if (keepTags == null || keepTags.length == 0)
+			return "<[!/]?\\b\\w+\\b\\s*[^>]*>";
+		String fmt = "\\b%s\\b";
+		StringBuilder sb = new StringBuilder();
+		for (String kt : keepTags){
+			if (kt == null || kt.trim().length() == 0)
+				continue;
+			
+			if (sb.length() > 0)
+				sb.append("|");
+			sb.append(String.format(fmt, kt));
+		}
+		if (sb.length() == 0)
+			return "<[!/]?\\b\\w+\\b\\s*[^>]*>";
+		
+		String pattern = "<[!/]?\\b(?!("+sb.toString()+"))+\\b\\s*[^>]*>";
+		
+		return pattern;
+	}
+	
+	/**
+	 * 匹配给定标签的正则表达式
+	 * @date 2013-1-7 下午03:47:11
+	 * @param tags 如果不给定则匹配所有标签
+	 * @return
+	 */
+	public static String xmlTagsRegex(String... tags) {
+		if (tags == null || tags.length == 0)
+			return "<[!/]?\\b\\w+\\b\\s*[^>]*>";
+		String fmt = "\\b%s\\b";
+		StringBuilder sb = new StringBuilder();
+		for (String kt : tags){
+			if (kt == null || kt.trim().length() == 0)
+				continue;
+			
+			if (sb.length() > 0)
+				sb.append("|");
+			sb.append(String.format(fmt, kt));
+		}
+		if (sb.length() == 0)
+			return "<[!/]?\\b\\w+\\b\\s*[^>]*>";
+		
+		String pattern = "<[!/]?("+sb.toString()+")\\s*[^>]*>";
+		
+		return pattern;
 	}
 	
 	public static <T> T mappingPojo(Map<String, Object> data, Class<T> cls) throws Exception {
