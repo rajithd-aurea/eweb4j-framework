@@ -52,6 +52,23 @@ public class CommonUtil {
 		System.out.println(CommonUtil.formatTime(new Date(1357833637000l)));
 	}
 	
+	public static String cleanLF(String str) {
+		return str.replace("\n", "");
+	}
+	
+	public static Double addDouble(Double d1, Double d2) {
+		return d1+d2;
+	}
+	public static Float addFloat(Float d1, Float d2) {
+		return d1+d2;
+	}
+	public static Integer addInteger(Integer d1, Integer d2) {
+		return d1+d2;
+	}
+	public static Long addLong(Long d1, Long d2) {
+		return d1+d2;
+	}
+	
 	public static Integer toInt(String str) {
 		return Integer.parseInt(str);
 	}
