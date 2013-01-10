@@ -1012,21 +1012,8 @@ public class DAOImpl implements DAO {
 		return page;
 	}
 
-	public DAO join(String fieldName){
-		return join(fieldName, fieldName);
-	}
-	
 	public DAO enableExpress(boolean flag){
 		this.express = flag;
-		return this;
-	}
-	
-	public DAO join(String fieldName, String alias) {
-		if (fieldName == null || alias == null)
-			return this;
-		
-		handleJoin(fieldName, alias);
-		
 		return this;
 	}
 	
@@ -1037,8 +1024,63 @@ public class DAOImpl implements DAO {
 		this.aliasMap.put(alias, a);
 		return this;
 	}
+	
+	public DAO join(String fieldName){
+		return join(fieldName, fieldName);
+	}
+	
+	public DAO join(String fieldName, String alias) {
+		if (fieldName == null || alias == null)
+			return this;
+		
+		handleJoin(0, fieldName, alias);
+		return this;
+	}
+	
+	public DAO leftJoin(String fieldName) {
+		return leftJoin(fieldName, fieldName);
+	}
 
-	private void handleJoin(String _fieldName, String _alias) {
+	public DAO leftJoin(String fieldName, String alias) {
+		if (fieldName == null || alias == null)
+			return this;
+		
+		handleJoin(1, fieldName, alias);
+		return this;
+	}
+
+	public DAO rightJoin(String fieldName) {
+		return rightJoin(fieldName, fieldName);
+	}
+
+	public DAO rightJoin(String fieldName, String alias) {
+		if (fieldName == null || alias == null)
+			return this;
+		
+		handleJoin(2, fieldName, alias);
+		return this;
+	}
+	
+	public DAO fullJoin(String fieldName) {
+		return fullJoin(fieldName, fieldName);
+	}
+
+	public DAO fullJoin(String fieldName, String alias) {
+		if (fieldName == null || alias == null)
+			return this;
+		
+		handleJoin(3, fieldName, alias);
+		return this;
+	}
+	
+	/**
+	 * 
+	 * @date 2013-1-9 上午01:16:37
+	 * @param type 0 innerJoin 1 leftOuterJoin 2 rightOuterJoin 3 fullOuterJoin
+	 * @param _fieldName
+	 * @param _alias
+	 */
+	private void handleJoin(int type, String _fieldName, String _alias) {
 		String[] fDots = _fieldName.split("\\.");
 		String[] aDots = _alias.split("\\.");
 		Class<?> currentClazz = this.clazz;
@@ -1106,26 +1148,6 @@ public class DAOImpl implements DAO {
 		for (String field : fields)
 			this.unFetch.add(field);
 		return this;
-	}
-
-	public DAO leftJoin(String fieldName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public DAO leftJoin(String fieldName, String alias) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public DAO rightJoin(String fieldName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public DAO rightJoin(String fieldName, String alias) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	public DAO likeEqual(Object value) {

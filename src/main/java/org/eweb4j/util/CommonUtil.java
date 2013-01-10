@@ -48,6 +48,28 @@ public class CommonUtil {
 		Date date = CommonUtil.parse("yyyy-MM-dd-HH-mm-ss", source);
 		System.out.println(CommonUtil.formatTime(new Date(1357660800000L)));
 		System.out.println(String.valueOf(date.getTime()).substring(0, 10));
+		long time = 1357835763 + 852209000;
+		System.out.println(CommonUtil.formatTime(new Date(1357833637000l)));
+	}
+	
+	public static Integer toInt(String str) {
+		return Integer.parseInt(str);
+	}
+	
+	public static Long toLong(String str) {
+		return Long.parseLong(str);
+	}
+	
+	public static Float toFloat(String str) {
+		return Float.parseFloat(str);
+	}
+	
+	public static Double toDouble(String str) {
+		return Double.parseDouble(str);
+	}
+	
+	public static Boolean toBoolean(String str) {
+		return Boolean.parseBoolean(str);
 	}
 	
 	public static String String(){
@@ -310,7 +332,7 @@ public class CommonUtil {
 		return calculateTime(start, System.currentTimeMillis(), format);
 	}
 	
-	public static String calculateTime(long start,int end){
+	public static String calculateTime(long start,long end){
 		return calculateTime(start, end, "${d}d ${h}h${m}m${s}s");
 	}
 	
@@ -364,7 +386,7 @@ public class CommonUtil {
 	
 	public static List<String> findByRegex(String input, String regex){
 		List<String> result = new ArrayList<String>();
-		Pattern p = Pattern.compile(regex);
+		Pattern p = Pattern.compile(regex, Pattern.DOTALL);
 		Matcher m = p.matcher(input);
 		while(m.find()){
 			result.add(m.group());
@@ -448,6 +470,10 @@ public class CommonUtil {
 		        .replaceAll("^[^a-zA-Z0-9]+", "");
 	}
 
+	public static Long getNow(){
+		return System.currentTimeMillis();
+	}
+	
 	public static Long getNow(int length){
 		return getTime(length, new Date());
 	}

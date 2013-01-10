@@ -275,22 +275,83 @@ public interface DAO {
 	
 	public DAO alias(String alias);
 	
+	/**
+	 * Left Outer Join
+	 * @date 2013-1-9 上午01:10:04
+	 * @param fieldName
+	 * @return
+	 */
 	public DAO leftJoin(String fieldName);
 	
+	/**
+	 * Left Outer Join
+	 * @date 2013-1-9 上午01:10:24
+	 * @param fieldName
+	 * @param alias
+	 * @return
+	 */
 	public DAO leftJoin(String fieldName, String alias);
 	
+	/**
+	 * Right Outer Join
+	 * @date 2013-1-9 上午01:10:04
+	 * @param fieldName
+	 * @return
+	 */
 	public DAO rightJoin(String fieldName);
 	
+	/**
+	 * Right Outer Join
+	 * @date 2013-1-9 上午01:10:24
+	 * @param fieldName
+	 * @param alias
+	 * @return
+	 */
 	public DAO rightJoin(String fieldName, String alias);
+	
+	/**
+	 * Full Outer Join
+	 * @date 2013-1-9 上午01:10:24
+	 * @param fieldName
+	 * @return
+	 */
+	public DAO fullJoin(String fieldName);
+	
+	/**
+	 * Full Outer Join
+	 * @date 2013-1-9 上午01:10:24
+	 * @param fieldName
+	 * @param alias
+	 * @return
+	 */
+	public DAO fullJoin(String fieldName, String alias);
 	
 	public DAO on();
 	
+	/**
+	 * Inner Join
+	 * @date 2013-1-9 上午01:11:14
+	 * @param fieldName
+	 * @return
+	 */
 	public DAO join(String fieldName);
 	
+	/**
+	 * Inner Join
+	 * @date 2013-1-9 上午01:11:46
+	 * @param fieldName
+	 * @param alias
+	 * @return
+	 */
 	public DAO join(String fieldName, String alias);
 	
+	/**
+	 * Enable the Expression of Join
+	 * @date 2013-1-9 上午01:11:57
+	 * @param flag
+	 * @return
+	 */
 	public DAO enableExpress(boolean flag);
-	
 	
 	public DAO groupBy(String... fieldNames);
 
