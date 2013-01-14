@@ -184,7 +184,7 @@ public class DeleteSqlCreator<T> {
 						
 						if (joinColAnn != null && joinColAnn.referencedColumnName().trim().length() > 0){
 							String refCol = joinColAnn.referencedColumnName();
-							String refField = ORMConfigBeanUtil.getColumn(_value.getClass(), refCol);
+							String refField = ORMConfigBeanUtil.getField(_value.getClass(), refCol);
 							ReflectUtil tarRu = new ReflectUtil(_value);
 							Method tarFKGetter = tarRu.getGetter(refField);
 							value = tarFKGetter.invoke(_value);

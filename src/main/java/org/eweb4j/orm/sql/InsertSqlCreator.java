@@ -84,7 +84,8 @@ public class InsertSqlCreator<T> {
 									joinColAnn = f.getAnnotation(JoinColumn.class);
 								
 								if (joinColAnn != null && joinColAnn.referencedColumnName().trim().length() > 0){
-									String refField = joinColAnn.referencedColumnName();
+									String refCol = joinColAnn.referencedColumnName();
+									String refField = ORMConfigBeanUtil.getField(_value.getClass(), refCol);
 									ReflectUtil tarRu = new ReflectUtil(_value);
 									Method tarFKGetter = tarRu.getGetter(refField);
 									value = tarFKGetter.invoke(_value);
