@@ -9,9 +9,10 @@ import org.eweb4j.orm.config.ORMConfigBeanUtil;
 import org.eweb4j.orm.jdbc.JdbcUtil;
 import org.eweb4j.orm.sql.OrderColumnUtil;
 
+@Deprecated
 @SuppressWarnings("all")
 public class DAOUtil {
-	public static <T> Number selectMaxIds(T t, Connection con, String dbType)
+	public static <T> Number selectMaxId(T t, Connection con, String dbType)
 			throws SQLException {
 		String idColumn;
 		String table;
