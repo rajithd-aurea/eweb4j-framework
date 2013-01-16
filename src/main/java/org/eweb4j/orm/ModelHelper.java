@@ -40,10 +40,9 @@ public class ModelHelper<T> implements IModel<T>{
 			id = DAOFactory.getInsertDAO(this.dsName).insertByField(this.model, field);
 		else
 			id = DAOFactory.getInsertDAO(this.dsName).insert(this.model);
-		
 		if (id == null || (Integer) id == -1)
 			return false;
-
+		
 		_setId(Long.parseLong(id + ""));
 		return true;
 	}
@@ -184,7 +183,8 @@ public class ModelHelper<T> implements IModel<T>{
 		if (idField == null)
 			return ;
 		try {
-			ru.getSetter(idField).invoke(model, id);
+			Method setter = ru.getSetter(idField);
+			setter.invoke(model, id);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 

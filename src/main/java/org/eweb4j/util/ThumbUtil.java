@@ -250,16 +250,17 @@ public class ThumbUtil {
 		
 		// 质量
 		float quality = 0.9f;
-		String outputFormat = "jpg";
+		String outputFormat = "png";
 		String name = CommonUtil.getNowTime("yyyyMMddHHmmss");
 
 		// 原图，也可以是本地的d:/xx.jpg
 //		String remoteImageUrl = "http://gd.image-gmkt.com/mi/830/443/414443830.jpg";
 //		String remoteImageUrl = "http://www.shoplay.com/cache/bigpic/20121130/470/aaeed8a8dd_w470.jpg";
-		String remoteImageUrl = "http://www.malijuthemeshop.com/live_previews/mws-admin/example/scottwills_squirrel.jpg";
+//		String remoteImageUrl = "http://www.malijuthemeshop.com/live_previews/mws-admin/example/scottwills_squirrel.jpg";
+		String remoteImageUrl = "http://static.sg.groupon-content.net/88/75/1357633937588.png";
 //		String remoteImageUrl = "http://test.shoplay.com/cache/bigpic/20121108/470/55c5b78e5c_w470.jpg";
-		int outputWidth = 210;
-		int outputHeight = 250;
+		int outputWidth = 400;
+		int outputHeight = 0;
 
 		float contrast = 0f; // 对比度
 		float brightness = 0f; // 亮度 0 表示不调整
@@ -267,23 +268,23 @@ public class ThumbUtil {
 		File file = new File("d:/" + name + "_w" + outputWidth + "h" + outputHeight + "_sharpen" + sharpenTimes 
 				+ "_contrat" + contrast + "_quality"+quality + "." + outputFormat);
 		
-//		BufferedImage image = ThumbUtil.generate(
-//				remoteImageUrl, 
-//				sharpenTimes,
-//				quality, contrast, brightness, outputFormat, 1, // 远程图片下载失败重试次数
-//				1 * 1000, // 失败后休眠时间
-//				outputWidth, outputHeight);
+		BufferedImage image = ThumbUtil.generate(
+				remoteImageUrl, 
+				sharpenTimes,
+				quality, contrast, brightness, outputFormat, 1, // 远程图片下载失败重试次数
+				1 * 1000, // 失败后休眠时间
+				outputWidth, outputHeight);
 		
-		int x1 = 55;
-		int y1 = 90;
-		int x2 = 173;
-		int y2 = 215;
-		
-		BufferedImage image = 
-			ThumbUtil
-				.build(remoteImageUrl, sharpenTimes, contrast, brightness, x1, y1, x2, y2)
-				.outputFormat(outputFormat)
-				.asBufferedImage();
+//		int x1 = 55;
+//		int y1 = 90;
+//		int x2 = 173;
+//		int y2 = 215;
+//		
+//		BufferedImage image = 
+//			ThumbUtil
+//				.build(remoteImageUrl, sharpenTimes, contrast, brightness, x1, y1, x2, y2)
+//				.outputFormat(outputFormat)
+//				.asBufferedImage();
 		
 		System.out.println(image.getWidth()+ ", "+image.getHeight());
 		boolean isOK = ImageIO.write(image, outputFormat, new FileOutputStream(file));

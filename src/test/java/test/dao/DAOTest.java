@@ -3,11 +3,14 @@ package test.dao;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import junit.framework.Assert;
 
 import org.eweb4j.config.ConfigConstant;
 import org.eweb4j.config.EWeb4JConfig;
+import org.eweb4j.orm.Models;
 import org.eweb4j.orm.config.ORMConfigBeanUtil;
 import org.eweb4j.orm.dao.DAO;
 import org.eweb4j.orm.dao.DAOFactory;
@@ -33,7 +36,31 @@ public class DAOTest {
 		dao = DAOFactory.getDAO(Map.class);
 	}
 
-	@Test
+	/**
+	 * 测试多线程下插入新纪录自增长 ID 的获取
+	 * TODO
+	 * @date 2013-1-16 上午11:11:14
+	 * @throws InterruptedException
+	 */
+	public void testInsert() throws InterruptedException{
+		ExecutorService pool = Executors.newFixedThreadPool(5);
+		for (int i = 0; i < 5; i++) {
+			final int index = i;
+			pool.execute(new Runnable() {
+				public void run() {
+					Pet pet = new Pet();
+					pet.setAge(5+index);
+					pet.setName("test pet " + index);
+					pet.setNumber("abcdef " + index);
+					pet.setType("dog " + index);
+					Models.inst(pet).create();
+					System.out.println("id--->"+pet.getPetId());
+				}
+			});
+		}
+		Thread.sleep(5*1000);
+	}
+	
 	public void testCol() throws Exception{
 		Assert.assertEquals("pet.master_id", ORMConfigBeanUtil.getColumn(Master.class, "pets.master"));
 //		Collection<Object> ms = DAOFactory.getDAO(Master.class).enableExpress(false).select("*").join("pets").where().field("pet.name").equal("xiaohei").groupBy("pet.name").query();

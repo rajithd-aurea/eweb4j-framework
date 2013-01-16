@@ -661,25 +661,6 @@ public class DAOImpl implements DAO {
 			} else {
 				rs = (Integer) JdbcUtil.update(ds.getConnection(), sql);
 			}
-
-			if (rs > 0 && sql.contains("INSERT INTO")) {
-				if (Map.class.isAssignableFrom(clazz)) {
-					if (map == null) {
-						map = new HashMap<String, Object>();
-						map.put("idColumn", "id");
-						map.put("table", this.table);
-					} else if (map.get("idColumn") == null) {
-						map.put("idColumn", "id");
-					}
-
-					Number id = DAOUtil.selectMaxId(map, ds.getConnection(),dbType);
-					return id == null ? 0 : id.intValue();
-				} else {
-					Number id = DAOUtil.selectMaxId(clazz,ds.getConnection(), dbType);
-					return id == null ? 0 : id.intValue();
-				}
-			}
-
 		} catch (SQLException e) {
 			log.error("sql-->" + sql + "exception:" + CommonUtil.getExceptionString(e));
 			throw new DAOException(sql + " execute exception", e);

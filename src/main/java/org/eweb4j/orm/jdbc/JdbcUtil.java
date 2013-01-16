@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,8 +46,7 @@ public class JdbcUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Number[] updateWithArgs(Connection con, String[] sqls,
-			Object[][] args) throws JdbcUtilException {
+	public static Number[] updateWithArgs(Connection con, String[] sqls, Object[][] args) throws JdbcUtilException {
 		Number[] result = null;
 
 		if (con != null && sqls != null && sqls.length > 0) {
@@ -61,9 +61,15 @@ public class JdbcUtil {
 				for (int i = 0; i < sqls.length; ++i) {
 					sqls[i] = sqls[i].replace(";", "");
 					sql.append(sqls[i]);
-					pstmt = con.prepareStatement(sqls[i]);
+					pstmt = con.prepareStatement(sqls[i], Statement.RETURN_GENERATED_KEYS);
 					fillArgs(args, pstmt, i);
 					result[i] = pstmt.executeUpdate();
+					if (result[i].intValue() > 0 && sqls[i].contains("INSERT INTO")) {
+						ResultSet rs = pstmt.getGeneratedKeys();
+						if (rs.next()){
+							result[i] = rs.getInt(1);
+						}
+					}
 					pstmt.close();
 					logToOrm(sqls, result, i);
 				}
@@ -380,7 +386,7 @@ public class JdbcUtil {
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("execute sql：").append(sqls[i]);
-		sb.append(" affected rows：").append(result[i]).append(";");
+		sb.append(" result->").append(result[i]).append(";");
 		log.debug(sb.toString());
 	}
 
