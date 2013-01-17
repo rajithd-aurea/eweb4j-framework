@@ -172,8 +172,7 @@ public class Props {
 					if (err != null)
 						log.error(err);
 				} catch (IOException e) {
-					e.printStackTrace();
-					log.error("reload properties id=" + propId + " throws exception");
+					log.error("reload properties id=" + propId + " throws exception", e);
 				}
 				
 				break;
@@ -257,7 +256,7 @@ public class Props {
 			}
 
 		} catch (FileNotFoundException e) {
-			log.warn(filePath + ", file not found!");
+			log.warn(filePath + ", file not found!", e);
 			if (isCreate) {
 				boolean flag = FileUtil.createFile(filePath);
 				if (flag) {
@@ -329,8 +328,7 @@ public class Props {
 		try {
 			writeProp(propId, data);
 		} catch (IOException e) {
-			e.printStackTrace();
-			log.error("write property value to properties id="+propId+" throws exception");
+			log.error("write property value to properties id="+propId+" throws exception", e);
 		}
 	}
 	
@@ -369,8 +367,7 @@ public class Props {
 		try {
 			removeProp(propId, key);
 		} catch (IOException e) {
-			e.printStackTrace();
-			log.error("remove property which key="+key+" of file which id="+propId+" throws exception");
+			log.error("remove property which key="+key+" of file which id="+propId+" throws exception", e);
 		}
 	}
 	

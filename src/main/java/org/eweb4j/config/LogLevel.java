@@ -6,9 +6,9 @@ public class LogLevel {
 		case 0:
 			return "OFF";
 		case 1:
-			return "INFO";
-		case 2:
 			return "DEBUG";
+		case 2:
+			return "INFO";
 		case 3:
 			return "WARN";
 		case 4:
@@ -16,16 +16,16 @@ public class LogLevel {
 		case 5:
 			return "FATAL";
 		default:
-			return "INFO";
+			return "DEBUG";
 		}
 	}
 
 	public static int level(String level) {
 		if ("OFF".equalsIgnoreCase(level))
 			return 0;
-		if ("INFO".equalsIgnoreCase(level))
-			return 1;
 		if ("DEBUG".equalsIgnoreCase(level))
+			return 1;
+		if ("INFO".equalsIgnoreCase(level))
 			return 2;
 		if ("WARN".equalsIgnoreCase(level))
 			return 3;

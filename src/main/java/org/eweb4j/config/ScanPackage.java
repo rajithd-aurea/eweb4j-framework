@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.FileUtil;
 
 public abstract class ScanPackage {
@@ -57,8 +56,7 @@ public abstract class ScanPackage {
 			//all ok
 			onOk();
 		} catch (Exception e) {
-			error = CommonUtil.getExceptionString(e);
-			log.error(error);
+			error = log.error("", e);
 		}
 
 		return error;

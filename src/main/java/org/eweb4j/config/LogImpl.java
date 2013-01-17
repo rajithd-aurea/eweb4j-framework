@@ -4,11 +4,13 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import org.eweb4j.config.bean.LogConfigBean;
 import org.eweb4j.config.bean.LogsConfigBean;
-import org.eweb4j.util.FileUtil;
 import org.eweb4j.util.CommonUtil;
+import org.eweb4j.util.FileUtil;
 
 public class LogImpl implements Log {
 	private Class<?> clazz;
@@ -69,8 +71,7 @@ public class LogImpl implements Log {
 
 					if (file.length() / (1024 * 1024) >= Integer.parseInt(log
 							.getSize())) {
-						File tf = new File(file.getAbsolutePath() + "."
-								+ CommonUtil.getNowTime("_MMddHHmmss"));
+						File tf = new File(file.getAbsolutePath() + "." + CommonUtil.getNowTime("_MMddHHmmss"));
 						FileUtil.copy(file, tf);
 						file.delete();
 						file = null;
@@ -81,13 +82,13 @@ public class LogImpl implements Log {
 
 					bw.newLine();
 					bw.write(sb.toString());
-					bw.close();
 				}
 			} catch (Exception ex) {
 
 			} finally {
 				if (bw != null) {
 					try {
+						bw.flush();
 						bw.close();
 					} catch (IOException ex) {
 						e.printStackTrace();
@@ -99,24 +100,71 @@ public class LogImpl implements Log {
 		return result.toString();
 	}
 
-	public String info(String info) {
-		return this.write(1, info);
-	}
-
 	public String debug(String debug) {
-		return this.write(2, debug);
+		return this.write(1, debug);
 	}
 
+	public String info(String info) {
+		return this.write(2, info);
+	}
+	
 	public String warn(String warn) {
 		return this.write(3,  warn);
+	}
+	
+	public String warn(String warn, Exception e) {
+		StringWriter strWriter = new StringWriter();
+		PrintWriter writer = new PrintWriter(strWriter, true);
+		e.printStackTrace(writer);
+		StringBuffer sb = strWriter.getBuffer();
+		
+		String err = warn + " cause by " + sb.toString();
+		
+		return this.write(3,  err);
 	}
 
 	public String error(String error) {
 		return this.write(4,  error);
 	}
-
+	
+	public static void main(String[] args){
+		try {
+			int i = 10 / 0;
+		}catch(Exception e){
+			StringWriter strWriter = new StringWriter();
+			PrintWriter writer = new PrintWriter(strWriter, true);
+			e.printStackTrace(writer);
+			StringBuffer sb = strWriter.getBuffer();
+			
+			String err = " cause by " + sb.toString();
+			System.out.println(err);
+		}
+	}
+	
+	public String error(String error, Exception e) {
+		StringWriter strWriter = new StringWriter();
+		PrintWriter writer = new PrintWriter(strWriter, true);
+		e.printStackTrace(writer);
+		StringBuffer sb = strWriter.getBuffer();
+		
+		String err = error + " cause by " + sb.toString();
+		
+		return this.write(4,  err);
+	}
+	
 	public String fatal(String fatal) {
 		return this.write(5,  fatal);
+	}
+	
+	public String fatal(String fatal, Exception e) {
+		StringWriter strWriter = new StringWriter();
+		PrintWriter writer = new PrintWriter(strWriter, true);
+		e.printStackTrace(writer);
+		StringBuffer sb = strWriter.getBuffer();
+		
+		String err = fatal + " cause by " + sb.toString();
+		
+		return this.write(5,  err);
 	}
 
 	public Class<?> getClazz() {

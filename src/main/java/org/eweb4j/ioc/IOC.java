@@ -274,7 +274,7 @@ public class IOC {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("IOC.getBean(" + beanID + ") failed!", e);
 		}
 
 		String info = "IOC.getBean(" + beanID + ") ——> " + t;

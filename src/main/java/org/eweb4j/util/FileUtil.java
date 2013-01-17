@@ -6,6 +6,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -26,6 +27,25 @@ import javax.imageio.ImageIO;
  */
 public class FileUtil {
 	
+	public static void appendFile(File f, String content) throws Exception{
+		BufferedWriter writer = null;
+		try {
+			writer = new BufferedWriter(new FileWriter(f, true));
+			writer.write(content);
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			if (writer != null){
+				try {
+					writer.flush();
+					writer.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
 	public static void writeFile(File f, String content) throws Exception{
 		BufferedWriter writer = null;
 		try {
@@ -36,6 +56,7 @@ public class FileUtil {
 		} finally {
 			if (writer != null){
 				try {
+					writer.flush();
 					writer.close();
 				} catch (IOException e) {
 					e.printStackTrace();

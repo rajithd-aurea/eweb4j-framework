@@ -1,5 +1,6 @@
 package org.eweb4j.util;
 
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
@@ -44,12 +45,14 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 public class CommonUtil {
 	
 	public static void main(String[] args){
-		String source = "2013-01-14-12-00-00";
-		Date date = CommonUtil.parse("yyyy-MM-dd-HH-mm-ss", source);
 		System.out.println(CommonUtil.formatTime(new Date(1357660800000L)));
+		String source = "2013-01-17 11:00";
+		Date date = CommonUtil.parse("yyyy-MM-dd HH:mm", source);
 		System.out.println(String.valueOf(date.getTime()).substring(0, 10));
-		long time = 1357835763 + 852209000;
-		System.out.println(CommonUtil.formatTime(new Date(1357833637000l)));
+		long time = System.currentTimeMillis() + 50152*1000;
+		System.out.println(time);
+		System.out.println((""+time).substring(0, 10));
+		System.out.println(CommonUtil.formatTime(new Date(time)));
 	}
 	
 	public static String cleanLF(String str) {
@@ -1355,18 +1358,14 @@ public class CommonUtil {
 		if (e == null)
 			return "";
 		
-		StringBuilder sb = new StringBuilder(e.toString());
-		sb.append(getStack(e.getStackTrace()));
-		Throwable t = e.getCause();
-		if (t != null) {
-			sb.append("\r\n <font color='red'> | cause by ").append(
-					e.getCause());
-			sb.append(getStack(e.getCause().getStackTrace()));
-			sb.append("</font>");
-		}
-		return sb.toString();
+		StringWriter strWriter = new StringWriter();
+		PrintWriter writer = new PrintWriter(strWriter, true);
+		e.printStackTrace(writer);
+		StringBuffer sb = strWriter.getBuffer();
+		return "cause by: \n\t" + sb.toString();
 	}
 
+	@Deprecated
 	public static String getStack(StackTraceElement[] stes) {
 		StringBuilder sb = new StringBuilder();
 		for (StackTraceElement ste : stes) {

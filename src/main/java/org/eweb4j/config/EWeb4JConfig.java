@@ -125,15 +125,11 @@ public class EWeb4JConfig {
 					String info = "configuration error, now it has repaired.";
 					error = CommonUtil.getNowTime() + "EWeb4JConfig : " + info + "exception：" + CommonUtil.getExceptionString(e);
 
-					log.error(info);
-
-					e.printStackTrace();
+					log.error(info, e);
 				} catch (Exception e1) {
 					String info = "can not write any configuration";
 					error = CommonUtil.getNowTime() + "EWeb4JConfig : " + info + "exception：" + CommonUtil.getExceptionString(e1);
-					log.fatal(info);
-
-					e1.printStackTrace();
+					log.fatal(info, e);
 				}
 			}
 			
@@ -241,8 +237,7 @@ public class EWeb4JConfig {
 								error += error13;
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
-					log.warn(e.toString());
+					log.warn(e.toString(), e);
 					if (error == null)
 						error = e.toString();
 					else
@@ -273,7 +268,7 @@ public class EWeb4JConfig {
 						// read jpa annotation
 						String error10 = new PojoAnnotationConfig().readAnnotation(cb.getOrm().getScanPojoPackage().getPath());
 						if (error10 != null)
-								error = error10;
+							error = error10;
 						
 						if (error == null){
 							log.debug("orm.pojo.annotation module -> ok");
