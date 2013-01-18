@@ -56,14 +56,14 @@ public class TestDAOSql {
 		dao.clear();
 		Object[] values = { 3, "baby" };
 		String sql = dao.values(values).toSql();
-		Assert.assertEquals(" VALUES('3', 'baby') ", sql);
+		Assert.assertEquals(" VALUES(?, ?) ", sql);
 	}
 	
 	@Test
 	public void testUpdate() {
 		dao.clear();
 		String sql = dao.update("petId", "name").set(3, "baby").toSql();
-		Assert.assertEquals(" UPDATE t_pet SET id = '3', name = 'baby' ", sql);
+		Assert.assertEquals(" UPDATE t_pet SET id = ? , name = ?  ", sql);
 	}
 	
 	@Test
@@ -84,7 +84,7 @@ public class TestDAOSql {
 	public void testWhereNotIn() {
 		dao.clear();
 		String sql = dao.where().field("id").notIn(1,2).toSql();
-		Assert.assertEquals(" WHERE  id  not in('1', '2') ", sql);
+		Assert.assertEquals(" WHERE  id  not in(?, ?) ", sql);
 	}
 	
 	@Test

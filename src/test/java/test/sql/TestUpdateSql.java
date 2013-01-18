@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eweb4j.config.EWeb4JConfig;
+import org.eweb4j.orm.sql.Sql;
 import org.eweb4j.orm.sql.SqlFactory;
 import org.eweb4j.orm.sql.UpdateSqlCreator;
 import org.junit.Assert;
@@ -42,10 +43,12 @@ public class TestUpdateSql {
 		pet.setAge(3);
 		pet.setType("cat");
 		UpdateSqlCreator<?> update = SqlFactory.getUpdateSql(map, pet);
-
-		Assert.assertEquals(
-				"UPDATE t_pet SET num = '123',name = 'weiwei',age = '3',type = 'dog' WHERE id = '5' ;",
-				update.update()[0]);
+		Sql sql = update.update()[0];
+		Assert.assertEquals("UPDATE t_pet SET num = ? ,name = ? ,age = ? ,type = ?  WHERE id = '5' ;", sql.sql);
+		Assert.assertEquals(123, sql.args.get(0));
+		Assert.assertEquals("weiwei", sql.args.get(1));
+		Assert.assertEquals(3, sql.args.get(2));
+		Assert.assertEquals("dog", sql.args.get(3));
 	}
 
 	/**
@@ -63,9 +66,12 @@ public class TestUpdateSql {
 		Master master = new Master();
 		master.setId(9L);
 		pet.setMaster(master);
-		String sql = update.update()[0];
-		Assert.assertEquals(
-				"UPDATE t_pet SET name = '小黑',age = '1111',cate = 'dog',master_id = '9' WHERE id = '5' ;",sql);
+		Sql sql = update.update()[0];
+		Assert.assertEquals("UPDATE t_pet SET name = ? ,age = ? ,cate = ? ,master_id = ?  WHERE id = '5' ;", sql.sql);
+		Assert.assertEquals("小黑", sql.args.get(0));
+		Assert.assertEquals(1111, sql.args.get(1));
+		Assert.assertEquals("dog", sql.args.get(2));
+		Assert.assertEquals(9l, sql.args.get(3));
 	}
 
 	/**
@@ -98,10 +104,11 @@ public class TestUpdateSql {
 		master.setId(5L);
 		pet.setMaster(master);
 		String[] fields = { "name", "age", "master" };
-		String sql = update.update(fields)[0];
-		Assert.assertEquals(
-				"UPDATE t_pet SET name = 'xiaohuang', age = '3', master_id = '5' WHERE id = '12' ;",
-				sql);
+		Sql sql = update.update(fields)[0];
+		Assert.assertEquals("UPDATE t_pet SET name = ? , age = ? , master_id = ?  WHERE id = '12' ;",sql.sql);
+		Assert.assertEquals("xiaohuang", sql.args.get(0));
+		Assert.assertEquals(3, sql.args.get(1));
+		Assert.assertEquals(5l, sql.args.get(2));
 	}
 
 	/**

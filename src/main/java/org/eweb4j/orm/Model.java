@@ -50,11 +50,11 @@ public class Model<T>{
 		this.helper.load();
 	}
 
-	public int delete(String query, Object... params) {
+	public Number delete(String query, Object... params) {
 		return this.helper.delete(query, params);
 	}
 
-	public int deleteAll() {
+	public Number deleteAll() {
 		return this.helper.deleteAll();
 	}
 

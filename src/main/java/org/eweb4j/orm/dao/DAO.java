@@ -556,7 +556,7 @@ public interface DAO {
 	 * 
 	 * @return
 	 */
-	public int execute();
+	public Number execute();
 
 	/**
 	 * 设置一个表名，这种一般用在没有映射对象的时候。 例如没有Pet对象，但是想查询数据库， 这时候可以使用Map.class对象来查询。

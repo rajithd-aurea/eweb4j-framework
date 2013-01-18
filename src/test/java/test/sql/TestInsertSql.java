@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.eweb4j.config.EWeb4JConfig;
 import org.eweb4j.orm.sql.InsertSqlCreator;
+import org.eweb4j.orm.sql.Sql;
 import org.eweb4j.orm.sql.SqlFactory;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -42,9 +43,17 @@ public class TestInsertSql {
 		pet.setAge(3);
 		pet.setType("cat");
 		final InsertSqlCreator<?> insert = SqlFactory.getInsertSql(map, pet);
-		String[] sql = insert.create();
-		Assert.assertEquals("INSERT INTO t_pet(num,name,age,cate) VALUES('123','weiwei','3','dog') ;", sql[0]);
-		Assert.assertEquals("INSERT INTO t_pet(num,name,age,cate) VALUES('4444','xxx','3','cat') ;", sql[1]);
+		Sql[] sql = insert.create();
+		Assert.assertEquals("INSERT INTO t_pet(num,name,age,cate) VALUES(?,?,?,?) ;", sql[0].sql);
+		Assert.assertEquals(123, sql[0].args.get(0));
+		Assert.assertEquals("weiwei", sql[0].args.get(1));
+		Assert.assertEquals(3, sql[0].args.get(2));
+		Assert.assertEquals("dog", sql[0].args.get(3));
+		Assert.assertEquals("INSERT INTO t_pet(num,name,age,cate) VALUES(?,?,?,?) ;", sql[1].sql);
+		Assert.assertEquals("4444", sql[1].args.get(0));
+		Assert.assertEquals("xxx", sql[1].args.get(1));
+		Assert.assertEquals(3, sql[1].args.get(2));
+		Assert.assertEquals("cat", sql[1].args.get(3));
 	}
 
 	/**
@@ -74,11 +83,11 @@ public class TestInsertSql {
 		pet.setAge(3);
 		pet.setType("dog");
 
-		String sql = insert.create()[0];
-		Assert.assertEquals(
-				"INSERT INTO t_pet(name,age,cate) VALUES('小黑','3','dog') ;",
-				sql);
-
+		Sql sql = insert.create()[0];
+		Assert.assertEquals("INSERT INTO t_pet(name,age,cate) VALUES(?,?,?) ;",sql.sql);
+		Assert.assertEquals("小黑", sql.args.get(0));
+		Assert.assertEquals(3, sql.args.get(1));
+		Assert.assertEquals("dog", sql.args.get(2));
 	}
 
 	/**
@@ -93,10 +102,11 @@ public class TestInsertSql {
 		pet.setAge(2);
 		pet.setMaster(master);
 		String[] fields = { "name", "age", "master" };
-		String sql = insert.createByFields(fields)[0];
-		Assert.assertEquals(
-				"INSERT INTO t_pet(name,age,master_id) VALUES('xiaohei','2','5') ;",
-				sql);
+		Sql sql = insert.createByFields(fields)[0];
+		Assert.assertEquals("INSERT INTO t_pet(name,age,master_id) VALUES(?,?,?) ;",sql.sql);
+		Assert.assertEquals("xiaohei", sql.args.get(0));
+		Assert.assertEquals(2, sql.args.get(1));
+		Assert.assertEquals(5l, sql.args.get(2));
 	}
 
 	/**
@@ -127,10 +137,11 @@ public class TestInsertSql {
 		pet.setAge(3);
 		pet.setType("dog");
 		pet.setMaster(null);
-		String sql = insert.create("xxx = 'ooo'")[0];
-		Assert.assertEquals(
-				"INSERT INTO t_pet(name,age,cate) VALUES('小黑','3','dog')  WHERE xxx = 'ooo' ;",
-				sql);
+		Sql sql = insert.create("xxx = 'ooo'")[0];
+		Assert.assertEquals("INSERT INTO t_pet(name,age,cate) VALUES(?,?,?)  WHERE xxx = 'ooo' ;",sql.sql);
+		Assert.assertEquals("小黑", sql.args.get(0));
+		Assert.assertEquals(3, sql.args.get(1));
+		Assert.assertEquals("dog", sql.args.get(2));
 	}
 
 	/**
@@ -172,8 +183,8 @@ public class TestInsertSql {
 	@Test
 	public void testInsertByFields() {
 		pet.setName("小黑");
-		String sql = insert.createByFields(new String[] { "name" })[0];
-		Assert.assertEquals("INSERT INTO t_pet(name) VALUES('小黑') ;", sql);
-
+		Sql sql = insert.createByFields(new String[] { "name" })[0];
+		Assert.assertEquals("INSERT INTO t_pet(name) VALUES(?) ;", sql.sql);
+		Assert.assertEquals("小黑", sql.args.get(0));
 	}
 }

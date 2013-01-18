@@ -111,11 +111,11 @@ public class ModelHelper<T> implements IModel<T>{
 			DAOFactory.getCascadeDAO(this.dsName).select(this.model, fields);
 	}
 
-	public int delete(String query, Object... params) {
-		return (Integer) DAOFactory.getDeleteDAO(this.dsName).deleteWhere(this.model.getClass(), query, params);
+	public Number delete(String query, Object... params) {
+		return DAOFactory.getDeleteDAO(this.dsName).deleteWhere(this.model.getClass(), query, params);
 	}
 
-	public int deleteAll() {
+	public Number deleteAll() {
 		return DAOFactory.getDAO(this.model.getClass(), this.dsName).delete().execute();
 	}
 

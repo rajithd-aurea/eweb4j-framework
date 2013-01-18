@@ -36,51 +36,55 @@ public class DeleteSqlCreator<T> {
 		this.ts = tmp;
 	}
 
-	public String deleteWhere(String condition) {
+	public Sql deleteWhere(String condition) {
+		Sql sql = new Sql();
 		if (this.ts != null && this.ts.length > 0) {
 			StringBuilder sb = new StringBuilder();
 			for (T t : this.ts) {
 				sb.append(this.makeSQL(t, condition));
 			}
-			return sb.toString();
+			sql.sql = sb.toString();
 		} else {
-			return "";
+			sql.sql = "";
 		}
+		
+		return sql;
 	}
 
-	private String makeSQL(T t, String condition) {
+	private Sql makeSQL(T t, String condition) {
+		Sql sql = new Sql();
 		ORMConfigBean ormBean = ORMConfigBeanCache.get(t.getClass().getName());
-		String table = ormBean != null ? ormBean.getTable() : t.getClass()
-				.getSimpleName();
-		return String.format("DELETE FROM %s WHERE %s ;", table, condition);
+		String table = ormBean != null ? ormBean.getTable() : t.getClass().getSimpleName();
+		sql.sql = String.format("DELETE FROM %s WHERE %s ;", table, condition);
+		return sql;
 	}
 
-	public String[] delete() throws SqlCreateException {
-		String[] sqls = new String[ts.length];
+	public Sql[] delete() throws SqlCreateException {
+		Sql[] sqls = new Sql[ts.length];
 		for (int i = 0; i < ts.length; i++) {
 			sqls[i] = this.makeSQL(ts[i]);
 		}
 		return sqls;
 	}
 
-	public String[] delete(String[] fields, String[] values)
-			throws SqlCreateException {
-		String[] sqls = new String[ts.length];
+	public Sql[] delete(String[] fields, String[] values)throws SqlCreateException {
+		Sql[] sqls = new Sql[ts.length];
 		for (int i = 0; i < ts.length; i++) {
 			sqls[i] = this.makeSQL(ts[i], fields, values);
 		}
 		return sqls;
 	}
 
-	public String[] delete(String... fields) throws SqlCreateException {
-		String[] sqls = new String[ts.length];
+	public Sql[] delete(String... fields) throws SqlCreateException {
+		Sql[] sqls = new Sql[ts.length];
 		for (int i = 0; i < ts.length; i++) {
 			sqls[i] = this.makeSQL(ts[i], fields);
 		}
 		return sqls;
 	}
 
-	private String makeSQL(T t) throws SqlCreateException {
+	private Sql makeSQL(T t) throws SqlCreateException {
+		Sql sql = new Sql();
 		Class<?> clazz = t.getClass();
 		String idColumn;
 		String idField;
@@ -116,18 +120,18 @@ public class DeleteSqlCreator<T> {
 		}
 
 		StringBuilder condition = new StringBuilder();
-		condition.append(idColumn + " = ");
-
-		condition.append("'" + idValue + "'");
-
-		return String.format("DELETE FROM %s WHERE %s ;", table, condition);
+		condition.append(idColumn).append(" = ? ");
+//		condition.append("'" + idValue + "'");
+		sql.args.add(idValue);
+		sql.sql = String.format("DELETE FROM %s WHERE %s ;", table, condition);
+		
+		return sql;
 	}
 
-	private String makeSQL(T t, String[] fields, String[] values)
-			throws SqlCreateException {
+	private Sql makeSQL(T t, String[] fields, String[] values) throws SqlCreateException {
 		Class<?> clazz = t.getClass();
 		String table = ORMConfigBeanUtil.getTable(clazz, false);
-
+		Sql sql = new Sql();
 		StringBuilder condition = new StringBuilder();
 		String[] columns = ORMConfigBeanUtil.getColumns(clazz, fields);
 		for (int i = 0; i < columns.length; ++i) {
@@ -135,14 +139,18 @@ public class DeleteSqlCreator<T> {
 				condition.append(" AND ");
 			}
 
-			condition.append(columns[i] + " = ");
-			condition.append("'" + values[i] + "'");
-
+//			condition.append(columns[i]).append(" = ").append("'").append(values[i]).append("'");
+			condition.append(columns[i]).append(" = ? ");
+			sql.args.add(values[i]);
 		}
-		return String.format("DELETE FROM %s WHERE %s ;", table, condition);
+		
+		sql.sql =  String.format("DELETE FROM %s WHERE %s ;", table, condition);
+		
+		return sql;
 	}
 
-	private String makeSQL(T t, String... fields) throws SqlCreateException {
+	private Sql makeSQL(T t, String... fields) throws SqlCreateException {
+		Sql sql = new Sql();
 		Class<?> clazz = t.getClass();
 		String table = ORMConfigBeanUtil.getTable(clazz, false);
 		StringBuilder condition = new StringBuilder();
@@ -208,10 +216,14 @@ public class DeleteSqlCreator<T> {
 			}
 
 			String column = ORMConfigBeanUtil.getColumn(clazz, fields[i]);
-			condition.append(column + " = ").append("'" + value + "'");
-
+//			condition.append(column).append(" = ").append("'").append(value).append("'");
+			condition.append(column).append(" = ? ");
+			sql.args.add(value);
 		}
-		return String.format("DELETE FROM %s WHERE %s ;", table, condition);
+
+		sql.sql = String.format("DELETE FROM %s WHERE %s ;", table, condition);
+		
+		return sql;
 	}
 
 	public T[] getTs() {

@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 import org.eweb4j.orm.config.ORMConfigBeanUtil;
 import org.eweb4j.orm.dao.DAOException;
 import org.eweb4j.orm.jdbc.JdbcUtil;
+import org.eweb4j.orm.sql.Sql;
 import org.eweb4j.orm.sql.SqlFactory;
 
 public class DeleteDAOImpl implements DeleteDAO {
@@ -34,13 +35,11 @@ public class DeleteDAOImpl implements DeleteDAO {
 		try {
 			con = ds.getConnection();
 			for (int i = 0; i < ts.length; i++) {
-				String[] sqls = SqlFactory.getDeleteSql(new Object[] { ts[i] })
-						.delete();
+				Sql[] sqls = SqlFactory.getDeleteSql(new Object[] { ts[i] }).delete();
 				if (sqls == null)
 					ids[i] = -1;
 				else {
-					int rs = (Integer) JdbcUtil.update(con, sqls[0]);
-					ids[i] = rs;
+					ids[i] = JdbcUtil.updateWithArgs(con, sqls[i].sql, sqls[i].args.toArray());
 				}
 			}
 		} catch (Exception e) {
@@ -71,13 +70,11 @@ public class DeleteDAOImpl implements DeleteDAO {
 			}
 
 			for (int i = 0; i < ts.length; i++) {
-				String[] sqls = SqlFactory.getDeleteSql(ts[i]).delete(fields,
-						values);
+				Sql[] sqls = SqlFactory.getDeleteSql(ts[i]).delete(fields,values);
 				if (sqls == null)
 					ids[i] = -1;
 				else {
-					int rs = (Integer) JdbcUtil.update(con, sqls[0]);
-					ids[i] = rs;
+					ids[i] = JdbcUtil.updateWithArgs(con, sqls[i].sql, sqls[i].args.toArray());
 				}
 			}
 		} catch (Exception e) {
@@ -99,9 +96,8 @@ public class DeleteDAOImpl implements DeleteDAO {
 			Connection con = null;
 			try {
 				con = ds.getConnection();
-				String[] sqls = SqlFactory.getDeleteSql(new Object[] { t })
-						.delete(fields);
-				id = JdbcUtil.update(con, sqls[0]);
+				Sql[] sqls = SqlFactory.getDeleteSql(new Object[] { t }).delete(fields);
+				id = JdbcUtil.updateWithArgs(con, sqls[0].sql, sqls[0].args.toArray());
 			} catch (Exception e) {
 				throw new DAOException("", e);
 			}
@@ -117,10 +113,8 @@ public class DeleteDAOImpl implements DeleteDAO {
 			Connection con = null;
 			try {
 				con = ds.getConnection();
-				String[] sqls = SqlFactory.getDeleteSql(
-						new Object[] { clazz.newInstance() }).delete(fields,
-						values);
-				id = JdbcUtil.update(con, sqls[0]);
+				Sql[] sqls = SqlFactory.getDeleteSql(new Object[] { clazz.newInstance() }).delete(fields, values);
+				id = JdbcUtil.updateWithArgs(con, sqls[0].sql, sqls[0].args.toArray());
 			} catch (Exception e) {
 				throw new DAOException("", e);
 			}
@@ -128,21 +122,18 @@ public class DeleteDAOImpl implements DeleteDAO {
 		return id;
 	}
 
-	public <T> Number deleteByFieldIsValue(Class<T> clazz, String field,
-			String value) throws DAOException {
-		return this.deleteByFieldIsValue(clazz, new String[] { field },
-				new String[] { value });
+	public <T> Number deleteByFieldIsValue(Class<T> clazz, String field,String value) throws DAOException {
+		return this.deleteByFieldIsValue(clazz, new String[] { field },new String[] { value });
 	}
 
-	public <T> Number deleteWhere(Class<T> clazz, String condition,
-			Object[] args) throws DAOException {
+	public <T> Number deleteWhere(Class<T> clazz, String condition, Object[] args) throws DAOException {
 		Number id = 0;
 		if (clazz != null) {
 			Connection con = null;
 			try {
 				con = ds.getConnection();
-				String sql = SqlFactory.getDeleteSql(new Object[] { clazz.newInstance() }).deleteWhere(ORMConfigBeanUtil.parseQuery(condition, clazz));
-				id = JdbcUtil.updateWithArgs(con, sql, args);
+				Sql sql = SqlFactory.getDeleteSql(new Object[] { clazz.newInstance() }).deleteWhere(ORMConfigBeanUtil.parseQuery(condition, clazz));
+				id = JdbcUtil.updateWithArgs(con, sql.sql, args);
 				// 缓存
 			} catch (Exception e) {
 				throw new DAOException("", e);

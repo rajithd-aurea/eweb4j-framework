@@ -6,6 +6,7 @@ import javax.sql.DataSource;
 
 import org.eweb4j.orm.dao.DAOException;
 import org.eweb4j.orm.jdbc.JdbcUtil;
+import org.eweb4j.orm.sql.Sql;
 import org.eweb4j.orm.sql.SqlFactory;
 
 public class UpdateDAOImpl implements UpdateDAO {
@@ -28,8 +29,8 @@ public class UpdateDAOImpl implements UpdateDAO {
 			try {
 				con = ds.getConnection();
 				for (int i = 0; i < ts.length; i++) {
-					String[] sqls = SqlFactory.getUpdateSql(new Object[] { ts[i] }).update();
-					ids[i] = JdbcUtil.update(con, sqls[i]);
+					Sql[] sqls = SqlFactory.getUpdateSql(new Object[] { ts[i] }).update();
+					ids[i] = JdbcUtil.updateWithArgs(con, sqls[i].sql, sqls[i].args.toArray());
 					// 更新缓存
 				}
 			} catch (Exception e) {
@@ -57,10 +58,8 @@ public class UpdateDAOImpl implements UpdateDAO {
 				new String[] { value });
 	}
 
-	public <T> Number updateBySQLWithArgs(String sql, Object... args)
-			throws DAOException {
-		Number[] rs = this.updateBySQLWithArgs(new String[] { sql },
-				new Object[][] { args });
+	public <T> Number updateBySQLWithArgs(String sql, Object... args) throws DAOException {
+		Number[] rs = this.updateBySQLWithArgs(new String[] { sql }, new Object[][] { args });
 		return rs == null ? 0 : rs[0];
 	}
 
@@ -73,8 +72,8 @@ public class UpdateDAOImpl implements UpdateDAO {
 			try {
 				con = ds.getConnection();
 				for (int i = 0; i < ts.length; i++) {
-					String[] sqls = SqlFactory.getUpdateSql(ts).update(fields);
-					ids[i] = JdbcUtil.update(con, sqls[i]);
+					Sql[] sqls = SqlFactory.getUpdateSql(ts).update(fields);
+					ids[i] = JdbcUtil.updateWithArgs(con, sqls[i].sql, sqls[i].args.toArray());
 					// 更新缓存
 				}
 			} catch (Exception e) {
@@ -93,9 +92,8 @@ public class UpdateDAOImpl implements UpdateDAO {
 			try {
 				con = ds.getConnection();
 				for (int i = 0; i < ts.length; i++) {
-					String[] sqls = SqlFactory.getUpdateSql(ts).update(fields,
-							values);
-					ids[i] = JdbcUtil.update(con, sqls[i]);
+					Sql[] sqls = SqlFactory.getUpdateSql(ts).update(fields, values);
+					ids[i] = JdbcUtil.updateWithArgs(con, sqls[i].sql, sqls[i].args.toArray());
 					// 更新缓存
 				}
 			} catch (Exception e) {
@@ -105,10 +103,8 @@ public class UpdateDAOImpl implements UpdateDAO {
 		return ids;
 	}
 
-	public <T> Number[] updateByFieldIsValue(Class<T>[] clazz, String field,
-			String value) throws DAOException {
-		return this.updateByFieldIsValue(clazz, new String[] { field },
-				new String[] { value });
+	public <T> Number[] updateByFieldIsValue(Class<T>[] clazz, String field, String value) throws DAOException {
+		return this.updateByFieldIsValue(clazz, new String[] { field }, new String[] { value });
 	}
 
 	public <T> Number[] updateBySQL(String... sqls) throws DAOException {

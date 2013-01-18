@@ -24,9 +24,9 @@ public interface IModel<T> {
 	 */
 	public void load() ;
 
-	public int delete(String query, Object... params) ;
+	public Number delete(String query, Object... params) ;
 
-	public int deleteAll() ;
+	public Number deleteAll() ;
 
 	public T findById(long id) ;
 

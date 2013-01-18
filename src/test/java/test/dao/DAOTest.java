@@ -1,10 +1,9 @@
 package test.dao;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import junit.framework.Assert;
 
@@ -35,6 +34,11 @@ public class DAOTest {
 		System.out.println(ConfigConstant.START_FILE_PATH());
 		dao = DAOFactory.getDAO(Map.class);
 	}
+	
+	@Test
+	public void testJoin() throws Exception {
+		
+	}
 
 	/**
 	 * 测试多线程下插入新纪录自增长 ID 的获取
@@ -42,23 +46,26 @@ public class DAOTest {
 	 * @date 2013-1-16 上午11:11:14
 	 * @throws InterruptedException
 	 */
+	@Test
 	public void testInsert() throws InterruptedException{
-		ExecutorService pool = Executors.newFixedThreadPool(5);
-		for (int i = 0; i < 5; i++) {
-			final int index = i;
-			pool.execute(new Runnable() {
-				public void run() {
-					Pet pet = new Pet();
-					pet.setAge(5+index);
-					pet.setName("test pet " + index);
-					pet.setNumber("abcdef " + index);
-					pet.setType("dog " + index);
-					Models.inst(pet).create();
-					System.out.println("id--->"+pet.getPetId());
-				}
-			});
-		}
-		Thread.sleep(5*1000);
+//		ExecutorService pool = Executors.newFixedThreadPool(5);
+//		for (int i = 0; i < 5; i++) {
+//			final int index = i;
+//			pool.execute(new Runnable() {
+//				public void run() {
+//					Pet pet = new Pet();
+//					pet.setAge(5+index);
+//					pet.setName("test' pet ".replace("'", "\\'") + index);
+//					pet.setNumber("abc'def ".replace("'", "\\'") + index);
+//					pet.setType("dog " + index);
+//					Models.inst(pet).create();
+//					System.out.println("id--->"+pet.getPetId());
+//				}
+//			});
+//		}
+//		Thread.sleep(5*1000);
+		Collection<Pet> pets = Models.inst(Pet.class).dao().selectAll().where().field("name").equal("test'").query();
+		System.out.println(pets);
 	}
 	
 	public void testCol() throws Exception{
@@ -103,7 +110,7 @@ public class DAOTest {
 				.set("fuckyou!", 4)
 				.where()
 					.field("id").equal(1)
-				.execute();
+				.execute().intValue();
 		
 		System.out.println("~~~~ update i = > " + i);
 	}

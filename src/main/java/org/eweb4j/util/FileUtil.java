@@ -133,11 +133,10 @@ public class FileUtil {
 		int count = 0;
 		while (true){
 			try {
-				if (imagePath.startsWith("http://") || imagePath.startsWith("https://")){
-					URL url = new URL(imagePath);
-					return ImageIO.read(url);
-				}else {
+				try {
 					return ImageIO.read(new File(imagePath));
+				}catch(Throwable e) {
+					return ImageIO.read(new URL(imagePath));
 				}
 			} catch (Exception e) {
 				if (count >= retryTimes){

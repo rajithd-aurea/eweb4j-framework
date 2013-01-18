@@ -31,10 +31,9 @@ public class UpdateSqlCreator<T> {
 		this.ts = tmp;
 	}
 
-	public String[] update(String condition) {
-		String[] sqls = null;
+	public Sql[] update(String condition) {
+		Sql[] sqls = new Sql[ts.length];
 		if (this.ts != null && this.ts.length > 0) {
-			sqls = new String[ts.length];
 			for (int i = 0; i < ts.length; ++i) {
 				sqls[i] = this.makeSQL(ts[i], condition);
 			}
@@ -42,14 +41,17 @@ public class UpdateSqlCreator<T> {
 		return sqls;
 	}
 
-	private String makeSQL(T t, String condition) {
+	private Sql makeSQL(T t, String condition) {
+		Sql sql = new Sql();
 		Class<?> clazz = t.getClass();
 		String table = ORMConfigBeanUtil.getTable(clazz, false);
-		return String.format("UPDATE %s %s ;", table, condition);
+		sql.sql = String.format("UPDATE %s %s ;", table, condition);
+		
+		return sql;
 	}
 
-	public String[] update() throws SqlCreateException {
-		String[] sqls = new String[ts.length];
+	public Sql[] update() throws SqlCreateException {
+		Sql[] sqls = new Sql[ts.length];
 		for (int i = 0; i < ts.length; ++i) {
 			sqls[i] = makeSQL(ts[i]);
 		}
@@ -57,8 +59,8 @@ public class UpdateSqlCreator<T> {
 		return sqls;
 	}
 
-	public String[] update(String... fields) throws SqlCreateException {
-		String[] sqls = new String[ts.length];
+	public Sql[] update(String... fields) throws SqlCreateException {
+		Sql[] sqls = new Sql[ts.length];
 		for (int i = 0; i < ts.length; ++i) {
 			sqls[i] = makeSQL(ts[i], fields);
 		}
@@ -66,9 +68,9 @@ public class UpdateSqlCreator<T> {
 		return sqls;
 	}
 
-	public String[] update(String[] fields, String[] values)
+	public Sql[] update(String[] fields, String[] values)
 			throws SqlCreateException {
-		String[] sqls = new String[ts.length];
+		Sql[] sqls = new Sql[ts.length];
 		for (int i = 0; i < ts.length; ++i) {
 			sqls[i] = makeSQL(ts[i], fields, values);
 		}
@@ -76,8 +78,8 @@ public class UpdateSqlCreator<T> {
 		return sqls;
 	}
 
-	private String makeSQL(T t) throws SqlCreateException {
-
+	private Sql makeSQL(T t) throws SqlCreateException {
+		Sql sql = new Sql();
 		Class<?> clazz = t.getClass();
 		String table;
 		String[] columns;
@@ -180,18 +182,20 @@ public class UpdateSqlCreator<T> {
 				if (valuesSb.length() > 0)
 					valuesSb.append(",");
 
-				valuesSb.append(column).append(" = '").append(value)
-						.append("'");
+//				valuesSb.append(column).append(" = '").append(value).append("'");
+				valuesSb.append(column).append(" = ? ");
+				sql.args.add(value);
 			}
 		} catch (Exception e) {
 			throw new SqlCreateException("" + e.toString(), e);
 		}
 
-		return String.format("UPDATE %s SET %s WHERE %s ;", table, valuesSb,
-				condition);
+		sql.sql = String.format("UPDATE %s SET %s WHERE %s ;", table, valuesSb,condition);
+		return sql;
 	}
 
-	private String makeSQL(T t, String[] fields) throws SqlCreateException {
+	private Sql makeSQL(T t, String[] fields) throws SqlCreateException {
+		Sql sql = new Sql();
 		Class<?> clazz = t.getClass();
 		String table = ORMConfigBeanUtil.getTable(clazz, false);
 		StringBuilder condition = new StringBuilder();
@@ -270,18 +274,20 @@ public class UpdateSqlCreator<T> {
 				if (values.length() > 0)
 					values.append(", ");
 
-				values.append(column).append(" = '").append(value).append("'");
+//				values.append(column).append(" = '").append(value).append("'");
+				values.append(column).append(" = ? ");
+				sql.args.add(value);
 			} catch (Exception e) {
 				throw new SqlCreateException(idGetter + " invoke exception " + e.toString(), e);
 			}
 		}
 
-		return String.format("UPDATE %s SET %s WHERE %s ;", table, values,
-				condition);
+		sql.sql = String.format("UPDATE %s SET %s WHERE %s ;", table, values,condition);
+		return sql;
 	}
 
-	private String makeSQL(T t, String[] fields, String[] values)
-			throws SqlCreateException {
+	private Sql makeSQL(T t, String[] fields, String[] values) throws SqlCreateException {
+		Sql sql = new Sql();
 		Class<?> clazz = t.getClass();
 		String table = ORMConfigBeanUtil.getTable(clazz, false);
 		ReflectUtil ru = new ReflectUtil(t);
@@ -305,12 +311,14 @@ public class UpdateSqlCreator<T> {
 			if (sb.length() > 0)
 				sb.append(", ");
 
-			sb.append(column).append(" = '");
-			sb.append(values[i]).append("'");
+//			sb.append(column).append(" = '").append(values[i]).append("'");
+			sb.append(column).append(" = ?");
+			sql.args.add(values[i]);
 		}
 
-		return String.format("UPDATE %s SET %s WHERE %s ;", table,
-				sb.toString(), condition);
+		sql.sql = String.format("UPDATE %s SET %s WHERE %s ;", table, sb.toString(), condition);
+		
+		return sql;
 	}
 
 	public T[] getTs() {

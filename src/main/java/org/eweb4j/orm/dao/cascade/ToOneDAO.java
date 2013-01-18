@@ -150,10 +150,11 @@ public class ToOneDAO {
 			return;
 		if (idVal == null || "0".equals(idVal) || "".equals(idVal)) {
 			return;
-		} else if (DAOFactory.getSelectDAO(dsName).selectOne(t, this.idField) == null) {
-			// 检查一下当前对象的ID是否存在于数据库
-			return;
-		}
+		} 
+//		else if (DAOFactory.getSelectDAO(dsName).selectOne(t, this.idField) == null) {
+//			// 检查一下当前对象的ID是否存在于数据库
+//			return;
+//		}
 
 		for (Field f : fields) {
 			Method tarGetter = ru.getGetter(f.getName());

@@ -2,7 +2,9 @@ package org.eweb4j.orm.sql;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.JoinColumn;
@@ -32,16 +34,16 @@ public class InsertSqlCreator<T> {
 
 	}
 
-	public String[] create() throws SqlCreateException {
+	public Sql[] create() throws SqlCreateException {
 		return this.create(null);
 	}
 
-	public String[] createByFields(String[] fields) throws SqlCreateException {
+	public Sql[] createByFields(String[] fields) throws SqlCreateException {
 		return createByFieldsIsValues(new String[][] { fields }, null);
 	}
 
-	public String[] createByFieldsIsValues(String[][] fields, String[][] values)throws SqlCreateException {
-		String[] sqls = new String[ts.length];
+	public Sql[] createByFieldsIsValues(String[][] fields, String[][] values)throws SqlCreateException {
+		Sql[] sqls = new Sql[ts.length];
 		for (int i = 0; i < ts.length; ++i) {
 			T t = ts[i];
 			ReflectUtil ru = new ReflectUtil(t);
@@ -49,6 +51,7 @@ public class InsertSqlCreator<T> {
 			String table = ORMConfigBeanUtil.getTable(clazz, false);
 			StringBuilder columnSB = new StringBuilder();
 			StringBuilder valueSB = new StringBuilder();
+			sqls[i] = new Sql();
 			for (int j = 0; j < fields[i].length; ++j) {
 				String name = fields[i][j];
 				Object _value = null;
@@ -119,10 +122,12 @@ public class InsertSqlCreator<T> {
 				}
 
 				columnSB.append(column);
-				valueSB.append("'").append(value).append("'");
+//				valueSB.append("'").append(value).append("'");
+				valueSB.append("?");
+				sqls[i].args.add(value);
 			}
 
-			sqls[i] = String.format("INSERT INTO %s(%s) VALUES(%s) ;", table, columnSB.toString(), valueSB.toString());
+			sqls[i].sql = String.format("INSERT INTO %s(%s) VALUES(%s) ;", table, columnSB.toString(), valueSB.toString());
 		}
 
 		return sqls;
@@ -132,8 +137,8 @@ public class InsertSqlCreator<T> {
 		System.out.println(Boolean.class.isAssignableFrom(boolean.class));
 	}
 
-	public static String createByColumnsIsValues(String table,String[] columns, String[] values) {
-		String sql = null;
+	public static Sql createByColumnsIsValues(String table,String[] columns, String[] values) {
+		Sql sql = new Sql();
 		StringBuilder columnSB = new StringBuilder();
 		StringBuilder valueSB = new StringBuilder();
 		for (int i = 0; i < columns.length; i++) {
@@ -146,16 +151,18 @@ public class InsertSqlCreator<T> {
 			}
 
 			columnSB.append(column);
-			valueSB.append("'").append(value).append("'");
+//			valueSB.append("'").append(value).append("'");
+			valueSB.append("?");
+			sql.args.add(value);
 		}
 
-		sql = String.format("INSERT INTO %s(%s) VALUES(%s) ;", table, columnSB.toString(), valueSB.toString());
+		sql.sql = String.format("INSERT INTO %s(%s) VALUES(%s) ;", table, columnSB.toString(), valueSB.toString());
 
 		return sql;
 	}
 
-	public String[] create(String condition) throws SqlCreateException {
-		String[] sqls = new String[ts.length];
+	public Sql[] create(String condition) throws SqlCreateException {
+		Sql[] sqls = new Sql[ts.length];
 		for (int index = 0; index < ts.length; ++index) {
 			String table = null;
 			StringBuilder columnSB = new StringBuilder();
@@ -166,6 +173,7 @@ public class InsertSqlCreator<T> {
 			String[] columns;
 			String idColumn;
 			Object[] values = null;
+			sqls[index] = new Sql();
 			HashMap<String, Object> map = null;
 			if (Map.class.isAssignableFrom(clazz)) {
 				map = (HashMap<String, Object>) t;
@@ -262,8 +270,9 @@ public class InsertSqlCreator<T> {
 				if (valueSB.length() > 0)
 					valueSB.append(",");
 
-				valueSB.append("'").append(value).append("'");
-
+//				valueSB.append("'").append(value).append("'");
+				valueSB.append("?");
+				sqls[index].args.add(value);
 			}
 
 			String format = "INSERT INTO ${table}(${columns}) VALUES(${values}) ${condition} ;";
@@ -276,7 +285,7 @@ public class InsertSqlCreator<T> {
 			else
 				format = format.replace("${condition} ", "");
 
-			sqls[index] = format;
+			sqls[index].sql = format;
 		}
 
 		return sqls;

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.eweb4j.config.EWeb4JConfig;
 import org.eweb4j.orm.sql.DeleteSqlCreator;
+import org.eweb4j.orm.sql.Sql;
 import org.eweb4j.orm.sql.SqlFactory;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -44,7 +45,9 @@ public class TestDeleteSql {
 		map.put("idValue", 7);
 		Pet pet = new Pet();
 		DeleteSqlCreator<?> delete = SqlFactory.getDeleteSql(map, pet);
-		Assert.assertEquals("DELETE FROM t_pet WHERE id = '7' ;", delete.delete()[0]);
+		Sql sql = delete.delete()[0];
+		Assert.assertEquals("DELETE FROM t_pet WHERE id = ?  ;", sql.sql);
+		Assert.assertEquals(7, sql.args.get(0));
 	}
 
 	/**
@@ -56,8 +59,9 @@ public class TestDeleteSql {
 	@Test
 	public void testDeleteById() {
 		pet.setPetId(10L);
-		String sql = delete.delete()[0];
-		Assert.assertEquals("DELETE FROM t_pet WHERE id = '10' ;", sql);
+		Sql sql = delete.delete()[0];
+		Assert.assertEquals("DELETE FROM t_pet WHERE id = ?  ;", sql.sql);
+		Assert.assertEquals(10l,sql.args.get(0));
 	}
 
 	/**
@@ -69,9 +73,9 @@ public class TestDeleteSql {
 	@Test
 	public void testDeleteByField() {
 
-		String sql = delete.delete(new String[] { "age" })[0];
-		Assert.assertEquals("DELETE FROM t_pet WHERE age = '30' ;", sql);
-
+		Sql sql = delete.delete(new String[] { "age" })[0];
+		Assert.assertEquals("DELETE FROM t_pet WHERE age = ?  ;", sql.sql);
+		Assert.assertEquals(30,sql.args.get(0));
 	}
 
 	/**
@@ -85,8 +89,9 @@ public class TestDeleteSql {
 		master.setId(5L);
 		pet.setMaster(master);
 		String[] fields = { "master" };
-		String sql = delete.delete(fields)[0];
-		Assert.assertEquals("DELETE FROM t_pet WHERE master_id = '5' ;", sql);
+		Sql sql = delete.delete(fields)[0];
+		Assert.assertEquals("DELETE FROM t_pet WHERE master_id = ?  ;", sql.sql);
+		Assert.assertEquals(5l,sql.args.get(0));
 	}
 
 	/**
@@ -99,10 +104,9 @@ public class TestDeleteSql {
 	 */
 	@Test
 	public void testDeleteByFieldAndValue() {
-		String sql = delete.delete(new String[] { "age" },
-				new String[] { "50" })[0];
-		Assert.assertEquals("DELETE FROM t_pet WHERE age = '50' ;", sql);
-
+		Sql sql = delete.delete(new String[] { "age" }, new String[] { "50" })[0];
+		Assert.assertEquals("DELETE FROM t_pet WHERE age = ?  ;", sql.sql);
+		Assert.assertEquals("50",sql.args.get(0));
 	}
 
 	/**
@@ -112,11 +116,11 @@ public class TestDeleteSql {
 	 * @param condition
 	 * @return
 	 */
-	@Test
 	public void testDeleteWhere() {
 		pet.setName("weiwei");
-		String sql = delete.deleteWhere("name = 'weiwei'");
-		Assert.assertEquals("DELETE FROM t_pet WHERE name = 'weiwei' ;", sql);
+		Sql sql = delete.deleteWhere("name = ?");
+		Assert.assertEquals("DELETE FROM t_pet WHERE name = ? ;", sql.sql);
+		Assert.assertEquals("weiwei", sql.args.get(0));
 	}
 
 	/**
@@ -127,10 +131,9 @@ public class TestDeleteSql {
 	 * @param args
 	 * @return
 	 */
-	@Test
 	public void testDeleteWhereByArgs() {
-		String sql = delete.deleteWhere("name = ?");
-		Assert.assertEquals("DELETE FROM t_pet WHERE name = ? ;", sql);
+		Sql sql = delete.deleteWhere("name = ?");
+		Assert.assertEquals("DELETE FROM t_pet WHERE name = ? ;", sql.sql);
 	}
 
 }
