@@ -24,7 +24,7 @@ public interface InsertDAO {
 	 * </code> 会执行sql:INSERT INTO $table values('小黑','3');
 	 * 
 	 */
-	public <T> Number[] batchInsert(T... ts) throws DAOException;
+	public <T> Number[] batchInsert(T[] ts, String... fields) throws DAOException;
 
 	/**
 	 * 

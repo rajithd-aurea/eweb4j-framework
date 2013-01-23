@@ -106,9 +106,7 @@ public class UpdateSqlCreator<T> {
 			idField = ORMConfigBeanUtil.getIdField(clazz);
 		}
 
-		StringBuilder condition = new StringBuilder();
 		StringBuilder valuesSb = new StringBuilder();
-		condition.append(idColumn + " = ");
 		ReflectUtil ru = new ReflectUtil(t);
 		try {
 			if (map == null) {
@@ -117,8 +115,6 @@ public class UpdateSqlCreator<T> {
 					throw new SqlCreateException("can not find id getter");
 				idValue = idGetter.invoke(t);
 			}
-
-			condition.append("'" + idValue + "'");
 
 			for (int i = 0; i < columns.length; i++) {
 				String column = columns[i];
@@ -190,7 +186,10 @@ public class UpdateSqlCreator<T> {
 			throw new SqlCreateException("" + e.toString(), e);
 		}
 
-		sql.sql = String.format("UPDATE %s SET %s WHERE %s ;", table, valuesSb,condition);
+//		String condition = new StringBuilder().append(idColumn).append(" = ").append("'").append(idValue).append("'").toString();
+		String condition = new StringBuilder().append(idColumn).append(" = ? ").toString();
+		sql.args.add(idValue);
+		sql.sql = String.format("UPDATE %s SET %s WHERE %s ;", table, valuesSb, condition);
 		return sql;
 	}
 
@@ -198,7 +197,6 @@ public class UpdateSqlCreator<T> {
 		Sql sql = new Sql();
 		Class<?> clazz = t.getClass();
 		String table = ORMConfigBeanUtil.getTable(clazz, false);
-		StringBuilder condition = new StringBuilder();
 		StringBuilder values = new StringBuilder();
 		ReflectUtil ru = new ReflectUtil(t);
 		String[] columns = ORMConfigBeanUtil.getColumns(clazz, fields);
@@ -207,10 +205,9 @@ public class UpdateSqlCreator<T> {
 		Method idGetter = ru.getGetter(idField);
 		if (idGetter == null)
 			throw new SqlCreateException("can not find id getter.");
-
+		Object idValue = null;
 		try {
-			condition.append(idColumn).append(" = '")
-					.append(idGetter.invoke(t)).append("'");
+			idValue = idGetter.invoke(t);
 		} catch (Exception e) {
 			throw new SqlCreateException(idGetter + " invoke exception " + e.toString(), e);
 		}
@@ -282,6 +279,9 @@ public class UpdateSqlCreator<T> {
 			}
 		}
 
+//		String condition = new StringBuilder().append(idColumn).append(" = ").append("'").append(idValue).append("'").toString();
+		String condition = new StringBuilder().append(idColumn).append(" = ? ").toString();
+		sql.args.add(idValue);
 		sql.sql = String.format("UPDATE %s SET %s WHERE %s ;", table, values,condition);
 		return sql;
 	}
@@ -297,11 +297,9 @@ public class UpdateSqlCreator<T> {
 		Method idGetter = ru.getGetter(idField);
 		if (idGetter == null)
 			throw new SqlCreateException("can not find id getter.");
-
-		StringBuilder condition = new StringBuilder();
+		Object idValue = null;
 		try {
-			condition.append(idColumn).append(" = '")
-					.append(idGetter.invoke(t)).append("'");
+			idValue = idGetter.invoke(t);
 		} catch (Exception e) {
 			throw new SqlCreateException(idGetter + " invoke exception " + e.toString(), e);
 		}
@@ -315,7 +313,9 @@ public class UpdateSqlCreator<T> {
 			sb.append(column).append(" = ?");
 			sql.args.add(values[i]);
 		}
-
+//		String condition = new StringBuilder().append(idColumn).append(" = ").append("'").append(idValue).append("'").toString();
+		String condition = new StringBuilder().append(idColumn).append(" = ? ").toString();
+		sql.args.add(idValue);
 		sql.sql = String.format("UPDATE %s SET %s WHERE %s ;", table, sb.toString(), condition);
 		
 		return sql;

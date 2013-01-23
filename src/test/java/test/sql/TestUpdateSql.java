@@ -44,11 +44,12 @@ public class TestUpdateSql {
 		pet.setType("cat");
 		UpdateSqlCreator<?> update = SqlFactory.getUpdateSql(map, pet);
 		Sql sql = update.update()[0];
-		Assert.assertEquals("UPDATE t_pet SET num = ? ,name = ? ,age = ? ,type = ?  WHERE id = '5' ;", sql.sql);
+		Assert.assertEquals("UPDATE t_pet SET num = ? ,name = ? ,age = ? ,type = ?  WHERE id = ?  ;", sql.sql);
 		Assert.assertEquals(123, sql.args.get(0));
 		Assert.assertEquals("weiwei", sql.args.get(1));
 		Assert.assertEquals(3, sql.args.get(2));
 		Assert.assertEquals("dog", sql.args.get(3));
+		Assert.assertEquals(5, sql.args.get(4));
 	}
 
 	/**
@@ -67,11 +68,12 @@ public class TestUpdateSql {
 		master.setId(9L);
 		pet.setMaster(master);
 		Sql sql = update.update()[0];
-		Assert.assertEquals("UPDATE t_pet SET name = ? ,age = ? ,cate = ? ,master_id = ?  WHERE id = '5' ;", sql.sql);
+		Assert.assertEquals("UPDATE t_pet SET name = ? ,age = ? ,cate = ? ,master_id = ?  WHERE id = ?  ;", sql.sql);
 		Assert.assertEquals("小黑", sql.args.get(0));
 		Assert.assertEquals(1111, sql.args.get(1));
 		Assert.assertEquals("dog", sql.args.get(2));
 		Assert.assertEquals(9l, sql.args.get(3));
+		Assert.assertEquals(5l, sql.args.get(4));
 	}
 
 	/**
@@ -105,10 +107,11 @@ public class TestUpdateSql {
 		pet.setMaster(master);
 		String[] fields = { "name", "age", "master" };
 		Sql sql = update.update(fields)[0];
-		Assert.assertEquals("UPDATE t_pet SET name = ? , age = ? , master_id = ?  WHERE id = '12' ;",sql.sql);
+		Assert.assertEquals("UPDATE t_pet SET name = ? , age = ? , master_id = ?  WHERE id = ?  ;",sql.sql);
 		Assert.assertEquals("xiaohuang", sql.args.get(0));
 		Assert.assertEquals(3, sql.args.get(1));
 		Assert.assertEquals(5l, sql.args.get(2));
+		Assert.assertEquals(12l, sql.args.get(3));
 	}
 
 	/**

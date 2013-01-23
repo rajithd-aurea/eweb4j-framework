@@ -10,7 +10,7 @@ public interface UpdateDAO {
 	 * @param ts
 	 * @return
 	 */
-	public <T> Number[] batchUpdate(T... ts) throws DAOException;
+	public <T> Number[] batchUpdate(T[] ts, String... fields) throws DAOException;
 
 	public <T> Number update(T t) throws DAOException;
 

@@ -7,6 +7,7 @@ import org.eweb4j.config.EWeb4JConfig;
 import org.eweb4j.orm.Db;
 import org.eweb4j.orm.config.ORMConfigBeanUtil;
 import org.eweb4j.orm.dao.DAOFactory;
+import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.ReflectUtil;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,7 +36,6 @@ public class TestDb {
 		System.out.println(p);
 	}
 	
-	@Test
 	public void testOrmUtil() throws Exception{
 		String[] fields = new ReflectUtil(Master.class).getFieldsName();
 		System.out.println(Arrays.asList(fields));
@@ -43,4 +43,38 @@ public class TestDb {
 		System.out.println(m);
 	}
 	
+	public void testBatchInsert() throws Exception {
+		Pet p1 = new Pet();
+		p1.setName("pet_1");
+		Pet p2 = new Pet();
+		p2.setName("pet_2");
+		Pet p3 = new Pet();
+		p3.setName("pet_3");
+		Pet p4 = new Pet();
+		p4.setName("pet_4");
+		
+//		Number[] ids = DAOFactory.getInsertDAO().batchInsert(p1, p2, p3, p4);
+//		System.out.println(Arrays.asList(ids));
+		Db.batchInsert(new Pet[]{p1,p2,p3,p4}, "name");
+		System.out.println(CommonUtil.toJson(Arrays.asList(p1, p2, p3, p4)));
+	}
+	
+	@Test
+	public void testBatchUpdate() throws Exception {
+		Pet p1 = new Pet();
+		p1.setPetId(14);
+		p1.setName("name up 11");
+		Pet p2 = new Pet();
+		p2.setPetId(15);
+		p2.setName("name up 22");
+		Pet p3 = new Pet();
+		p3.setPetId(16);
+		p3.setName("name up 33");
+		Pet p4 = new Pet();
+		p4.setPetId(17);
+		p4.setName("name up 44");
+		
+		Number[] rs = DAOFactory.getUpdateDAO().batchUpdate(new Pet[]{p1, p2, p3, p4}, "name");
+		System.out.println(Arrays.asList(rs));
+	}
 }

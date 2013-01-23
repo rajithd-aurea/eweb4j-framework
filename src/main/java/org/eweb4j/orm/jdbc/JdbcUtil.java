@@ -47,6 +47,62 @@ public class JdbcUtil {
 	 * @return
 	 * @throws Exception
 	 */
+	public static Number[] batchUpdateWithArgs(Connection con, String sql, Object[][] args) throws JdbcUtilException {
+		Number[] result = null;
+
+		if (con == null || sql == null || sql.trim().length() == 0 || args == null || args.length == 0)
+			return result;
+	
+		PreparedStatement pstmt = null;
+		try {
+			result = new Number[args.length];
+			pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+			for (int i = 0; i < args.length; ++i) {
+				for (int j = 0; j < args[i].length; j++){
+					pstmt.setObject(j+1, args[i][j]);
+				}
+				pstmt.addBatch();
+			}
+			
+			int[] row = pstmt.executeBatch();
+			if (row != null && row.length > 0) {
+				if (sql.contains("INSERT INTO")){
+					ResultSet rs = pstmt.getGeneratedKeys();
+					int i = 0;
+					while (rs.next()){
+						result[i] = rs.getInt(1);
+						i++;
+					}
+				}else{
+					for (int i = 0; i < row.length; i++){
+						result[i] = row[i];
+					}
+				}
+			}
+			pstmt.close();
+			logToOrm(sql, args, result);
+		} catch (SQLException e) {
+			logException(new StringBuilder(sql), e);
+			throw new JdbcUtilException(sql + " exception", e);
+		} finally {
+			close(null, pstmt, null);
+			if (!ConThreadLocal.isTrans()) {
+				close(con);
+			}
+		}
+
+		return result;
+	}
+	
+	/**
+	 * 执行sql语句，更新操作，支持有？占位符
+	 * 
+	 * @param con
+	 * @param sqls
+	 * @param args
+	 * @return
+	 * @throws Exception
+	 */
 	public static Number[] updateWithArgs(Connection con, String[] sqls, Object[][] args) throws JdbcUtilException {
 		Number[] result = null;
 
@@ -97,14 +153,12 @@ public class JdbcUtil {
 	 * @param i
 	 * @throws SQLException
 	 */
-	private static void fillArgs(Object[][] args, PreparedStatement pstmt, int i)
-			throws SQLException {
-		if (args != null && args.length > 0)
-			if (args[i] != null && args[i].length > 0)
-				for (int j = 0; j < args[i].length; ++j) {
-					pstmt.setObject(j + 1, args[i][j]);
-				}
-
+	private static void fillArgs(Object[][] args, PreparedStatement pstmt, int i) throws SQLException {
+		if (args == null || args.length == 0)
+			return ;
+		if (args[i] != null && args[i].length > 0)
+			for (int j = 0; j < args[i].length; ++j) 
+				pstmt.setObject(j + 1, args[i][j]);
 	}
 
 	/**
@@ -383,6 +437,20 @@ public class JdbcUtil {
 		log.error(sb.toString());
 	}
 
+	private static void logToOrm(String sql, Object[][] args, Number[] result) {
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("execute sql：").append(sql);
+		if (args != null && args.length > 0) {
+			sb.append(" args->");
+			for (Object[] arg : args){
+				sb.append(Arrays.asList(arg)).append(",");
+			}
+		}
+		sb.append(" result->").append(Arrays.asList(result)).append(";");
+		log.debug(sb.toString());
+	}
+	
 	private static void logToOrm(String[] sqls, Object[][] args, Number[] result, int i) {
 
 		StringBuilder sb = new StringBuilder();

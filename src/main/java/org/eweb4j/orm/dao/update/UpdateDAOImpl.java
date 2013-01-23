@@ -1,6 +1,8 @@
 package org.eweb4j.orm.dao.update;
 
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -21,18 +23,25 @@ public class UpdateDAOImpl implements UpdateDAO {
 		return rs == null ? 0 : rs[0];
 	}
 
-	public <T> Number[] batchUpdate(T... ts) throws DAOException {
+	public <T> Number[] batchUpdate(T[] ts, String... fields) throws DAOException {
 		Number[] ids = null;
 		if (ts != null && ts.length > 0) {
 			Connection con = null;
 			ids = new Number[ts.length];
 			try {
 				con = ds.getConnection();
-				for (int i = 0; i < ts.length; i++) {
-					Sql[] sqls = SqlFactory.getUpdateSql(new Object[] { ts[i] }).update();
-					ids[i] = JdbcUtil.updateWithArgs(con, sqls[i].sql, sqls[i].args.toArray());
-					// 更新缓存
+				
+				Sql[] sqls = SqlFactory.getUpdateSql(ts).update(fields);
+				List<Object[]> argList = new ArrayList<Object[]>(ts.length);
+				for (Sql sql : sqls){
+					argList.add(sql.args.toArray());
 				}
+				Object[][] args = new Object[argList.size()][];
+				for (int i = 0; i < argList.size(); i++){
+					args[i] = argList.get(i);
+				}
+				
+				ids = JdbcUtil.batchUpdateWithArgs(con, sqls[0].sql, args);
 			} catch (Exception e) {
 				throw new DAOException("batchUpdate exception ", e);
 			}
@@ -70,9 +79,9 @@ public class UpdateDAOImpl implements UpdateDAO {
 			Connection con = null;
 			ids = new Number[ts.length];
 			try {
-				con = ds.getConnection();
+				Sql[] sqls = SqlFactory.getUpdateSql(ts).update(fields);
 				for (int i = 0; i < ts.length; i++) {
-					Sql[] sqls = SqlFactory.getUpdateSql(ts).update(fields);
+					con = ds.getConnection();
 					ids[i] = JdbcUtil.updateWithArgs(con, sqls[i].sql, sqls[i].args.toArray());
 					// 更新缓存
 				}
@@ -90,9 +99,9 @@ public class UpdateDAOImpl implements UpdateDAO {
 			Connection con = null;
 			ids = new Number[ts.length];
 			try {
-				con = ds.getConnection();
+				Sql[] sqls = SqlFactory.getUpdateSql(ts).update(fields, values);
 				for (int i = 0; i < ts.length; i++) {
-					Sql[] sqls = SqlFactory.getUpdateSql(ts).update(fields, values);
+					con = ds.getConnection();
 					ids[i] = JdbcUtil.updateWithArgs(con, sqls[i].sql, sqls[i].args.toArray());
 					// 更新缓存
 				}

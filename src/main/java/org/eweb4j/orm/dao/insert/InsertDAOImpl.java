@@ -1,6 +1,8 @@
 package org.eweb4j.orm.dao.insert;
 
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -18,29 +20,25 @@ public class InsertDAOImpl implements InsertDAO {
 		this.dbType = dbType;
 	}
 
-	public <T> Number[] batchInsert(T... ts) throws DAOException {
+	public <T> Number[] batchInsert(T[] ts, String... fields) throws DAOException {
 		Number[] ids = null;
 		Connection con = null;
 		if (ts == null || ts.length == 0)
 			return ids;
 
-		ids = new Number[ts.length];
-
 		try {
 			con = ds.getConnection();
-			for (int i = 0; i < ts.length; i++) {
-				Sql[] sqls = SqlFactory.getInsertSql(new Object[] { ts[i] }).create();
-				if (sqls == null)
-					ids[i] = -1;
-				else {
-					ids[i] = JdbcUtil.updateWithArgs(con, sqls[i].sql, sqls[i].args.toArray());
-//					if (rs > 0) {
-//						ids[i] = DAOUtil.selectMaxId(ts[i], ds.getConnection(), dbType);
-//						// 缓存
-//					}
-				}
-
+			Sql[] sqls = SqlFactory.getInsertSql(ts).createByFields(fields);
+			List<Object[]> argList = new ArrayList<Object[]>(ts.length);
+			for (Sql sql : sqls){
+				argList.add(sql.args.toArray());
 			}
+			Object[][] args = new Object[argList.size()][];
+			for (int i = 0; i < argList.size(); i++){
+				args[i] = argList.get(i);
+			}
+			
+			ids = JdbcUtil.batchUpdateWithArgs(con, sqls[0].sql, args);
 		} catch (Exception e) {
 			throw new DAOException("", e);
 		}
@@ -82,19 +80,10 @@ public class InsertDAOImpl implements InsertDAO {
 
 		ids = new Number[ts.length];
 		try {
-			con = ds.getConnection();
+			Sql[] sqls = SqlFactory.getInsertSql(ts).create(condition);
 			for (int i = 0; i < ts.length; i++) {
-				Sql[] sqls = SqlFactory.getInsertSql(new Object[] { ts[i] }).create(condition);
-				if (sqls == null)
-					ids[i] = -1;
-				else {
-					ids[i] = JdbcUtil.updateWithArgs(con, sqls[i].sql, sqls[i].args.toArray());
-//					if (rs > 0) {
-//						ids[i] = DAOUtil.selectMaxId(ts[i], ds.getConnection(),
-//								dbType);
-//						// 缓存
-//					}
-				}
+				con = ds.getConnection();
+				ids[i] = JdbcUtil.updateWithArgs(con, sqls[i].sql, sqls[i].args.toArray());
 			}
 		} catch (Exception e) {
 			throw new DAOException("", e);
@@ -111,21 +100,10 @@ public class InsertDAOImpl implements InsertDAO {
 
 		ids = new Number[ts.length];
 		try {
-			con = ds.getConnection();
-
+			Sql[] sqls = SqlFactory.getInsertSql(ts).createByFields(fields);
 			for (int i = 0; i < ts.length; i++) {
-				Sql[] sqls = SqlFactory.getInsertSql(new Object[] { ts[i] }).createByFields(fields);
-				if (sqls == null)
-					ids[i] = -1;
-				else {
-					ids[i] = JdbcUtil.updateWithArgs(con, sqls[i].sql, sqls[i].args.toArray());
-//					if (rs > 0) {
-//						ids[i] = DAOUtil.selectMaxId(ts[i], ds.getConnection(),
-//								dbType);
-//						// 缓存
-//					}
-				}
-
+				con = ds.getConnection();
+				ids[i] = JdbcUtil.updateWithArgs(con, sqls[i].sql, sqls[i].args.toArray());
 			}
 		} catch (Exception e) {
 			throw new DAOException("", e);
