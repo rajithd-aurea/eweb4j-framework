@@ -297,7 +297,7 @@ public class CommonUtil {
 					}
 					if (value instanceof Boolean)
 						v = ((Boolean)value ? "1.0" : "0.0");
-					m.invoke(t, Float.parseFloat(v));
+					m.invoke(t, Double.parseDouble(v));
 				} else if ("string".equalsIgnoreCase(type) || "java.lang.String".equalsIgnoreCase(type)) {
 					m.invoke(t, v);
 				} else if ("boolean".equalsIgnoreCase(type) || "java.lang.Boolean".equalsIgnoreCase(type)){
