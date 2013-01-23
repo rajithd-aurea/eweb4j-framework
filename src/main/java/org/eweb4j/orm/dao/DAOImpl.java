@@ -128,7 +128,7 @@ public class DAOImpl implements DAO {
 		if (column == null)
 			column = query;
 
-		query = ORMConfigBeanUtil.parseQuery(query, clazz);
+		query = ORMConfigBeanUtil.parseQuery(column, clazz);
 
 		this.condition.append(" ").append(query).append(" ");
 		return this;
@@ -499,16 +499,9 @@ public class DAOImpl implements DAO {
 			if (result != null && result.size() > 0){
 				for (T t : result){
 					// ToOne relation class cascade select
-					final String[] fields = ORMConfigBeanUtil.getFields(t.getClass());
-					if (fields == null || fields.length == 0)
-						continue;
 					ReflectUtil ru = new ReflectUtil(t);
-					for (String f : fields){
-						Field field = ru.getField(f);
-						if (field == null)
-							continue;
-						if (field.getType() == null)
-							continue;
+					for (Field field : ru.getFields()){
+						String f = field.getName();
 						boolean isEntity = ORMConfigBeanCache.containsKey(field.getType().getName());
 						if (!isEntity)
 							continue;

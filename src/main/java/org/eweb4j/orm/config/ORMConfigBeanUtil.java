@@ -85,7 +85,10 @@ public class ORMConfigBeanUtil {
 	private static String parse(String con, String query, Class<?> clazz){
 		if (con == null)
 			con = "=";
-		final String regex = "[a-zA-Z]+ "+con;
+		
+		String regex = "[a-zA-Z]+ "+con;
+		if ("=".equals(con))
+			regex = "[a-zA-Z]+[ ]?"+con;
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(new String(query));
 		while (matcher.find()) {

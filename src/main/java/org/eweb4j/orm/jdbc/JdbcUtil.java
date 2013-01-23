@@ -7,6 +7,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +72,7 @@ public class JdbcUtil {
 						}
 					}
 					pstmt.close();
-					logToOrm(sqls, result, i);
+					logToOrm(sqls, args, result, i);
 				}
 			} catch (SQLException e) {
 
@@ -168,9 +169,9 @@ public class JdbcUtil {
 				list = RowMapping.mapRows(rs, clazz);
 
 				// ----------------------
-				logOrm(sql, list);
+				logOrm(sql, args, list);
 			} catch (Exception e) {
-				logException(sql, e);
+				logException(sql, args, e);
 				throw new JdbcUtilException(sql + " exception ", e);
 			} finally {
 				close(rs, pstmt, null);
@@ -296,10 +297,10 @@ public class JdbcUtil {
 						result.put(name, rs.getObject(name));
 					}
 				}
-				logOrm(sql, result);
+				logOrm(sql, args, result);
 			} catch (Exception e) {
 
-				logException(sql, e);
+				logException(sql, args, e);
 				throw new JdbcUtilException(sql + " exception ", e);
 			} finally {
 				close(rs, pstmt, null);
@@ -382,36 +383,45 @@ public class JdbcUtil {
 		log.error(sb.toString());
 	}
 
-	private static void logToOrm(String[] sqls, Number[] result, int i) {
+	private static void logToOrm(String[] sqls, Object[][] args, Number[] result, int i) {
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("execute sql：").append(sqls[i]);
+		if (args != null && args[i] != null && args.length > 0 && args[i].length > 0)
+			sb.append(" args->").append(Arrays.asList(args[i]));
 		sb.append(" result->").append(result[i]).append(";");
 		log.debug(sb.toString());
 	}
 
-	private static void logException(String sql, Exception e) {
+	private static void logException(String sql, Object[] args, Exception e) {
 		StringBuilder sb = new StringBuilder(e.toString());
 		for (StackTraceElement ste : e.getStackTrace()) {
 			sb.append("\n").append(ste.toString());
 		}
-		sb.append(sql).append("execute sql fail!");
+		sb.append(sql);
+		if (args != null && args.length > 0)
+			sb.append(" args->").append(Arrays.asList(args));
+		sb.append(" execute sql fail!");
 		log.error(sb.toString());
 	}
 
-	private static <T> void logOrm(String sql, List<T> list) {
+	private static <T> void logOrm(String sql, Object[] args, List<T> list) {
 
 		StringBuilder sb = new StringBuilder();
 		int count = list == null ? 0 : list.size();
 		sb.append("execute sql：").append(sql);
+		if (args != null && args.length > 0)
+			sb.append(" args->").append(Arrays.asList(args));
 		sb.append(" affected rows：").append(count).append(";");
 		log.debug(sb.toString());
 	}
 
-	private static void logOrm(String sql, Map<String, Object> result) {
+	private static void logOrm(String sql, Object[] args, Map<String, Object> result) {
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("execute sql：").append(sql);
+		if (args != null && args.length > 0)
+			sb.append(" args->").append(Arrays.asList(args));
 		sb.append(" result rows：").append(result.size()).append(";");
 		log.debug(sb.toString());
 	}
