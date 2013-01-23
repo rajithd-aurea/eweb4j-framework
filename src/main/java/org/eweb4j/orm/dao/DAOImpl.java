@@ -502,33 +502,41 @@ public class DAOImpl implements DAO {
 					ReflectUtil ru = new ReflectUtil(t);
 					for (Field field : ru.getFields()){
 						String f = field.getName();
-						boolean isEntity = ORMConfigBeanCache.containsKey(field.getType().getName());
-						if (!isEntity)
-							continue;
-						
 						OneToOne o2o = field.getAnnotation(OneToOne.class);
 						ManyToOne m2o = field.getAnnotation(ManyToOne.class);
 						OneToMany o2m = field.getAnnotation(OneToMany.class);
 						ManyToMany m2m = field.getAnnotation(ManyToMany.class);
 						FetchType fetchType = null;
-						if (o2o != null)
+						boolean is2One = false;
+						if (o2o != null){
 							fetchType = o2o.fetch();
-						if (m2o != null)
+							is2One = true;
+						}if (m2o != null){
 							fetchType = m2o.fetch();
-						if (o2m != null)
+							is2One = true;
+						}if (o2m != null){
 							fetchType = o2m.fetch();
-						if (m2m != null)
+						}if (m2m != null){
 							fetchType = m2m.fetch();
+						}
 						
 						if (fetchType == null)
+							continue;
+						
+						String beanId = field.getType().getName();
+						if (!is2One)
+							beanId = ClassUtil.getGenericType(field).getName();
+						
+						boolean isEntity = ORMConfigBeanCache.containsKey(beanId);
+						if (!isEntity)
 							continue;
 						
 						if (unFetch.contains(f))
 							continue;
 						
 						if (fetch.contains(f)){
-							DAOFactory.getCascadeDAO(dsName).select(t, f);
 							log.debug("cascade select -> " + t.getClass().getName() +"." + f);
+							DAOFactory.getCascadeDAO(dsName).select(t, f);
 							continue;
 						}
 						

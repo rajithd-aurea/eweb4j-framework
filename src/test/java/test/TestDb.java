@@ -1,10 +1,12 @@
 package test;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.eweb4j.config.EWeb4JConfig;
 import org.eweb4j.orm.Db;
 import org.eweb4j.orm.config.ORMConfigBeanUtil;
+import org.eweb4j.orm.dao.DAOFactory;
 import org.eweb4j.util.ReflectUtil;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,6 +39,8 @@ public class TestDb {
 	public void testOrmUtil() throws Exception{
 		String[] fields = new ReflectUtil(Master.class).getFieldsName();
 		System.out.println(Arrays.asList(fields));
+		Master m = DAOFactory.getDAO(Master.class).fetch("pets").selectAll().queryOne();
+		System.out.println(m);
 	}
 	
 }

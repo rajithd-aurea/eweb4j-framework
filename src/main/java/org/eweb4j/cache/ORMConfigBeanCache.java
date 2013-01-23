@@ -35,7 +35,7 @@ public class ORMConfigBeanCache {
 			String info = null;
 			if (!ht.containsKey(beanID)) {
 				ht.put(beanID, o);
-				info = "ORMConfigBeanCache:add...finished..." + o;
+				info = "ORMConfigBeanCache:add k->"+beanID+" finished..." + o;
 				log.debug(info);
 			}
 		}
