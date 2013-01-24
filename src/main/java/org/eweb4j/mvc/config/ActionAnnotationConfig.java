@@ -211,7 +211,7 @@ public class ActionAnnotationConfig extends ScanPackage {
 		log.debug("parse action.method --> " + fullName);
 
 		String uriMapping = null;
-
+		Path m_path = m.getAnnotation(Path.class);
 		if (methodName.startsWith(ActionMethod.PREFIX)) {
 			uriMapping = methodName.substring(ActionMethod.PREFIX.length());
 			// doUriBindParam1AndParam2JoinUriAtPostOrGet
@@ -282,7 +282,7 @@ public class ActionAnnotationConfig extends ScanPackage {
 				uriMapping = uriMapping + "/" + join;
 			}
 
-		} else {
+		} else if (m_path == null) {
 			/* 8 个默认方法 */
 			ActionConfigBean defaultAcb = parseDefaultActionConfig(methodName,
 					moduleName);
@@ -293,18 +293,16 @@ public class ActionAnnotationConfig extends ScanPackage {
 				uriMapping = defaultAcb.getUriMapping();
 			} else {
 
-				String info = fullName + " does not starts with '"
-						+ ActionMethod.PREFIX
-						+ "' so that can not be a valid action uri mapping";
+				String info = fullName + " does not starts with '" + ActionMethod.PREFIX + "' so that can not be a valid action uri mapping";
 				log.debug(info);
 				return null;
 			}
 		}
-
-		Path m_path = m.getAnnotation(Path.class);
+		
 		if (m_path != null) {
 			uriMapping = CommonUtil.parsePropValue(m_path.value());
 		}
+		
 		acb.setUriMapping(uriMapping);
 		return acb;
 	}
