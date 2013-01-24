@@ -39,7 +39,7 @@
 			</dbInfoXmlFiles>
 		</orm>
 		<mvc>
-			<open>0</open>
+			<open>1</open>
 			<logs>
 				<log console="1" level="debug" file="" size="5" />
 	      	</logs>

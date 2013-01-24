@@ -27,7 +27,7 @@ public class ActionConfigBean {
 	private String[] pathParams;
 
 	@AttrTag
-	private String httpMethod = HttpMethod.GET;
+	private String httpMethod = HttpMethod.GET+"|"+HttpMethod.POST+"|"+HttpMethod.PUT+"|"+HttpMethod.DELETE;
 
 	@AttrTag
 	private String uriMapping;

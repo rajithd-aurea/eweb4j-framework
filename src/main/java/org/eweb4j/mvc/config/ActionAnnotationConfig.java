@@ -27,12 +27,14 @@ import org.eweb4j.mvc.config.bean.ResultConfigBean;
 import org.eweb4j.mvc.config.bean.ValidatorConfigBean;
 import org.eweb4j.mvc.config.creator.ValidatorUtil;
 import org.eweb4j.mvc.validator.annotation.Validate;
-import org.eweb4j.util.ReflectUtil;
 import org.eweb4j.util.CommonUtil;
+import org.eweb4j.util.ReflectUtil;
+import org.junit.Test;
 
-public class ActionAnnotationConfig extends ScanPackage{
+import test.controller.PetControl;
 
-	
+public class ActionAnnotationConfig extends ScanPackage {
+
 	public ActionAnnotationConfig() {
 		super();
 	}
@@ -45,8 +47,8 @@ public class ActionAnnotationConfig extends ScanPackage{
 	 */
 	public boolean handleClass(String clsName) {
 
-		//log.debug("handleClass -> " + clsName);
-		 
+		// log.debug("handleClass -> " + clsName);
+
 		Class<?> cls = null;
 		try {
 			cls = Class.forName(clsName);
@@ -56,10 +58,13 @@ public class ActionAnnotationConfig extends ScanPackage{
 
 			String simpleName = cls.getSimpleName();
 			Controller controlAnn = cls.getAnnotation(Controller.class);
-			if (controlAnn == null && !simpleName.endsWith("Controller") && !simpleName.endsWith("Action") && !simpleName.endsWith("Control"))
+			if (controlAnn == null && !simpleName.endsWith("Controller")
+					&& !simpleName.endsWith("Action")
+					&& !simpleName.endsWith("Control"))
 				return false;
 
-			String moduleName = CommonUtil.toLowCaseFirst(simpleName.replace("Controller", "").replace("Control", ""));
+			String moduleName = CommonUtil.toLowCaseFirst(simpleName.replace(
+					"Controller", "").replace("Control", ""));
 			if (simpleName.endsWith("Action")) {
 				moduleName = "";
 			}
@@ -76,12 +81,14 @@ public class ActionAnnotationConfig extends ScanPackage{
 					obj = cls.newInstance();
 
 			} catch (Error er) {
-				er.printStackTrace();
-				log.debug("the action class new instance failued -> " + clsName + " | " + er.toString());
+				// er.printStackTrace();
+				log.debug("the action class new instance failued -> " + clsName
+						+ " | " + er.toString());
 				return false;
 			} catch (Exception e) {
-				e.printStackTrace();
-				log.warn("the action class new instance failued -> " + clsName + " | " + e.toString());
+				// e.printStackTrace();
+				log.warn("the action class new instance failued -> " + clsName
+						+ " | " + e.toString());
 				return false;
 			}
 
@@ -113,8 +120,15 @@ public class ActionAnnotationConfig extends ScanPackage{
 		} catch (Exception e) {
 			return false;
 		}
-		
+
 		return true;
+	}
+
+	@Test
+	public void test() throws Exception {
+		ReflectUtil ru = new ReflectUtil(PetControl.class);
+		new ActionAnnotationConfig().handleActionConfigInfo(ru,
+				PetControl.class, ru.getMethod("doHelloWorld"), "pets");
 	}
 
 	/**
@@ -125,10 +139,12 @@ public class ActionAnnotationConfig extends ScanPackage{
 	 * @param method
 	 * @param moduleName
 	 */
-	private void handleActionConfigInfo(ReflectUtil ru,
-			Class<?> controller, Method method, String moduleName) {
+	private void handleActionConfigInfo(ReflectUtil ru, Class<?> controller,
+			Method method, String moduleName) {
 
-		final ActionConfigBean action = parseUriMappingSuffix(moduleName, method);
+		// 这一步解析约定好的方法名doXxxAtXxx
+		final ActionConfigBean action = parseUriMappingSuffix(moduleName,
+				method);
 		if (action == null)
 			return;
 
@@ -140,12 +156,14 @@ public class ActionAnnotationConfig extends ScanPackage{
 
 		/* 解析出Http Method */
 		String httpMethod = parseHttpMethodByAnnotation(controller, method);
-		if (httpMethod != null)
+		// 如果方法上的注解不为空则覆盖约定好的
+		if (httpMethod != null && httpMethod.trim().length() > 0)
 			action.setHttpMethod(httpMethod);
 
 		/* 解析出最终的uriMapping */
-		String uriMapping = parseUriMapping(controller, moduleName, action.getUriMapping());
-		if (uriMapping != null)
+		String uriMapping = parseUriMapping(controller, moduleName,
+				action.getUriMapping());
+		if (uriMapping != null && uriMapping.trim().length() > 0)
 			action.setUriMapping(uriMapping);
 
 		// 解析@Result注解
@@ -168,7 +186,8 @@ public class ActionAnnotationConfig extends ScanPackage{
 			action.getValidator().addAll(vals);
 
 		/* 解析最终的actionKey (包括合并http method、正则等) */
-		String actionConfigKey = parseFullUriMapping(controller, method, action.getHttpMethod(), action.getUriMapping());
+		String actionConfigKey = parseFullUriMapping(controller, method,
+				action.getHttpMethod(), action.getUriMapping());
 		if (actionConfigKey == null)
 			return;
 
@@ -178,109 +197,118 @@ public class ActionAnnotationConfig extends ScanPackage{
 	}
 
 	/**
-     * 解析 URI Mapping 后部分
-     * 
-     * @param moduleName
-     * @param m
-     * @return
-     */
-    private ActionConfigBean parseUriMappingSuffix(String moduleName, Method m) {
-            ActionConfigBean acb = new ActionConfigBean();
+	 * 解析 URI Mapping 后部分
+	 * 
+	 * @param moduleName
+	 * @param m
+	 * @return
+	 */
+	private ActionConfigBean parseUriMappingSuffix(String moduleName, Method m) {
+		ActionConfigBean acb = new ActionConfigBean();
 
-            String methodName = m.getName();
-            String fullName = m.toString();
-            log.debug("parse action.method --> " + fullName);
+		String methodName = m.getName();
+		String fullName = m.toString();
+		log.debug("parse action.method --> " + fullName);
 
-            String uriMapping = null;
+		String uriMapping = null;
 
-            Path m_path = m.getAnnotation(Path.class);
-            if (m_path != null) {
-                    uriMapping = CommonUtil.parsePropValue(m_path.value());
-            } else if (methodName.startsWith(ActionMethod.PREFIX)) {
-                    uriMapping = methodName.substring(ActionMethod.PREFIX.length());
-                    // doUriBindParam1AndParam2JoinUriAtPostOrGet
-                    String at = null;
-                    int indexOfAt = methodName.indexOf(ActionMethod.AT);
-                    if (indexOfAt != -1) {
-                            at = methodName.substring(indexOfAt + ActionMethod.AT.length());
-                            if (methodName.startsWith(ActionMethod.PREFIX))
-                                    uriMapping = uriMapping.substring(0,uriMapping.indexOf(ActionMethod.AT));
+		if (methodName.startsWith(ActionMethod.PREFIX)) {
+			uriMapping = methodName.substring(ActionMethod.PREFIX.length());
+			// doUriBindParam1AndParam2JoinUriAtPostOrGet
+			String at = null;
+			int indexOfAt = methodName.indexOf(ActionMethod.AT);
+			if (indexOfAt != -1) {
+				at = methodName.substring(indexOfAt + ActionMethod.AT.length());
+				if (methodName.startsWith(ActionMethod.PREFIX))
+					uriMapping = uriMapping.substring(0,
+							uriMapping.indexOf(ActionMethod.AT));
+				String[] httpMethods = at.split(ActionMethod.OR);
+				StringBuilder sb = new StringBuilder();
+				for (String httpMethod : httpMethods) {
+					if (sb.length() > 0)
+						sb.append("|");
 
-                            String[] httpMethods = at.split(ActionMethod.OR);
-                            StringBuilder sb = new StringBuilder();
-                            for (String httpMethod : httpMethods) {
-                                    if (sb.length() > 0)
-                                            sb.append("|");
+					sb.append(httpMethod.toUpperCase());
+				}
+				if (sb.length() > 0) {
+					acb.setHttpMethod(sb.toString());
+				}
+			}
+			String join = "";
+			String bind;
+			int indexOfBind = methodName.indexOf(ActionMethod.BIND);
+			if (indexOfBind != -1) {
+				if (indexOfAt != -1 && indexOfAt > indexOfBind) {
+					bind = methodName
+							.substring(
+									indexOfBind + ActionMethod.BIND.length(),
+									indexOfAt);
+				} else {
+					bind = methodName.substring(indexOfBind
+							+ ActionMethod.BIND.length());
+				}
 
-                                    sb.append(httpMethod.toUpperCase());
-                            }
+				uriMapping = uriMapping.substring(0,
+						uriMapping.indexOf(ActionMethod.BIND));
 
-                            if (sb.length() > 0) {
-                                    acb.setHttpMethod(sb.toString());
-                            }
-                    }
-                    String join = "";
-                    String bind;
-                    int indexOfBind = methodName.indexOf(ActionMethod.BIND);
-                    if (indexOfBind != -1) {
-                            if (indexOfAt != -1 && indexOfAt > indexOfBind) {
-                                    bind = methodName.substring(indexOfBind + ActionMethod.BIND.length(),indexOfAt);
-                            } else {
-                                    bind = methodName.substring(indexOfBind + ActionMethod.BIND.length());
-                            }
+				int indexOfJoin = bind.indexOf(ActionMethod.JOIN);
+				if (indexOfJoin != -1) {
+					String[] joins = bind.split(ActionMethod.JOIN);
+					if (joins.length > 1) {
+						bind = joins[0];
+						join = joins[1];
+					}
+				}
 
-                            uriMapping = uriMapping.substring(0,uriMapping.indexOf(ActionMethod.BIND));
+				String[] pathParams = bind.split(ActionMethod.AND);
+				StringBuilder pathParamSB = new StringBuilder();
+				for (int i = 0; i < pathParams.length; i++) {
+					pathParams[i] = CommonUtil.toLowCaseFirst(pathParams[i]);
+					pathParamSB.append("/{").append(pathParams[i]).append("}");
+				}
 
-                            int indexOfJoin = bind.indexOf(ActionMethod.JOIN);
-                            if (indexOfJoin != -1) {
-                                    String[] joins = bind.split(ActionMethod.JOIN);
-                                    if (joins.length > 1) {
-                                            bind = joins[0];
-                                            join = joins[1];
-                                    }
-                            }
+				if (pathParamSB.length() > 0)
+					uriMapping = uriMapping + pathParamSB.toString();
 
-                            String[] pathParams = bind.split(ActionMethod.AND);
-                            StringBuilder pathParamSB = new StringBuilder();
-                            for (int i = 0; i < pathParams.length; i++) {
-                                    pathParams[i] = CommonUtil.toLowCaseFirst(pathParams[i]);
-                                    pathParamSB.append("/{").append(pathParams[i]).append("}");
-                            }
+				acb.setPathParams(pathParams);
+			}
 
-                            if (pathParamSB.length() > 0)
-                                    uriMapping = uriMapping + pathParamSB.toString();
+			uriMapping = CommonUtil.toLowCaseFirst(uriMapping);
+			uriMapping = CommonUtil.hump2ohter(uriMapping, "-");
 
-                            acb.setPathParams(pathParams);
-                    }
+			if (join.length() > 0) {
+				join = CommonUtil.toLowCaseFirst(join);
+				join = CommonUtil.hump2ohter(join, "-");
+				uriMapping = uriMapping + "/" + join;
+			}
 
-                    uriMapping = CommonUtil.toLowCaseFirst(uriMapping);
-                    uriMapping = CommonUtil.hump2ohter(uriMapping, "-");
+		} else {
+			/* 8 个默认方法 */
+			ActionConfigBean defaultAcb = parseDefaultActionConfig(methodName,
+					moduleName);
+			if (defaultAcb != null) {
+				acb.setHttpMethod(defaultAcb.getHttpMethod());
+				acb.getResult().addAll(defaultAcb.getResult());
 
-                    if (join.length() > 0) {
-                            join = CommonUtil.toLowCaseFirst(join);
-                            join = CommonUtil.hump2ohter(join, "-");
-                            uriMapping = uriMapping + "/" + join;
-                    }
+				uriMapping = defaultAcb.getUriMapping();
+			} else {
 
-            } else {
-                    /* 8 个默认方法 */
-                    ActionConfigBean defaultAcb = parseDefaultActionConfig(methodName, moduleName);
-                    if (defaultAcb != null) {
-                            acb.setHttpMethod(defaultAcb.getHttpMethod());
-                            acb.getResult().addAll(defaultAcb.getResult());
+				String info = fullName + " does not starts with '"
+						+ ActionMethod.PREFIX
+						+ "' so that can not be a valid action uri mapping";
+				log.debug(info);
+				return null;
+			}
+		}
 
-                            uriMapping = defaultAcb.getUriMapping();
-                    } else {
+		Path m_path = m.getAnnotation(Path.class);
+		if (m_path != null) {
+			uriMapping = CommonUtil.parsePropValue(m_path.value());
+		}
+		acb.setUriMapping(uriMapping);
+		return acb;
+	}
 
-                            String info = fullName + " does not starts with '" + ActionMethod.PREFIX + "' so that can not be a valid action uri mapping";
-                            log.debug(info);
-                            return null;
-                    }
-            }
-
-            acb.setUriMapping(uriMapping);
-            return acb;
-    }
 	/**
 	 * 解析默认的Action配置
 	 * 
@@ -288,7 +316,8 @@ public class ActionAnnotationConfig extends ScanPackage{
 	 * @param moduleName
 	 * @return
 	 */
-	private static ActionConfigBean parseDefaultActionConfig(String methodName, String moduleName) {
+	private static ActionConfigBean parseDefaultActionConfig(String methodName,
+			String moduleName) {
 		String uriMapping = null;
 		String httpMethod = null;
 		ActionConfigBean acb = new ActionConfigBean();
@@ -372,13 +401,11 @@ public class ActionAnnotationConfig extends ScanPackage{
 			acb = null;
 		}
 
-		
-		
 		if (acb != null) {
 			acb.setHttpMethod(httpMethod);
 			acb.setUriMapping(uriMapping);
 		}
-		
+
 		return acb;
 	}
 
@@ -408,9 +435,11 @@ public class ActionAnnotationConfig extends ScanPackage{
 		return m_sb.toString();
 	}
 
-	private static String parseFullUriMapping(Class<?> cls, Method m, final String httpMethod, final String uriMapping) {
+	private static String parseFullUriMapping(Class<?> cls, Method m,
+			final String httpMethod, final String uriMapping) {
 		// Action全名，框架用，包括对“{xxx}”url参数的正则化，HttpRequestMethod
-		String actionFullName = ActionUrlUtil.mathersUrlMapping(m, uriMapping, cls);
+		String actionFullName = ActionUrlUtil.mathersUrlMapping(m, uriMapping,
+				cls);
 		if (actionFullName == null)
 			return null;
 
@@ -419,7 +448,7 @@ public class ActionAnnotationConfig extends ScanPackage{
 		}
 
 		actionFullName = actionFullName + ActionMethod.CON + httpMethod;
-		
+
 		return actionFullName;
 	}
 
@@ -431,12 +460,13 @@ public class ActionAnnotationConfig extends ScanPackage{
 		Validate validate = m.getAnnotation(Validate.class);
 		if (validate == null)
 			return vals;
-		
+
 		String[] fields = validate.value();
 		String[] excepts = validate.except();
 		if (fields != null) {
 			// 读取Action object 的属性 验证信息
-			List<ValidatorConfigBean> fieldVal = ValidatorUtil.readValidator(fields,excepts, null, ru, null, null);
+			List<ValidatorConfigBean> fieldVal = ValidatorUtil.readValidator(
+					fields, excepts, null, ru, null, null);
 			if (fieldVal != null)
 				vals.addAll(fieldVal);
 		}
@@ -450,7 +480,8 @@ public class ActionAnnotationConfig extends ScanPackage{
 		List<String> pcbs = null;
 		if (producesAnn != null) {
 			pcbs = new ArrayList<String>();
-			String producesStr = CommonUtil.parsePropValue(producesAnn.value()[0]);
+			String producesStr = CommonUtil
+					.parsePropValue(producesAnn.value()[0]);
 			pcbs.add(producesStr);
 		}
 
@@ -474,7 +505,8 @@ public class ActionAnnotationConfig extends ScanPackage{
 
 		clsShowValErr = CommonUtil.parsePropValue(clsShowValErr);
 
-		String methodShowValErr = clsShowValErr.trim().length() == 0 ? "alert" : clsShowValErr;// 验证器验证信息输出方式默认”alert“
+		String methodShowValErr = clsShowValErr.trim().length() == 0 ? "alert"
+				: clsShowValErr;// 验证器验证信息输出方式默认”alert“
 
 		ShowValMess m_vm = m.getAnnotation(ShowValMess.class);
 		methodShowValErr = m_vm == null ? methodShowValErr : m_vm.value();
@@ -483,14 +515,11 @@ public class ActionAnnotationConfig extends ScanPackage{
 	}
 
 	private static String parseHttpMethodByAnnotation(Class<?> cls, Method m) {
-		//String clazzHttpMethod = parseHttpMethodByClazz(cls);
-
 		String methodHttpMethod = parseHttpMethodByMethodAnnotation(m);
-
-		//if (methodHttpMethod != null)
+		if (methodHttpMethod != null)
 			return methodHttpMethod;
 
-		//return clazzHttpMethod;
+		return parseHttpMethodByClazz(cls);
 	}
 
 	private static String parseHttpMethodByMethodAnnotation(Method m) {
@@ -504,14 +533,14 @@ public class ActionAnnotationConfig extends ScanPackage{
 
 		StringBuilder _sb = new StringBuilder();
 		for (String s : _methods) {
+			if (s.trim().length() == 0)
+				continue;
+
 			if (_sb.length() > 0 && s.length() > 0)
 				_sb.append("|");
 
 			_sb.append(s);
 		}
-
-		if (_sb.length() == 0)
-			return "GET|POST|PUT|DELETE";
 
 		return _sb.toString();
 	}
@@ -525,7 +554,8 @@ public class ActionAnnotationConfig extends ScanPackage{
 	 */
 	private static String parseUriMappingPrefix(Class<?> cls, String moduleName) {
 		Path cls_path = cls.getAnnotation(Path.class);
-		String clazzUriMapping = cls_path == null ? moduleName : cls_path.value();
+		String clazzUriMapping = cls_path == null ? moduleName : cls_path
+				.value();
 
 		clazzUriMapping = CommonUtil.parsePropValue(clazzUriMapping);
 
@@ -558,7 +588,7 @@ public class ActionAnnotationConfig extends ScanPackage{
 	@Override
 	protected void onOk() throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

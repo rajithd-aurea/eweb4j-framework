@@ -29,10 +29,11 @@ public class TestDb {
 		}
 	}
 	
+	@Test
 	public void test() throws Exception{
-		String query = ORMConfigBeanUtil.parseQuery("master is null and user = ?", Pet.class);
+		String query = ORMConfigBeanUtil.parseQuery("master <= ? and user > ?", Pet.class);
 		System.out.println(query);
-		Pet p = Db.ar(Pet.class).find("master = ? and user = ?", 1, 2).first();
+		Pet p = Db.ar(Pet.class).find("master <= ? and user > ?", 1, 2).first();
 		System.out.println(p);
 	}
 	
@@ -59,7 +60,6 @@ public class TestDb {
 		System.out.println(CommonUtil.toJson(Arrays.asList(p1, p2, p3, p4)));
 	}
 	
-	@Test
 	public void testBatchUpdate() throws Exception {
 		Pet p1 = new Pet();
 		p1.setPetId(14);

@@ -131,7 +131,7 @@ public final class ActionConfigBeanCache {
 
 			if (!ACTION_CFG_BEAN.containsKey(beanID)) {
 				ACTION_CFG_BEAN.put(beanID, o);
-				info = "add...finished..." + beanID + "|" + o;
+				info = "add...finished..." + beanID + " , " + o;
 			} else {
 				ActionConfigBean actionBean = ACTION_CFG_BEAN.get(beanID);
 				if (actionBean != null) {
@@ -166,7 +166,7 @@ public final class ActionConfigBeanCache {
 					}
 				} else {
 					ACTION_CFG_BEAN.put(beanID, o);
-					info = "add...finished..." + beanID + "|" + o;
+					info = "add...finished..." + beanID + " , " + o;
 				}
 			}
 

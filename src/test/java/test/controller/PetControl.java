@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -48,11 +49,12 @@ public class PetControl {
 		return info.toString();
 	}
 
+	@GET
 	public String doEdit(@PathParam("id") int id) {
 		return "";
 	}
 
-	public String doUriBindIdAndAgeAtGet(@PathParam("id") int id) {
+	public String doUriBindIdAndAgeAtGetOrPut(@PathParam("id") int id) {
 		return "do get";
 	}
 

@@ -69,6 +69,16 @@ public class ORMConfigBeanUtil {
 		}else{
 			if (query.contains("="))
 				query = parse(query, clazz);
+			if (query.contains("<>"))
+				query = parse("<>",query, clazz);
+			if (query.contains("<="))
+				query = parse("<=",query, clazz);
+			if (query.contains("<"))
+				query = parse("<",query, clazz);
+			if (query.contains(">="))
+				query = parse(">=",query, clazz);
+			if (query.contains(">"))
+				query = parse(">",query, clazz);
 			if (query.contains("is"))
 				query = parse("is", query, clazz);
 			if (query.contains("not like"))
