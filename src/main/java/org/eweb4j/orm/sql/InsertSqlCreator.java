@@ -39,7 +39,11 @@ public class InsertSqlCreator<T> {
 	}
 
 	public Sql[] createByFields(String[] fields) throws SqlCreateException {
-		return createByFieldsIsValues(new String[][] { fields }, null);
+		String[][] _fields = new String[ts.length][];
+		for (int i = 0; i < ts.length; i++){
+			_fields[i] = fields;
+		}
+		return createByFieldsIsValues(_fields, null);
 	}
 
 	public Sql[] createByFieldsIsValues(String[][] fields, String[][] values)throws SqlCreateException {

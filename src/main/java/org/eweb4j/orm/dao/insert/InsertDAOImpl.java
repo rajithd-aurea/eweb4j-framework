@@ -28,7 +28,11 @@ public class InsertDAOImpl implements InsertDAO {
 
 		try {
 			con = ds.getConnection();
-			Sql[] sqls = SqlFactory.getInsertSql(ts).createByFields(fields);
+			Sql[] sqls = null;
+			if (fields != null && fields.length > 0)
+				sqls = SqlFactory.getInsertSql(ts).createByFields(fields);
+			else
+				sqls = SqlFactory.getInsertSql(ts).create();
 			List<Object[]> argList = new ArrayList<Object[]>(ts.length);
 			for (Sql sql : sqls){
 				argList.add(sql.args.toArray());
