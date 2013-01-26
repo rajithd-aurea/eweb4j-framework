@@ -132,8 +132,7 @@ public class ThumbUtil {
 		}
 
 		if (bi == null)
-			throw new Exception("can not get the image file from -> "
-					+ imagePath);
+			throw new Exception("can not get the image file from -> " + imagePath);
 
 		//原图大小
 		int sw = bi.getWidth();
@@ -250,14 +249,15 @@ public class ThumbUtil {
 		
 		// 质量
 		float quality = 0.9f;
-		String outputFormat = "png";
+		String outputFormat = "gif";
 		String name = CommonUtil.getNowTime("yyyyMMddHHmmss");
 
 		// 原图，也可以是本地的d:/xx.jpg
 //		String remoteImageUrl = "http://gd.image-gmkt.com/mi/830/443/414443830.jpg";
 //		String remoteImageUrl = "http://www.shoplay.com/cache/bigpic/20121130/470/aaeed8a8dd_w470.jpg";
 //		String remoteImageUrl = "http://www.malijuthemeshop.com/live_previews/mws-admin/example/scottwills_squirrel.jpg";
-		String remoteImageUrl = "http://static.sg.groupon-content.net/88/75/1357633937588.png";
+//		String remoteImageUrl = "http://static.sg.groupon-content.net/88/75/1357633937588.png";
+		String remoteImageUrl = "http://coupree.com/image/ke7VpHtYCBwg6rCF.png/301/174";
 //		String remoteImageUrl = "http://test.shoplay.com/cache/bigpic/20121108/470/55c5b78e5c_w470.jpg";
 		int outputWidth = 400;
 		int outputHeight = 0;

@@ -49,10 +49,10 @@ public class CommonUtil {
 		String source = "2013-01-17 11:00";
 		Date date = CommonUtil.parse("yyyy-MM-dd HH:mm", source);
 		System.out.println(String.valueOf(date.getTime()).substring(0, 10));
-		long time = System.currentTimeMillis() + 111080*1000;
+		long time = System.currentTimeMillis() + 2797435 + CommonUtil.toSeconds("8h").longValue()*1000l;
 		System.out.println(time);
 		System.out.println((""+time).substring(0, 10));
-		System.out.println(CommonUtil.formatTime(new Date(time)));
+		System.out.println(CommonUtil.formatTime(new Date(1359214513263l)));
 	}
 	
 	public static String cleanLF(String str) {
