@@ -249,7 +249,7 @@ public class ThumbUtil {
 		
 		// 质量
 		float quality = 0.9f;
-		String outputFormat = "gif";
+		String outputFormat = "jpg";
 		String name = CommonUtil.getNowTime("yyyyMMddHHmmss");
 
 		// 原图，也可以是本地的d:/xx.jpg
@@ -257,7 +257,10 @@ public class ThumbUtil {
 //		String remoteImageUrl = "http://www.shoplay.com/cache/bigpic/20121130/470/aaeed8a8dd_w470.jpg";
 //		String remoteImageUrl = "http://www.malijuthemeshop.com/live_previews/mws-admin/example/scottwills_squirrel.jpg";
 //		String remoteImageUrl = "http://static.sg.groupon-content.net/88/75/1357633937588.png";
-		String remoteImageUrl = "http://coupree.com/image/ke7VpHtYCBwg6rCF.png/301/174";
+//		String remoteImageUrl = "http://coupree.com/image/ke7VpHtYCBwg6rCF.png/301/174";
+		String remoteImageUrl = "http://i2.sinaimg.cn/qc/2010/0723/2010723114117.bmp";
+//		String remoteImageUrl = "http://shoppetreatz.com/wp-content/themes/DailyDeal/thumb.php?src=http://shoppetreatz.com/wp-content/uploads/2012/11/13541581271295634499.jpg&w=560&h=280&zc=1&q=80&bid=1";
+//		String remoteImageUrl = "http://gd.image-gmkt.com/mi/207/546/419546207.jpg";
 //		String remoteImageUrl = "http://test.shoplay.com/cache/bigpic/20121108/470/55c5b78e5c_w470.jpg";
 		int outputWidth = 400;
 		int outputHeight = 0;
@@ -271,7 +274,7 @@ public class ThumbUtil {
 		BufferedImage image = ThumbUtil.generate(
 				remoteImageUrl, 
 				sharpenTimes,
-				quality, contrast, brightness, outputFormat, 1, // 远程图片下载失败重试次数
+				quality, contrast, brightness, outputFormat, 10, // 远程图片下载失败重试次数
 				1 * 1000, // 失败后休眠时间
 				outputWidth, outputHeight);
 		

@@ -761,9 +761,29 @@ public class CommonUtil {
 	}
 
 	public static Date parse(String format, String source) {
+		int aaIndex = format.indexOf(" aa");
+		if (aaIndex > -1){
+			format = format.replace(" aa", "");
+			String apm = source.substring(aaIndex+1, aaIndex+1+2);
+			return parse(format, source.substring(0, aaIndex), apm);
+		}
+		
 		SimpleDateFormat sdf = new java.text.SimpleDateFormat(format);
 		try {
 			return sdf.parse(source);
+		} catch (ParseException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static Date parse(String format, String source, String amOrPm) {
+		SimpleDateFormat sdf = new java.text.SimpleDateFormat(format);
+		try {
+			Date date = sdf.parse(source);
+			if ("PM".equalsIgnoreCase(amOrPm)){
+				date = CommonUtil.addHour(date, 12);
+			}
+			return date;
 		} catch (ParseException e) {
 			throw new RuntimeException(e);
 		}

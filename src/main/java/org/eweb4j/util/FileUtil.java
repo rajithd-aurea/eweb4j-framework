@@ -35,8 +35,8 @@ import javax.swing.ImageIcon;
  * 
  */
 public class FileUtil {
-	
-	public static void appendFile(File f, String content) throws Exception{
+
+	public static void appendFile(File f, String content) throws Exception {
 		BufferedWriter writer = null;
 		try {
 			writer = new BufferedWriter(new FileWriter(f, true));
@@ -44,7 +44,7 @@ public class FileUtil {
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			if (writer != null){
+			if (writer != null) {
 				try {
 					writer.flush();
 					writer.close();
@@ -54,16 +54,17 @@ public class FileUtil {
 			}
 		}
 	}
-	
-	public static void writeFile(File f, String content) throws Exception{
+
+	public static void writeFile(File f, String content) throws Exception {
 		BufferedWriter writer = null;
 		try {
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), "utf-8"));
+			writer = new BufferedWriter(new OutputStreamWriter(
+					new FileOutputStream(f), "utf-8"));
 			writer.write(content);
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			if (writer != null){
+			if (writer != null) {
 				try {
 					writer.flush();
 					writer.close();
@@ -73,19 +74,20 @@ public class FileUtil {
 			}
 		}
 	}
-	
-	public static String readFile(File f){
+
+	public static String readFile(File f) {
 		BufferedReader reader = null;
 		StringBuilder sb = new StringBuilder();
 		try {
-			reader = new BufferedReader(new InputStreamReader(new FileInputStream(f), "utf-8"));
+			reader = new BufferedReader(new InputStreamReader(
+					new FileInputStream(f), "utf-8"));
 			String line = null;
 			while ((line = reader.readLine()) != null)
 				sb.append(line);
-		} catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (reader != null){
+			if (reader != null) {
 				try {
 					reader.close();
 				} catch (IOException e) {
@@ -93,26 +95,27 @@ public class FileUtil {
 				}
 			}
 		}
-		
+
 		return sb.toString();
 	}
-	
-	public static String getExt(File f){
-		return f.getName().substring(f.getName().lastIndexOf(".")+1);
+
+	public static String getExt(File f) {
+		return f.getName().substring(f.getName().lastIndexOf(".") + 1);
 	}
-	
+
 	public static boolean deleteFolder(File folder) {
 		return deleteFolderContents(folder) && folder.delete();
 	}
-	
+
 	/**
 	 * Delete folder's children files
+	 * 
 	 * @param folder
 	 * @return
 	 */
 	public static boolean deleteFolderContents(File folder) {
 		File[] files = folder.listFiles();
-		if (files!=null) {
+		if (files != null) {
 			for (File file : files) {
 				if (file.isFile()) {
 					if (!file.delete()) {
@@ -127,94 +130,108 @@ public class FileUtil {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * 
-	 * @param imagePath 给定的图片Path
-	 * @param retryTimes 如果发生异常重试次数
+	 * @param imagePath
+	 *            给定的图片Path
+	 * @param retryTimes
+	 *            如果发生异常重试次数
 	 * @param sleep
 	 * @return
 	 */
-	public static BufferedImage getBufferedImage(String imagePath, int retryTimes, long sleep) throws Exception{
+	public static BufferedImage getBufferedImage(String imagePath,int retryTimes, long sleep) throws Exception {
 		if (imagePath == null || imagePath.trim().length() == 0)
 			throw new Exception("image url can not be empty");
-		
+
 		int count = 0;
-		while (true){
+		while (true) {
 			try {
-				try {
-					return toBufferedImage(Toolkit.getDefaultToolkit().getImage(imagePath));
-//					return ImageIO.read(new File(imagePath));
-				}catch(Throwable e) {
-					return toBufferedImage(Toolkit.getDefaultToolkit().getImage(new URL(imagePath)));
-//					return ImageIO.read(new URL(imagePath));
+				PicsModel mod = PicUtil.getAttrs(imagePath);
+				boolean isPng = false;
+				if (mod != null && "PNG".equalsIgnoreCase(mod.getExtName())){
+					isPng = true;
 				}
-			} catch (Exception e) {
-				if (count >= retryTimes){
-					throw e;
+				
+				try {
+					if (isPng)
+						return toBufferedImage(Toolkit.getDefaultToolkit().getImage(imagePath));
+					return ImageIO.read(new File(imagePath));
+				} catch (Throwable e) {
+					if (isPng)
+						return toBufferedImage(Toolkit.getDefaultToolkit().getImage(new URL(imagePath)));
+					return ImageIO.read(new URL(imagePath));
+				}
+			} catch (Throwable e) {
+				if (count >= retryTimes) {
+					throw new Exception(e);
 				}
 				Thread.sleep(sleep);
-			} 
+			}
 			count++;
 		}
 	}
-	
+
 	public static BufferedImage toBufferedImage(Image image) {
-        if (image instanceof BufferedImage) {
-            return (BufferedImage)image;
-         }
-    
-        // This code ensures that all the pixels in the image are loaded
-         image = new ImageIcon(image).getImage();
-    
-        // Determine if the image has transparent pixels; for this method's
-        // implementation, see e661 Determining If an Image Has Transparent Pixels
-        //boolean hasAlpha = hasAlpha(image);
-    
-        // Create a buffered image with a format that's compatible with the screen
-         BufferedImage bimage = null;
-         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        try {
-            // Determine the type of transparency of the new buffered image
-            int transparency = Transparency.OPAQUE;
-           /* if (hasAlpha) {
-                 transparency = Transparency.BITMASK;
-             }*/
-    
-            // Create the buffered image
-             GraphicsDevice gs = ge.getDefaultScreenDevice();
-             GraphicsConfiguration gc = gs.getDefaultConfiguration();
-             bimage = gc.createCompatibleImage(
-                 image.getWidth(null), image.getHeight(null), transparency);
-         } catch (HeadlessException e) {
-            // The system does not have a screen
-         }
-    
-        if (bimage == null) {
-            // Create a buffered image using the default color model
-            int type = BufferedImage.TYPE_INT_RGB;
-            //int type = BufferedImage.TYPE_3BYTE_BGR;//by wang
-            /*if (hasAlpha) {
-                 type = BufferedImage.TYPE_INT_ARGB;
-             }*/
-             bimage = new BufferedImage(image.getWidth(null), image.getHeight(null), type);
-         }
-    
-        // Copy image to buffered image
-         Graphics g = bimage.createGraphics();
-    
-        // Paint the image onto the buffered image
-         g.drawImage(image, 0, 0, null);
-         g.dispose();
-    
-        return bimage;
-     }
-	
-	public static boolean exists(String filePath){
+		if (image instanceof BufferedImage) {
+			return (BufferedImage) image;
+		}
+
+		// This code ensures that all the pixels in the image are loaded
+		image = new ImageIcon(image).getImage();
+
+		// Determine if the image has transparent pixels; for this method's
+		// implementation, see e661 Determining If an Image Has Transparent
+		// Pixels
+		// boolean hasAlpha = hasAlpha(image);
+
+		// Create a buffered image with a format that's compatible with the
+		// screen
+		BufferedImage bimage = null;
+		GraphicsEnvironment ge = GraphicsEnvironment
+				.getLocalGraphicsEnvironment();
+		try {
+			// Determine the type of transparency of the new buffered image
+			int transparency = Transparency.OPAQUE;
+			/*
+			 * if (hasAlpha) { transparency = Transparency.BITMASK; }
+			 */
+
+			// Create the buffered image
+			GraphicsDevice gs = ge.getDefaultScreenDevice();
+			GraphicsConfiguration gc = gs.getDefaultConfiguration();
+			bimage = gc.createCompatibleImage(image.getWidth(null),
+					image.getHeight(null), transparency);
+		} catch (HeadlessException e) {
+			// The system does not have a screen
+		}
+
+		if (bimage == null) {
+			// Create a buffered image using the default color model
+			int type = BufferedImage.TYPE_INT_RGB;
+			// int type = BufferedImage.TYPE_3BYTE_BGR;//by wang
+			/*
+			 * if (hasAlpha) { type = BufferedImage.TYPE_INT_ARGB; }
+			 */
+			bimage = new BufferedImage(image.getWidth(null),
+					image.getHeight(null), type);
+		}
+
+		// Copy image to buffered image
+		Graphics g = bimage.createGraphics();
+
+		// Paint the image onto the buffered image
+		g.drawImage(image, 0, 0, null);
+		g.dispose();
+
+		return bimage;
+	}
+
+	public static boolean exists(String filePath) {
 		File dir = new File(CommonUtil.uriDecoding(filePath));
 		return dir.exists();
 	}
-	
+
 	/**
 	 * 返回某目录下所有文件对象
 	 * 
@@ -247,9 +264,11 @@ public class FileUtil {
 		String imageUrl = "http://static.zalora.sg/p/evie-0117-52557-1-zoom.jpg";
 		String format = "jpg";
 		int retryTimes = 5;
-		
-		BufferedImage im = FileUtil.getBufferedImage(imageUrl, retryTimes, 1*1000);
-		FileOutputStream os = new FileOutputStream(new File("d:/testxxxxxx.jpg"));
+
+		BufferedImage im = FileUtil.getBufferedImage(imageUrl, retryTimes,
+				1 * 1000);
+		FileOutputStream os = new FileOutputStream(
+				new File("d:/testxxxxxx.jpg"));
 		ImageIO.write(im, format, os);
 	}
 
@@ -259,39 +278,43 @@ public class FileUtil {
 	 * @return
 	 */
 	public static String getLib() {
-		return CommonUtil.uriDecoding(FileUtil.getParent(FileUtil.getTopClassPath(FileUtil.class), 1) + "lib");
+		return CommonUtil.uriDecoding(FileUtil.getParent(
+				FileUtil.getTopClassPath(FileUtil.class), 1)
+				+ "lib");
 	}
-	
-	public static String[] getChildrenPath(File parent){
+
+	public static String[] getChildrenPath(File parent) {
 		File[] files = parent.listFiles();
 		String[] result = new String[files.length];
 		for (int i = 0; i < files.length; i++)
 			result[i] = CommonUtil.uriDecoding(files[i].getAbsolutePath());
-		
+
 		return result;
 	}
-	
-	public static Collection<String> getJars(){
+
+	public static Collection<String> getJars() {
 		Collection<String> jars = new HashSet<String>();
 		Enumeration<URL> urls;
 		try {
-			urls = FileUtil.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
-			
+			urls = FileUtil.class.getClassLoader().getResources(
+					"META-INF/MANIFEST.MF");
+
 			while (urls.hasMoreElements()) {
-	            URL url = (URL) urls.nextElement();
-	            String path = url.getFile().replace("file:/", "").replace("!/META-INF/MANIFEST.MF", "");
-	            jars.add(CommonUtil.uriDecoding(path));
-	        }
-			File jarDir= new File(getLib());
-			if (jarDir.isDirectory() && jarDir.exists()){
-				for (File jar : jarDir.listFiles()){
+				URL url = (URL) urls.nextElement();
+				String path = url.getFile().replace("file:/", "")
+						.replace("!/META-INF/MANIFEST.MF", "");
+				jars.add(CommonUtil.uriDecoding(path));
+			}
+			File jarDir = new File(getLib());
+			if (jarDir.isDirectory() && jarDir.exists()) {
+				for (File jar : jarDir.listFiles()) {
 					jars.add(CommonUtil.uriDecoding(jar.getAbsolutePath()));
 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return jars;
 	}
 
@@ -345,7 +368,8 @@ public class FileUtil {
 	 * @return
 	 * @throws IOException
 	 */
-	public static boolean createFile(File file, boolean isDelete) throws IOException{
+	public static boolean createFile(File file, boolean isDelete)
+			throws IOException {
 		boolean flag = true;
 		if (file.exists()) {
 			if (isDelete) {
@@ -357,10 +381,10 @@ public class FileUtil {
 		} else {
 			file.createNewFile();
 		}
-		
+
 		return flag;
 	}
-	
+
 	/**
 	 * 
 	 * @param path
