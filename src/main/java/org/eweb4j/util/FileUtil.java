@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.URI;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -158,9 +159,17 @@ public class FileUtil {
 						return toBufferedImage(Toolkit.getDefaultToolkit().getImage(imagePath));
 					return ImageIO.read(new File(imagePath));
 				} catch (Throwable e) {
+					URL host = new URL(imagePath);
+					URI uri = new URI(
+						    host.getProtocol(), 
+						    host.getHost(), 
+						    host.getPath(),
+						    null);
+					URL url = uri.toURL();
+					
 					if (isPng)
-						return toBufferedImage(Toolkit.getDefaultToolkit().getImage(new URL(imagePath)));
-					return ImageIO.read(new URL(imagePath));
+						return toBufferedImage(Toolkit.getDefaultToolkit().getImage(url));
+					return ImageIO.read(url);
 				}
 			} catch (Throwable e) {
 				if (count >= retryTimes) {
@@ -261,7 +270,7 @@ public class FileUtil {
 	}
 
 	public static void main(String[] args) throws Exception {
-		String imageUrl = "http://static.zalora.sg/p/evie-0117-52557-1-zoom.jpg";
+		String imageUrl = "http://beautydeals.sg/components/com_enmasse/upload/438081254ladies_watch_main - copy.jpg";
 		String format = "jpg";
 		int retryTimes = 5;
 

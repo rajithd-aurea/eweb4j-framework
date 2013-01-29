@@ -1,15 +1,21 @@
 package org.eweb4j.util;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 public class PicUtil {
 	
 	public static void main(String[] args) throws Exception{
-		PicsModel model = getAttrs("http://gd.image-gmkt.com/mi/207/546/419546207.jpg");
+		String url = "http://beautydeals.sg/components/com_enmasse/upload/438081254ladies_watch_main - copy.jpg";
+		PicsModel model = getAttrs(url);
+		BufferedImage img = FileUtil.getBufferedImage(url, 3, 1*1000);
+		System.out.println(img.getWidth());
 		// "E://hekai//hk0001.jpg" 也是可以的
 		System.out.println("picextendname is:" + model.getExtName());
 		System.out.println("picwidth is:" + model.getWidth());
@@ -100,7 +106,13 @@ public class PicUtil {
 			File file = new File(fileName);
 			
 			if (!file.exists()){
-				URL url = new URL(fileName);
+				URL host = new URL(fileName);
+				URI uri = new URI(
+					    host.getProtocol(), 
+					    host.getHost(), 
+					    host.getPath(),
+					    null);
+				URL url = uri.toURL();
 				is = url.openStream();
 			}else{
 				is = new FileInputStream(fileName);
@@ -111,6 +123,8 @@ public class PicUtil {
 			return buf;
 		}catch (IOException e){
 			throw e;
+		} catch (URISyntaxException e) {
+			throw new IOException(e);
 		}finally{
 			if (is != null)
 				is.close();

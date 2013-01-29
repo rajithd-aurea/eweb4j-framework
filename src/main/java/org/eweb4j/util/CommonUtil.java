@@ -53,6 +53,16 @@ public class CommonUtil {
 		System.out.println(time);
 		System.out.println((""+time).substring(0, 10));
 		System.out.println(CommonUtil.formatTime(new Date(1359214513263l)));
+		
+		double min = 0.01;
+		double max = 0.99;
+		for (int i = 0; i < 20; i++){
+			System.out.println(CommonUtil.random(min, max).doubleValue());
+		}
+	}
+	
+	public static Number random(double min, double max){
+		return (min+(max-min)*Math.random());
 	}
 	
 	public static String cleanLF(String str) {
