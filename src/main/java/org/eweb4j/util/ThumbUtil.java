@@ -258,7 +258,7 @@ public class ThumbUtil {
 //		String remoteImageUrl = "http://www.malijuthemeshop.com/live_previews/mws-admin/example/scottwills_squirrel.jpg";
 //		String remoteImageUrl = "http://static.sg.groupon-content.net/88/75/1357633937588.png";
 //		String remoteImageUrl = "http://coupree.com/image/ke7VpHtYCBwg6rCF.png/301/174";
-		String remoteImageUrl = "http://i2.sinaimg.cn/qc/2010/0723/2010723114117.bmp";
+		String remoteImageUrl = "http://www.featcher.sg/deal_images/wall street cafe/web3.jpg";
 //		String remoteImageUrl = "http://shoppetreatz.com/wp-content/themes/DailyDeal/thumb.php?src=http://shoppetreatz.com/wp-content/uploads/2012/11/13541581271295634499.jpg&w=560&h=280&zc=1&q=80&bid=1";
 //		String remoteImageUrl = "http://gd.image-gmkt.com/mi/207/546/419546207.jpg";
 //		String remoteImageUrl = "http://test.shoplay.com/cache/bigpic/20121108/470/55c5b78e5c_w470.jpg";

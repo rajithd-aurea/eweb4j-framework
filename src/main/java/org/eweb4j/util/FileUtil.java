@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.net.URI;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -159,13 +158,9 @@ public class FileUtil {
 						return toBufferedImage(Toolkit.getDefaultToolkit().getImage(imagePath));
 					return ImageIO.read(new File(imagePath));
 				} catch (Throwable e) {
-					URL host = new URL(imagePath);
-					URI uri = new URI(
-						    host.getProtocol(), 
-						    host.getHost(), 
-						    host.getPath(),
-						    null);
-					URL url = uri.toURL();
+					URL url = new URL(imagePath.replace(" ","%20"));
+//					URI uri = new URI(host.getProtocol(),null,host.getHost(),host.getPort(),host.getPath(),host.getQuery(),null);
+//					URL url = uri.toURL();
 					
 					if (isPng)
 						return toBufferedImage(Toolkit.getDefaultToolkit().getImage(url));

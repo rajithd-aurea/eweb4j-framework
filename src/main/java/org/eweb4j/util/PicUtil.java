@@ -5,14 +5,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 public class PicUtil {
 	
 	public static void main(String[] args) throws Exception{
-		String url = "http://beautydeals.sg/components/com_enmasse/upload/438081254ladies_watch_main - copy.jpg";
+		String url = "http://www.featcher.sg/deal_images/wall street cafe/web3.jpg";
 		PicsModel model = getAttrs(url);
 		BufferedImage img = FileUtil.getBufferedImage(url, 3, 1*1000);
 		System.out.println(img.getWidth());
@@ -106,13 +104,9 @@ public class PicUtil {
 			File file = new File(fileName);
 			
 			if (!file.exists()){
-				URL host = new URL(fileName);
-				URI uri = new URI(
-					    host.getProtocol(), 
-					    host.getHost(), 
-					    host.getPath(),
-					    null);
-				URL url = uri.toURL();
+				URL url = new URL(fileName.replace(" ", "%20"));
+//				URI uri = new URI(host.getProtocol(),null,host.getHost(),host.getPort(),host.getPath(),host.getQuery(),null);
+//				URL url = uri.toURL();
 				is = url.openStream();
 			}else{
 				is = new FileInputStream(fileName);
@@ -123,8 +117,8 @@ public class PicUtil {
 			return buf;
 		}catch (IOException e){
 			throw e;
-		} catch (URISyntaxException e) {
-			throw new IOException(e);
+//		} catch (URISyntaxException e) {
+//			throw new IOException(e);
 		}finally{
 			if (is != null)
 				is.close();
