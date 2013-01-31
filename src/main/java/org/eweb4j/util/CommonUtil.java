@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -1233,14 +1234,19 @@ public class CommonUtil {
 	 * @功能 取得当前时间,给定格式
 	 * @return
 	 */
-	public static String getNowTime(String format) {
+	public static String getNowTime(String format, Locale loc) {
 		if (format == null) {
 			format = "yyyy-MM-dd HH:mm:ss";
 		}
 
-		String now = new java.text.SimpleDateFormat(format)
-				.format(java.util.Calendar.getInstance().getTime());
-		return now;
+		if (loc == null)
+			return new java.text.SimpleDateFormat(format).format(java.util.Calendar.getInstance().getTime());
+		
+		return new java.text.SimpleDateFormat(format, loc).format(java.util.Calendar.getInstance().getTime());
+	}
+	
+	public static String getNowTime(String format){
+		return getNowTime(format, null);
 	}
 
 	/**
