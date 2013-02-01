@@ -1,7 +1,11 @@
 package org.eweb4j.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.net.ProtocolCommandEvent;
 import org.apache.commons.net.ProtocolCommandListener;
@@ -102,22 +106,48 @@ public class FTPUtil implements ProtocolCommandListener{
 		return true;
 	}
 	
-	public static void main(String[] args) throws Exception{
-		FTPUtil ftp = new FTPUtil("shoplay.com", 21, "weiwei", "123456");
-		ftp.setListener(new FTPListener() {
-			public void onInfo(String info) {
-				System.out.println(info);
-			}
+	public static void main(String[] args){
+		FTPUtil ftp = new FTPUtil("sytime.com", 21, "wfl", "wufulin");
+		try {
 			
-			public void onError(String err, Exception e) {
-				e.printStackTrace();
-			}
-		});
+			ftp.client.setDataTimeout(10*60*1000);
+			ftp.client.setConnectTimeout(60*60*1000);
+			ftp.setDebug(true);
+			ftp.setListener(new FTPListener() {
+				public void onInfo(String info) {
+					System.out.println(info);
+				}
+				
+				public void onError(String err, Exception e) {
+					e.printStackTrace();
+				}
+			});
 		
-		ftp.setDebug(true);
-		ftp.connectAndLogin();
-		ftp.mkdir("/wwwroot/longyan-web/cache/bigpic/20121006/470/");
-		ftp.logoutAndDisconnect();
+			ftp.connectAndLogin();
+			ftp.client.setFileTransferMode(FTPClient.PASSIVE_REMOTE_DATA_CONNECTION_MODE);
+			
+			String root = "/wwwroot/longyan-web/";
+			String filePath = "cache/bigpic/20130131/600/today-s-deal-1-start-to-order-up-to-70-discount-excellent-bass-awei-es500i-headset-only-19-99-original-49-99_df88b985bf_w599h782.jpg";
+			String remoteFile = "http://www.sytime.com:8088/"+filePath;
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			ImageIO.write(ThumbUtil.generate(remoteFile, 0, 0.2f, 0, 0, "jpg", 2, 1*1000, 100, 100), "jpg", os);
+//			System.out.println("os--->"+os);
+			boolean isOk = ftp.client.storeFile(root+filePath, new ByteArrayInputStream(os.toByteArray()));
+			System.out.println("fuck-->"+isOk);
+			ftp.client.logout();
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally {
+			if (ftp != null && ftp.client != null) {
+				if (ftp.client.isConnected()) {
+					try {
+						ftp.client.disconnect();
+					} catch (Exception e){
+						e.printStackTrace();
+					}
+				}
+			}
+		}
 	}
 	
     public void protocolCommandSent(ProtocolCommandEvent ev) {
