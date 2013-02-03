@@ -196,6 +196,10 @@ public class UpdateSqlCreator<T> {
 	private Sql makeSQL(T t, String[] fields) throws SqlCreateException {
 		Sql sql = new Sql();
 		Class<?> clazz = t.getClass();
+		//if fields is empty
+		if (fields == null || fields.length == 0){
+			fields = ORMConfigBeanUtil.getFields(clazz);
+		}
 		String table = ORMConfigBeanUtil.getTable(clazz, false);
 		StringBuilder values = new StringBuilder();
 		ReflectUtil ru = new ReflectUtil(t);
