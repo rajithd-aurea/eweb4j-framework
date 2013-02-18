@@ -50,16 +50,17 @@ public class CommonUtil {
 		String source = "2013-01-17 11:00";
 		Date date = CommonUtil.parse("yyyy-MM-dd HH:mm", source);
 		System.out.println(String.valueOf(date.getTime()).substring(0, 10));
-		long time = System.currentTimeMillis() + 2797435 + CommonUtil.toSeconds("8h").longValue()*1000l;
+		
+		long time = System.currentTimeMillis() + CommonUtil.toSeconds("1d 18h 7m 42s").longValue()*1000l;
 		System.out.println(time);
 		System.out.println((""+time).substring(0, 10));
-		System.out.println(CommonUtil.formatTime(new Date(1359214513263l)));
+		System.out.println(CommonUtil.formatTime(new Date(time)));
 		
-		double min = 0.01;
-		double max = 0.99;
-		for (int i = 0; i < 20; i++){
-			System.out.println(CommonUtil.random(min, max).doubleValue());
-		}
+//		double min = 0.01;
+//		double max = 0.99;
+//		for (int i = 0; i < 20; i++){
+//			System.out.println(CommonUtil.random(min, max).doubleValue());
+//		}
 	}
 	
 	public static Number random(double min, double max){
@@ -384,6 +385,15 @@ public class CommonUtil {
 	}
 	
 	public static Float toSeconds(String strTime){
+		Float time = 0F;
+		for (String s : strTime.split(" ")){
+			time += _toSeconds(s);
+		}
+		
+		return time;
+	}
+	
+	private static Float _toSeconds(String strTime){
 		Float time = 0F;
 		if (strTime.endsWith("s")){
 			time = Float.parseFloat(strTime.replace("s", "")) * 1;
