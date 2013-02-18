@@ -51,7 +51,7 @@ public class CommonUtil {
 		Date date = CommonUtil.parse("yyyy-MM-dd HH:mm", source);
 		System.out.println(String.valueOf(date.getTime()).substring(0, 10));
 		
-		long time = System.currentTimeMillis() + CommonUtil.toSeconds("1d 18h 7m 42s").longValue()*1000l;
+		long time = System.currentTimeMillis() + CommonUtil.toSeconds("dh 7m 42s").longValue()*1000l;
 		System.out.println(time);
 		System.out.println((""+time).substring(0, 10));
 		System.out.println(CommonUtil.formatTime(new Date(time)));
@@ -395,16 +395,20 @@ public class CommonUtil {
 	
 	private static Float _toSeconds(String strTime){
 		Float time = 0F;
-		if (strTime.endsWith("s")){
-			time = Float.parseFloat(strTime.replace("s", "")) * 1;
-		}else if (strTime.endsWith("m")){
-			time = Float.parseFloat(strTime.replace("m", "")) * 60;
-		}else if (strTime.endsWith("h")){
-			time = Float.parseFloat(strTime.replace("h", "")) * 60 * 60;
-		}else if (strTime.endsWith("d")){
-			time = Float.parseFloat(strTime.replace("d", "")) * 60 * 60 * 24;
-		}else
-			time = Float.parseFloat(strTime);
+		try {
+			if (strTime.endsWith("s")){
+				time = Float.parseFloat(strTime.replace("s", "")) * 1;
+			}else if (strTime.endsWith("m")){
+				time = Float.parseFloat(strTime.replace("m", "")) * 60;
+			}else if (strTime.endsWith("h")){
+				time = Float.parseFloat(strTime.replace("h", "")) * 60 * 60;
+			}else if (strTime.endsWith("d")){
+				time = Float.parseFloat(strTime.replace("d", "")) * 60 * 60 * 24;
+			}else
+				time = Float.parseFloat(strTime);
+		} catch (Throwable e) {
+			
+		}
 		
 		return time;
 	}
