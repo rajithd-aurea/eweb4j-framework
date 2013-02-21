@@ -670,3 +670,4 @@ ioc.xml
              System.out.println(CommonUtil.calculateTime(CommonUtil.parse("2011-02-03 05:33:21").getTime()));
              693d 7h18m9s
 (13)improve: ORM的Entity增加对Date、Timestamp、Time、byte[]的数据类型支持
+(14)bug fix: 解决@ManyToOne、@OneToOne的referenceColumn不是id字段的relProperty错误问题，导致DAO.unfetch 设置了的pojo无法正确获得查询回来的外键值

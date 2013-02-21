@@ -244,10 +244,15 @@ public class PojoAnnotationConfig extends ScanPackage {
 						p.setColumn(f.getName() + "_id");
 					
 					String refCol = null;
-					if (joinColumn != null && joinColumn.referencedColumnName().trim().length() > 0)
+					if (joinColumn != null && joinColumn.referencedColumnName().trim().length() > 0){
 						refCol = joinColumn.referencedColumnName();
+						if (refCol != null && refCol.trim().length() > 0){
+							String relField = ORMConfigBeanUtil.getField(f.getType(), refCol);
+							if (relField != null && relField.trim().length() > 0)
+								p.setRelProperty(relField);
+						}
+					}
 					
-					p.setRelProperty(ORMConfigBeanUtil.getField(f.getType(), refCol));
 					p.setRelClass(f.getType());
 					p.setSize("20");
 				}

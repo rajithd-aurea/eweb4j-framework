@@ -10,6 +10,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.persistence.Column;
+import javax.persistence.JoinColumn;
+
 import org.eweb4j.cache.ORMConfigBeanCache;
 import org.eweb4j.orm.PropType;
 import org.eweb4j.orm.config.bean.ORMConfigBean;
@@ -341,7 +344,91 @@ public class ORMConfigBeanUtil {
 		List<String> list = new ArrayList<String>();
 
 		ORMConfigBean ormBean = ORMConfigBeanCache.get(clazz.getName());
-		if (ormBean != null) {
+		if (ormBean == null) {
+			try {
+				ReflectUtil ru = new ReflectUtil(clazz);
+				// String idColumn = getIdColumn(clazz);
+				for (int i = 0; i < strs.length; i++) {
+					boolean finished = false;
+					Field[] _fields = ru.getFields();
+					for (Field _f : _fields) {
+						String pName = _f.getName();
+						JoinColumn jc = _f.getAnnotation(JoinColumn.class);
+						Column c = _f.getAnnotation(Column.class);
+						String col = pName;
+						if (c != null && c.name().trim().length() > 0)
+							col = c.name();
+						
+						if (jc != null && jc.name().trim().length() > 0)
+							col = jc.name();
+						
+						if (finished)
+							break;
+						switch (type) {
+						case 1:
+							int dotIndex = strs[i].indexOf(".");
+							if (dotIndex > 0 && dotIndex < strs[i].length() -1){
+								String[] dots = strs[i].split("\\.");
+								StringBuilder builder = new StringBuilder();
+								Class<?> prevCls = null;
+								for (int j = 0; j < dots.length; j++){
+									String dot = dots[j];
+									Field field = ru.getField(dot);
+									if (field == null && dot.equals(clazz.getSimpleName().toLowerCase())){
+										if (builder.length() > 0)
+											builder.append(".");
+										builder.append(dot);
+										prevCls = clazz;
+									}else if(field != null){
+										if (j == dots.length-1){
+											if (builder.length() > 0)
+												builder.append(".");
+											builder.append(ORMConfigBeanUtil.getColumn(prevCls, dot));
+										}else{
+											Class<?> cls = ClassUtil.getGenericType(field);
+											if (cls != null){
+												if (ORMConfigBeanCache.get(cls.getName()) != null){
+													if (builder.length() > 0)
+														builder.append(".");
+													
+													builder.append(cls.getSimpleName().toLowerCase());
+													prevCls = cls;
+													ru = new ReflectUtil(cls);
+												}
+											}
+										}
+									}
+								}
+								
+								if (builder.length() > 0){
+									result[i] = builder.toString();
+									finished = true;
+									break;
+								}
+							}
+							if (pName.equals(strs[i])) {
+								result[i] = col;
+								finished = true;
+							}
+							break;
+						case 2:
+							if (col.equals(strs[i])) {
+								result[i] = pName;
+								finished = true;
+							}
+							break;
+						case 3:
+							list.add(col);
+							break;
+						case 4:
+							list.add(pName);
+						}
+					}
+				}
+			} catch (Throwable e) {
+				
+			}
+		}else {
 			try{
 				ReflectUtil ru = new ReflectUtil(clazz);
 				// String idColumn = getIdColumn(clazz);
