@@ -1,5 +1,6 @@
 package test.dao;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import junit.framework.Assert;
 
 import org.eweb4j.config.ConfigConstant;
 import org.eweb4j.config.EWeb4JConfig;
+import org.eweb4j.orm.Db;
 import org.eweb4j.orm.Models;
 import org.eweb4j.orm.config.ORMConfigBeanUtil;
 import org.eweb4j.orm.dao.DAO;
@@ -37,7 +39,24 @@ public class DAOTest {
 	
 	@Test
 	public void testJoin() throws Exception {
+		Collection<Pet> pets = 
+			Db.ar(Pet.class)
+				.dao()
+				.alias("p")
+				.join("master", "m")
+				.selectAll()
+				.where()
+					.field("p.id").moreEqual(3)
+					.enableExpress(true)
+					.and("p.master").equal("m.id")
+				.query();
 		
+		if (pets == null)
+			pets = new ArrayList<Pet>();
+		
+		for (Pet p : pets){
+			System.out.println(p);
+		}
 	}
 
 	/**
@@ -46,7 +65,6 @@ public class DAOTest {
 	 * @date 2013-1-16 上午11:11:14
 	 * @throws InterruptedException
 	 */
-	@Test
 	public void testInsert() throws InterruptedException{
 //		ExecutorService pool = Executors.newFixedThreadPool(5);
 //		for (int i = 0; i < 5; i++) {

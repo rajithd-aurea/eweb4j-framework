@@ -175,10 +175,9 @@ public class DAOImpl implements DAO {
 	}
 
 	public DAO notLike(Object value) {
-		this.condition.append(" NOT LIKE ? ");
-		
 		if (!this.express){
 //			condition.append("'").append(value).append("' ");
+			this.condition.append(" NOT LIKE ? ");
 			args.add(value);
 		}else{
 			Map<String, Object> map = handleFieldAlias(String.valueOf(value));
@@ -186,17 +185,17 @@ public class DAOImpl implements DAO {
 			Class<?> cls = (Class<?>)map.get("class");
 			
 //			condition.append(ORMConfigBeanUtil.getColumn(cls, _fieldName));
-			args.add(ORMConfigBeanUtil.getColumn(cls, _fieldName));
+			String col = ORMConfigBeanUtil.getColumn(cls, _fieldName);
+			this.condition.append(" NOT LIKE ").append(col).append(" ");
 		}
 		
 		return this;
 	}
 
 	public DAO notEqual(Object value) {
-		this.condition.append(" <> ? ");
-		
 		if (!this.express) {
 //			condition.append("'").append(value).append("' ");
+			this.condition.append(" <> ? ");
 			args.add(value);
 		}else{
 			Map<String, Object> map = handleFieldAlias(String.valueOf(value));
@@ -204,17 +203,17 @@ public class DAOImpl implements DAO {
 			Class<?> cls = (Class<?>)map.get("class");
 			
 //			condition.append(ORMConfigBeanUtil.getColumn(cls, _fieldName));
-			args.add(ORMConfigBeanUtil.getColumn(cls, _fieldName));
+			String col = ORMConfigBeanUtil.getColumn(cls, _fieldName);
+			this.condition.append(" <> ").append(col).append(" ");
 		}
 		
 		return this;
 	}
 
 	public DAO equal(Object value) {
-		this.condition.append(" = ? ");
-		
 		if (!this.express){
 //			condition.append("'").append(value).append("' ");
+			this.condition.append(" = ? ");
 			args.add(value);
 		}else{
 			Map<String, Object> map = handleFieldAlias(String.valueOf(value));
@@ -222,17 +221,17 @@ public class DAOImpl implements DAO {
 			Class<?> cls = (Class<?>)map.get("class");
 			
 //			condition.append(ORMConfigBeanUtil.getColumn(cls, _fieldName));
-			args.add(ORMConfigBeanUtil.getColumn(cls, _fieldName));
+			String col = ORMConfigBeanUtil.getColumn(cls, _fieldName);
+			this.condition.append(" = ").append(col).append(" ");
 		}
 		
 		return this;
 	}
 
 	public DAO moreThan(Object value) {
-		this.condition.append(" > ? ");
-		
 		if (!this.express){
 //			condition.append("'").append(value).append("' ");
+			this.condition.append(" > ? ");
 			args.add(value);
 		} else {
 			Map<String, Object> map = handleFieldAlias(String.valueOf(value));
@@ -240,17 +239,17 @@ public class DAOImpl implements DAO {
 			Class<?> cls = (Class<?>)map.get("class");
 			
 //			condition.append(ORMConfigBeanUtil.getColumn(cls, _fieldName));
-			args.add(ORMConfigBeanUtil.getColumn(cls, _fieldName));
+			String col = ORMConfigBeanUtil.getColumn(cls, _fieldName);
+			this.condition.append(" > ").append(col).append(" ");
 		}
 		
 		return this;
 	}
 	
 	public DAO moreEqual(Object value) {
-		this.condition.append(" >= ? ");
-		
 		if (!this.express){
 //			condition.append("'").append(value).append("' ");
+			this.condition.append(" >= ? ");
 			args.add(value);
 		}else {
 			Map<String, Object> map = handleFieldAlias(String.valueOf(value));
@@ -258,17 +257,17 @@ public class DAOImpl implements DAO {
 			Class<?> cls = (Class<?>)map.get("class");
 			
 //			condition.append(ORMConfigBeanUtil.getColumn(cls, _fieldName));
-			args.add(ORMConfigBeanUtil.getColumn(cls, _fieldName));
+			String col = ORMConfigBeanUtil.getColumn(cls, _fieldName);
+			this.condition.append(" >= ").append(col).append(" ");
 		}
 		
 		return this;
 	}
 
 	public DAO lessThan(Object value) {
-		this.condition.append(" < ? ");
-		
 		if (!this.express){
 //			condition.append("'").append(value).append("' ");
+			this.condition.append(" < ? ");
 			args.add(value);
 		}else {
 			Map<String, Object> map = handleFieldAlias(String.valueOf(value));
@@ -279,17 +278,17 @@ public class DAOImpl implements DAO {
 			Class<?> cls = (Class<?>)map.get("class");
 			
 //			condition.append(ORMConfigBeanUtil.getColumn(cls, _fieldName));
-			args.add(ORMConfigBeanUtil.getColumn(cls, _fieldName));
+			String col = ORMConfigBeanUtil.getColumn(cls, _fieldName);
+			this.condition.append(" < ").append(col).append(" ");
 		}
 		
 		return this;
 	}
 	
 	public DAO lessEqual(Object value) {
-		this.condition.append(" <= ? ");
-		
 		if (!this.express){
 //			condition.append("'").append(value).append("' ");
+			this.condition.append(" <= ? ");
 			args.add(value);
 		}else {
 			Map<String, Object> map = handleFieldAlias(String.valueOf(value));
@@ -300,7 +299,8 @@ public class DAOImpl implements DAO {
 			Class<?> cls = (Class<?>)map.get("class");
 
 //			condition.append(ORMConfigBeanUtil.getColumn(cls, _fieldName));
-			args.add(ORMConfigBeanUtil.getColumn(cls, _fieldName));
+			String col = ORMConfigBeanUtil.getColumn(cls, _fieldName);
+			this.condition.append(" <= ").append(col).append(" ");
 		}
 		
 		return this;
@@ -806,10 +806,9 @@ public class DAOImpl implements DAO {
 	}
 
 	public DAO likeLeft(Object value) {
-		this.condition.append(" LIKE ? ");
-		
 		if (!this.express) {
 //			condition.append("'").append(value).append("%' ");
+			this.condition.append(" LIKE ? ");
 			args.add(value+"%");
 		} else{
 			Map<String, Object> map = handleFieldAlias(String.valueOf(value));
@@ -817,17 +816,17 @@ public class DAOImpl implements DAO {
 			Class<?> cls = (Class<?>)map.get("class");
 			
 //			condition.append(ORMConfigBeanUtil.getColumn(cls, _fieldName));
-			args.add(ORMConfigBeanUtil.getColumn(cls, _fieldName));
+			String col = ORMConfigBeanUtil.getColumn(cls, _fieldName);
+			this.condition.append(" LIKE ").append(col).append(" ");
 		}
 		
 		return this;
 	}
 
 	public DAO likeRight(Object value) {
-		this.condition.append(" LIKE ? ");
-		
 		if (!this.express){
 //			condition.append("'%").append(value).append("' ");
+			this.condition.append(" LIKE ? ");
 			args.add("%"+value);
 		}else {
 			Map<String, Object> map = handleFieldAlias(String.valueOf(value));
@@ -835,17 +834,17 @@ public class DAOImpl implements DAO {
 			Class<?> cls = (Class<?>)map.get("class");
 			
 //			condition.append(ORMConfigBeanUtil.getColumn(cls, _fieldName));
-			args.add(ORMConfigBeanUtil.getColumn(cls, _fieldName));
+			String col = ORMConfigBeanUtil.getColumn(cls, _fieldName);
+			this.condition.append(" LIKE ").append(col).append(" ");
 		}
 		
 		return this;
 	}
 
 	public DAO like(Object value) {
-		this.condition.append(" LIKE ? ");
-		
 		if (!this.express){
 //			condition.append("'%").append(value).append("%' ");
+			this.condition.append(" LIKE ? ");
 			args.add("%" + value + "%");
 		}else {
 			Map<String, Object> map = handleFieldAlias(String.valueOf(value));
@@ -853,7 +852,8 @@ public class DAOImpl implements DAO {
 			Class<?> cls = (Class<?>)map.get("class");
 			
 //			condition.append(ORMConfigBeanUtil.getColumn(cls, _fieldName));
-			args.add(ORMConfigBeanUtil.getColumn(cls, _fieldName));
+			String col = ORMConfigBeanUtil.getColumn(cls, _fieldName);
+			this.condition.append(" LIKE ").append(col).append(" ");
 		}
 		
 		return this;
@@ -903,8 +903,8 @@ public class DAOImpl implements DAO {
 				Class<?> cls = (Class<?>)map.get("class");
 				
 //				sb.append(ORMConfigBeanUtil.getColumn(cls, _fieldName));
-				sb.append("?");
-				args.add(ORMConfigBeanUtil.getColumn(cls, _fieldName));
+				String col = ORMConfigBeanUtil.getColumn(cls, _fieldName);
+				sb.append(col);
 			}
 		}
 
@@ -936,8 +936,8 @@ public class DAOImpl implements DAO {
 				Class<?> cls = (Class<?>)map.get("class");
 				
 //				sb.append(ORMConfigBeanUtil.getColumn(cls, _fieldName));
-				sb.append("?");
-				args.add(ORMConfigBeanUtil.getColumn(cls, _fieldName));
+				String col = ORMConfigBeanUtil.getColumn(cls, _fieldName);
+				sb.append(col);
 			}
 		}
 
@@ -1170,10 +1170,9 @@ public class DAOImpl implements DAO {
 		if (value == null)
 			return this;
 		
-		this.condition.append(" LIKE ? ");
-		
 		if (!this.express){
 //			condition.append("'").append(value).append("' ");
+			this.condition.append(" LIKE ? ");
 			args.add(value);
 		}else {
 			Map<String, Object> map = handleFieldAlias(String.valueOf(value));
@@ -1181,7 +1180,8 @@ public class DAOImpl implements DAO {
 			Class<?> cls = (Class<?>)map.get("class");
 			
 //			condition.append(ORMConfigBeanUtil.getColumn(cls, _fieldName));
-			args.add(ORMConfigBeanUtil.getColumn(cls, _fieldName));
+			String col = ORMConfigBeanUtil.getColumn(cls, _fieldName);
+			this.condition.append(" LIKE ").append(col).append(" ");
 		}
 		
 		return this;
