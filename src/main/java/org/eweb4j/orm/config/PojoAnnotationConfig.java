@@ -243,6 +243,7 @@ public class PojoAnnotationConfig extends ScanPackage {
 					 else 
 						p.setColumn(f.getName() + "_id");
 					
+					p.setRelProperty(null);
 					String refCol = null;
 					if (joinColumn != null && joinColumn.referencedColumnName().trim().length() > 0){
 						refCol = joinColumn.referencedColumnName();
@@ -293,7 +294,7 @@ public class PojoAnnotationConfig extends ScanPackage {
 				if (!PropType.ONE_ONE.equals(type) && !PropType.MANY_ONE.equals(type))
 					continue;
 				
-				if (p.getRelProperty() != null)
+				if (p.getRelProperty() != null && p.getRelProperty().trim().length() > 0)
 					continue;
 				
 				if (clazz == null)
