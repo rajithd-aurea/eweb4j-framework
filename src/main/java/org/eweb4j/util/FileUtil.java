@@ -147,24 +147,28 @@ public class FileUtil {
 		int count = 0;
 		while (true) {
 			try {
-				PicsModel mod = PicUtil.getAttrs(imagePath);
-				boolean isPng = false;
-				if (mod != null && "PNG".equalsIgnoreCase(mod.getExtName())){
-					isPng = true;
-				}
+//				PicsModel mod = PicUtil.getAttrs(imagePath);
+//				boolean isPng = false;
+//				if (mod != null && "PNG".equalsIgnoreCase(mod.getExtName())){
+//					isPng = true;
+//				}
 				
 				try {
-					if (isPng)
+					try {
 						return toBufferedImage(Toolkit.getDefaultToolkit().getImage(imagePath));
-					return ImageIO.read(new File(imagePath));
+					} catch (Throwable e){
+						return ImageIO.read(new File(imagePath));
+					}
 				} catch (Throwable e) {
 					URL url = new URL(imagePath.replace(" ","%20"));
 //					URI uri = new URI(host.getProtocol(),null,host.getHost(),host.getPort(),host.getPath(),host.getQuery(),null);
 //					URL url = uri.toURL();
 					
-					if (isPng)
+					try {
 						return toBufferedImage(Toolkit.getDefaultToolkit().getImage(url));
-					return ImageIO.read(url);
+					}catch (Throwable e1){
+						return ImageIO.read(url);
+					}
 				}
 			} catch (Throwable e) {
 				if (count >= retryTimes) {
@@ -204,8 +208,7 @@ public class FileUtil {
 			// Create the buffered image
 			GraphicsDevice gs = ge.getDefaultScreenDevice();
 			GraphicsConfiguration gc = gs.getDefaultConfiguration();
-			bimage = gc.createCompatibleImage(image.getWidth(null),
-					image.getHeight(null), transparency);
+			bimage = gc.createCompatibleImage(image.getWidth(null), image.getHeight(null), transparency);
 		} catch (HeadlessException e) {
 			// The system does not have a screen
 		}
