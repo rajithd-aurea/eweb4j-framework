@@ -41,7 +41,7 @@ public class DeleteSqlCreator<T> {
 		if (this.ts != null && this.ts.length > 0) {
 			StringBuilder sb = new StringBuilder();
 			for (T t : this.ts) {
-				sb.append(this.makeSQL(t, condition));
+				sb.append(this.makeSQL(t, condition).sql);
 			}
 			sql.sql = sb.toString();
 		} else {

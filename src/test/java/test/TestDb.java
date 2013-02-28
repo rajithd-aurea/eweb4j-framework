@@ -30,6 +30,10 @@ public class TestDb {
 	}
 	
 	@Test
+	public void testDel() throws Exception{
+		Db.ar(Pet.class).delete("byMaster", 12);
+	}
+	
 	public void test() throws Exception{
 		String query = ORMConfigBeanUtil.parseQuery("master <= ? and user > ?", Pet.class);
 		System.out.println(query);
