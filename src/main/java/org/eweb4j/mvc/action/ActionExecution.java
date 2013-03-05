@@ -682,8 +682,15 @@ public class ActionExecution {
 			this.context.getWriter().flush();
 
 			return;
-		} else if (re.startsWith(RenderType.FORWARD + ":")) {
-			String location = re.substring((RenderType.FORWARD + ":").length());
+		} else if (re.startsWith(RenderType.FORWARD + ":") 
+				|| re.startsWith(RenderType.JSP + ":")
+				|| re.endsWith("."+RenderType.JSP)) {
+			String location = re;
+			if (re.startsWith(RenderType.FORWARD + ":"))
+				location = re.substring((RenderType.FORWARD + ":").length());
+			else if (re.startsWith(RenderType.JSP + ":"))
+				location = re.substring((RenderType.JSP + ":").length());
+			
 			HttpServletRequest request = this.context.getRequest();
 			request.setAttribute(MVCConfigConstant.REQ_PARAM_MAP_NAME, this.context.getQueryParamMap());
 
@@ -696,8 +703,15 @@ public class ActionExecution {
 			request.getRequestDispatcher(MVCConfigConstant.FORWARD_BASE_PATH + "/"+ location).forward(request, this.context.getResponse());
 
 			return;
-		} else if (re.startsWith(RenderType.FREEMARKER + ":")) {
-			String location = re.substring((RenderType.FREEMARKER + ":").length());
+		} else if (re.startsWith(RenderType.FREEMARKER + ":") 
+				|| re.startsWith(RenderType.FREEMARKER2 + ":")
+				|| re.endsWith("."+RenderType.FREEMARKER2)) {
+			String location = re;
+			if (re.startsWith(RenderType.FREEMARKER + ":"))
+				location = re.substring((RenderType.FREEMARKER + ":").length());
+			else if (re.startsWith(RenderType.FREEMARKER2 + ":"))
+				location = re.substring((RenderType.FREEMARKER2 + ":").length());
+			
 			Configuration cfg =  (Configuration) context.getServletContext().getAttribute("ftlConfig");
 			Template template = cfg.getTemplate(location);
 			template.setEncoding("UTF-8");
@@ -705,8 +719,14 @@ public class ActionExecution {
 			template.process(this.context.getModel(), this.context.getWriter());
 
 			return;
-		}else if (re.startsWith(RenderType.VELOCITY + ":")) {
-			String location = re.substring((RenderType.VELOCITY + ":").length());
+		}else if (re.startsWith(RenderType.VELOCITY + ":") 
+				|| re.startsWith(RenderType.VELOCITY2 + ":")
+				|| re.endsWith("."+RenderType.VELOCITY2)) {
+			String location = re;
+			if (re.startsWith(RenderType.VELOCITY + ":"))
+				location = re.substring((RenderType.VELOCITY + ":").length());
+			else if (re.startsWith(RenderType.VELOCITY2 + ":"))
+				location = re.substring((RenderType.VELOCITY2 + ":").length());
 			
 	        // Velocity获取模板文件，得到模板引用
 			VelocityEngine ve = (VelocityEngine) context.getServletContext().getAttribute("vmEngine");
