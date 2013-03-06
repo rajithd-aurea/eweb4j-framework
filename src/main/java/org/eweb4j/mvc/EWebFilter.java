@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.HttpMethod;
 
+import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
 import org.eweb4j.config.ConfigConstant;
 import org.eweb4j.config.EWeb4JConfig;
@@ -110,7 +111,7 @@ public class EWebFilter implements Filter, Servlet {
 			cfg.setDirectoryForTemplateLoading(new File(ConfigConstant.ROOT_PATH + MVCConfigConstant.FORWARD_BASE_PATH));
 			// 指定模板如何检索数据模型
 			cfg.setObjectWrapper(new DefaultObjectWrapper());
-			cfg.setDefaultEncoding("UTF-8");
+			cfg.setDefaultEncoding("GBK");
 			servletContext.setAttribute("ftlConfig", cfg);
 		}
 		
@@ -124,9 +125,12 @@ public class EWebFilter implements Filter, Servlet {
 	        p.setProperty("file.resource.loader.path", viewsDir.getAbsolutePath());
 	        p.setProperty("file.resource.loader.cache", "true");
 	        p.setProperty("file.resource.loader.modificationCheckInterval", "2");
-	        p.setProperty("input.encoding", "UTF-8");
-	        p.setProperty("output.encoding", "UTF-8");
-	        ve = new VelocityEngine(p);
+	        p.setProperty(Velocity.ENCODING_DEFAULT, "GBK");
+	        p.setProperty(Velocity.INPUT_ENCODING, "GBK");
+	        p.setProperty(Velocity.OUTPUT_ENCODING, "GBK");    
+	        ve = new VelocityEngine();
+	        ve.init(p);
+	        
 	        servletContext.setAttribute("vmEngine", ve);
 		}
 		

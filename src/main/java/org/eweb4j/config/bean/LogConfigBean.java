@@ -8,7 +8,7 @@ public class LogConfigBean {
 	@AttrTag
 	private String console = "1";
 	@AttrTag
-	private String level = "info";
+	private String level = "debug";
 	@AttrTag
 	private String file = "logs/logs.log";
 	@Skip

@@ -244,14 +244,6 @@ public class ThumbUtil {
     }
 
 	public static void main(String[] args) throws Exception {
-		//锐化次数
-		int sharpenTimes = 0;
-		
-		// 质量
-		float quality = 0.9f;
-		String outputFormat = "jpg";
-		String name = CommonUtil.getNowTime("yyyyMMddHHmmss");
-
 		// 原图，也可以是本地的d:/xx.jpg
 //		String remoteImageUrl = "http://gd.image-gmkt.com/mi/830/443/414443830.jpg";
 //		String remoteImageUrl = "http://www.shoplay.com/cache/bigpic/20121130/470/aaeed8a8dd_w470.jpg";
@@ -263,38 +255,32 @@ public class ThumbUtil {
 //		String remoteImageUrl = "http://bestbargain.com.sg/static/team/2012/1226/13564943221081.jpg";
 //		String remoteImageUrl = "http://bestbargain.com.sg/static/team/2012/1226/13564943221081.jpg";
 //		String remoteImageUrl = "d:/13588489445010.jpg";
-		String remoteImageUrl = "http://www.iconpng.com/png/bluegray-icons/file-png.png";
+//		String remoteImageUrl = "http://www.iconpng.com/png/bluegray-icons/file-png.png";
 //		String remoteImageUrl = "http://shoppetreatz.com/wp-content/themes/DailyDeal/thumb.php?src=http://shoppetreatz.com/wp-content/uploads/2012/11/13541581271295634499.jpg&w=560&h=280&zc=1&q=80&bid=1";
 //		String remoteImageUrl = "http://gd.image-gmkt.com/mi/207/546/419546207.jpg";
 //		String remoteImageUrl = "http://test.shoplay.com/cache/bigpic/20121108/470/55c5b78e5c_w470.jpg";
-		int outputWidth = 400;
-		int outputHeight = 0;
-
-		float contrast = 0f; // 对比度
-		float brightness = 0f; // 亮度 0 表示不调整
-
-		File file = new File("d:/" + name + "_w" + outputWidth + "h" + outputHeight + "_sharpen" + sharpenTimes 
-				+ "_contrat" + contrast + "_quality"+quality + "." + outputFormat);
 		
+		String remoteImageUrl = "d:/test3.jpg";
+		Thumbnails.of("d:/test3.jpg")
+			.size(192, 288)
+			.toFile("d:/test333333333.jpg");
+		
+		int sharpenTimes = 1;// 锐化次数
+		float quality = 1f;// 质量
+		String outputFormat = "jpg";// 输出格式
+		String name = CommonUtil.getNowTime("yyyyMMddHHmmss");
+		int outputWidth = 192;// 宽度
+		int outputHeight = 288;// 高度
+		float contrast = 1.1f; // 对比度
+		float brightness = 1f; // 亮度 0 表示不调整
+
+		File file = new File("d:/" + name + "_w" + outputWidth + "h" + outputHeight + "_sharpen" + sharpenTimes + "_contrat" + contrast + "_quality"+quality + "." + outputFormat);
 		BufferedImage image = ThumbUtil.generate(
 				remoteImageUrl, 
 				sharpenTimes,
 				quality, contrast, brightness, outputFormat, 10, // 远程图片下载失败重试次数
 				1 * 1000, // 失败后休眠时间
 				outputWidth, outputHeight);
-		
-//		int x1 = 55;
-//		int y1 = 90;
-//		int x2 = 173;
-//		int y2 = 215;
-//		
-//		BufferedImage image = 
-//			ThumbUtil
-//				.build(remoteImageUrl, sharpenTimes, contrast, brightness, x1, y1, x2, y2)
-//				.outputFormat(outputFormat)
-//				.asBufferedImage();
-		
-		System.out.println(image.getWidth()+ ", "+image.getHeight());
 		
 		boolean isOK = ImageIO.write(image, outputFormat, new FileOutputStream(file));
 		if (!isOK)

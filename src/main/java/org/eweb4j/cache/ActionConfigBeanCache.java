@@ -91,12 +91,12 @@ public final class ActionConfigBeanCache {
 				List<String> urlParamValues = new ArrayList<String>();
 				while (m.find()) {
 					String g = m.group();
-					// System.out.println("g->" + g);
+//					System.out.println("g->" + g + ", p->"+pattern + ", um->"+urlMapping);
 					String[] regexSplit = urlMapping.split(pattern);
-					String paramVal = UrlParamHandler.matchersUrlParam(uri,
-							regexSplit);
+//					System.out.println("list--->"+Arrays.asList(regexSplit));
+					String paramVal = UrlParamHandler.matchersUrlParam(uri, regexSplit);
 
-					// System.out.println("pV->" + paramVal);
+//					 System.out.println("pV->" + paramVal);
 					if (paramVal != null) {
 						urlParamValues.add(paramVal);
 						urlParamNames.add(g);

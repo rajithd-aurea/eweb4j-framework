@@ -761,6 +761,10 @@ public class CommonUtil {
 		return cal.getTime();
 	}
 
+	public static Date addDay(Date source, int day){
+		return addDate(source, day);
+	}
+	
 	public static Date addDate(Date source, int day) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(source);

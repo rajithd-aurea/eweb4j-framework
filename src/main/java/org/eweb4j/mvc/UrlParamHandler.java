@@ -21,7 +21,7 @@ public class UrlParamHandler {
 	public static String matchersUrlParam(String _url, String[] regexSplit) {
 		String url = new String(_url);
 		for (int i = 0; i < regexSplit.length + 1; i++) {
-//			System.out.println("url-->"+url);
+//			System.out.println("urlxxx-->"+url + " regex.length->"+regexSplit.length);
 			if (url.contains("@")) {
 //				System.out.println("con@url-->"+url);
 				int start = url.indexOf("@");
@@ -43,12 +43,11 @@ public class UrlParamHandler {
 			}
 
 			if (i < regexSplit.length){
-				
 				url = new String(url.replaceFirst(regexSplit[i], "@"));
 //				System.out.println("no@url.rep-->"+regexSplit[i]+"-->"+url);
 			}
 		}
 
-		return null;
+		return url;
 	}
 }

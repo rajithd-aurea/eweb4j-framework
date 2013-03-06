@@ -119,14 +119,17 @@ public class ActionExecution {
 	public boolean findAction() throws Exception {
 		// URL参数
 		Map<String, List<?>> pathParams = null;
-		if (ActionConfigBeanCache.containsKey(this.context.getUri())|| (pathParams = ActionConfigBeanCache.getByMatches(this.context.getUri(), this.context.getHttpMethod())) != null) {
+		if (ActionConfigBeanCache.containsKey(this.context.getUri()) 
+				|| (pathParams = ActionConfigBeanCache.getByMatches(this.context.getUri(), this.context.getHttpMethod())) != null) {
 
 			// 处理形如" /xxx/{id}/{name} "的URI
 			if (pathParams != null && pathParams.containsKey("mvcBean")) {
 				// 根据Url配置的UrlParam获取参数值
 				this.context.setActionConfigBean((ActionConfigBean) pathParams.get("mvcBean").get(0));
-
-				this.context.getPathParamMap().putAll(ParamUtil.getPathParamMap(pathParams));
+				Map<String, String[]> pathParamMap = ParamUtil.getPathParamMap(pathParams);
+//				System.out.println("pp->\n\t"+pathParamMap);
+				this.context.getPathParamMap().putAll(pathParamMap);
+//				System.out.println("pp222->\n\t"+this.context.getPathParamMap());
 				this.context.getQueryParamMap().putAll(this.context.getPathParamMap());
 			} else
 				this.context.setActionConfigBean(ActionConfigBeanCache.get(this.context.getUri()));
@@ -183,7 +186,7 @@ public class ActionExecution {
 
 	private void exeActionLog() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("execute action -> ").append(this.context.getActionConfigBean()).append("; ");
+		sb.append("execute action -> ").append(this.context.getUri() + " of " + this.context.getActionConfigBean()).append("; ");
 
 		log.debug(sb.toString());
 	}
@@ -552,7 +555,6 @@ public class ActionExecution {
 	private void handleResult() throws Exception {
 
 		this.exeActionLog();
-
 		if (retn == null)
 			return;
 		String baseUrl = (String) this.context.getServletContext().getAttribute(MVCConfigConstant.BASE_URL_KEY);

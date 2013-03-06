@@ -208,7 +208,7 @@ public class ActionAnnotationConfig extends ScanPackage {
 
 		String methodName = m.getName();
 		String fullName = m.toString();
-		log.debug("parse action.method --> " + fullName);
+//		log.debug("parse action.method --> " + fullName);
 
 		String uriMapping = null;
 		Path m_path = m.getAnnotation(Path.class);
