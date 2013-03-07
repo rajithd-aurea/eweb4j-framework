@@ -477,7 +477,6 @@ public class ActionExecution {
 		this.injectActionCxt2Pojo(ru);
 		// 注入mvc action 请求参数
 		ParamUtil.injectParam(this.context, ru, startName);
-
 		return paramObj;
 	}
 
@@ -1063,19 +1062,44 @@ public class ActionExecution {
 					String[] jss = this.context.getQueryParamMap().get("_json_data_");
 					if (jss != null) {
 						for (String json : jss){
-							@SuppressWarnings("unchecked")
-							Map<String, Object> map = CommonUtil.parse(json, Map.class);
+							Map<String, Object> map;
+							try {
+								map = CommonUtil.parse(json, Map.class);
+							}catch (Exception e){
+								e.printStackTrace();
+								break;
+							}
 							for (Iterator<Entry<String, Object>> it = map.entrySet().iterator(); it.hasNext(); ){
 								Entry<String, Object> e = it.next();
 								String key = e.getKey();
 								String val = String.valueOf(e.getValue());
-								List<String> vals = new ArrayList<String>();
-								String[] _vals = this.context.getQueryParamMap().get(key);
-								if (_vals != null){
-									vals.addAll(Arrays.asList(_vals));
+								//继续解析，如果解析成功说明是多级的json格式，最后将其平展开来
+								try {
+									Map<String, Object> subMap = CommonUtil.parse(val, Map.class);
+									for (Iterator<Entry<String, Object>> subIt = subMap.entrySet().iterator(); subIt.hasNext(); ){
+										Entry<String, Object> subE = subIt.next();
+										String subKey = subE.getKey();
+										String subVal = String.valueOf(subE.getValue());
+										String newKey = key+"."+subKey;
+										
+										try {
+											Map<String, Object> subSubMap = CommonUtil.parse(subVal, Map.class);
+											for (Iterator<Entry<String, Object>> subSubIt = subSubMap.entrySet().iterator(); subSubIt.hasNext(); ){
+												Entry<String, Object> subSubE = subSubIt.next();
+												String subSubKey = subSubE.getKey();
+												String subSubVal = String.valueOf(subSubE.getValue());
+												String newSubKey = newKey+"."+subSubKey;
+												
+												assemJsonData(newSubKey, subSubVal);
+											}
+										}catch (Exception ex2){
+											assemJsonData(newKey, subVal);
+										}
+										
+									}
+								}catch (Exception ex){
+									assemJsonData(key, val);
 								}
-								vals.add(val);
-								this.context.getQueryParamMap().put(key, vals.toArray(new String[]{}));
 							}
 						}
 					}
@@ -1145,5 +1169,15 @@ public class ActionExecution {
 			throw e;
 		}
 		
+	}
+
+	private void assemJsonData(String key, String val) {
+		List<String> vals = new ArrayList<String>();
+		String[] _vals = this.context.getQueryParamMap().get(key);
+		if (_vals != null){
+			vals.addAll(Arrays.asList(_vals));
+		}
+		vals.add(val);
+		this.context.getQueryParamMap().put(key, vals.toArray(new String[]{}));
 	}
 }
