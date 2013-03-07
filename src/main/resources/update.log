@@ -671,3 +671,8 @@ ioc.xml
              693d 7h18m9s
 (13)improve: ORM的Entity增加对Date、Timestamp、Time、byte[]的数据类型支持
 (14)bug fix: 解决@ManyToOne、@OneToOne的referenceColumn不是id字段的relProperty错误问题，导致DAO.unfetch 设置了的pojo无法正确获得查询回来的外键值
+(15)bug fix: 解决DAO.join的表达式开启之后，传入的参数会变成占位符?方式，修改回来字符串拼接方式
+(16)bug fix: 解决ThumbUtil生成的图片有红色图层问题
+(17)bug fix: 解决DAO的带where条件修改问题
+(18)bug fix: 解决MVC的URL Path参数只有一个并且整个url映射是/{xxx}这种方式的时候出现的无法正确解析参数问题
+(19)improve: 增加action返回值文件名后缀来决定模板引擎切换的特性，例如 return "index.vm" 是 velocity解析， "index.fm"是 freemarker解析 "index.jsp"是jsp解析 

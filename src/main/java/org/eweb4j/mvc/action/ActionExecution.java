@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -26,12 +27,14 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -355,28 +358,33 @@ public class ActionExecution {
 					params[i] = list.toArray(new UploadFile[]{});
 				}
 				
+				// 根据参数名称获取http对应的参数值
 				String defaultValue = null;
 				DefaultValue defaultValueAnn = this.getDefaultValueAnn(anns);
 				if (defaultValueAnn != null)defaultValue = defaultValueAnn.value();
 	
 				paramValue = this.getQueryParamValue(fieldName, defaultValue);
-	
+				
+				// 处理Date日期类型的参数
 				if (java.util.Date.class.isAssignableFrom(paramClass)) {
 					params[i] = this.getDateParam(anns, paramValue[0]);
 					continue;
 				}
 	
+				// 处理POJO类型的参数
 				String startName = fieldName;
 				if (ClassUtil.isPojo(paramClass)) {
 					params[i] = this.injectParam2Pojo(paramClass, startName);
 					continue;
 				}
 	
+				// 处理Map类型的参数
 				if (Map.class.isAssignableFrom(paramClass)) {
 					params[i] = this.injectParam2Map(startName);
 					continue;
 				}
 	
+				//处理数组类型的参数
 				if (paramClass.isArray())
 					params[i] = ClassUtil.getParamVals(paramClass, paramValue);
 				else
@@ -1037,20 +1045,6 @@ public class ActionExecution {
 
 		// IOC注入对象到pojo中
 		injectIocBean();
-
-		// 注入框架mvc action 上下文环境
-		this.injectActionCxt2Pojo(this.ru);
-		
-		if (IAction.class.isAssignableFrom(this.actionObject.getClass())) {
-			// struts2风格
-			IAction action = (IAction) actionObject;
-			action.init(this.context);
-			retn = action.execute();
-			// 对Action执行返回结果的处理
-			this.handleResult();
-			
-			return ;
-		}
 		
 		String methodName = this.context.getActionConfigBean().getMethod();
 		Method[] methods = ru.getMethods(methodName);
@@ -1060,6 +1054,48 @@ public class ActionExecution {
 		method = this.getFirstMethd(methods);
 		if (method == null)
 			return;
+		
+		Consumes cons = method.getAnnotation(Consumes.class);
+		if (cons != null && cons.value() != null) {
+			String[] cts = cons.value();
+			for (String ct : cts){
+				if ("json".equals(ct) || MediaType.APPLICATION_JSON.equals(ct)){
+					String[] jss = this.context.getQueryParamMap().get("_json_data_");
+					if (jss != null) {
+						for (String json : jss){
+							@SuppressWarnings("unchecked")
+							Map<String, Object> map = CommonUtil.parse(json, Map.class);
+							for (Iterator<Entry<String, Object>> it = map.entrySet().iterator(); it.hasNext(); ){
+								Entry<String, Object> e = it.next();
+								String key = e.getKey();
+								String val = String.valueOf(e.getValue());
+								List<String> vals = new ArrayList<String>();
+								String[] _vals = this.context.getQueryParamMap().get(key);
+								if (_vals != null){
+									vals.addAll(Arrays.asList(_vals));
+								}
+								vals.add(val);
+								this.context.getQueryParamMap().put(key, vals.toArray(new String[]{}));
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		// 注入框架mvc action 上下文环境
+		this.injectActionCxt2Pojo(this.ru);
+		
+//		if (IAction.class.isAssignableFrom(this.actionObject.getClass())) {
+//			// struts2风格
+//			IAction action = (IAction) actionObject;
+//			action.init(this.context);
+//			retn = action.execute();
+//			// 对Action执行返回结果的处理
+//			this.handleResult();
+//			
+//			return ;
+//		}
 		
 		// 执行验证器
 		this.handleValidator();

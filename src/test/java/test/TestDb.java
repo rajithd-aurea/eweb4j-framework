@@ -1,7 +1,8 @@
 package test;
 
+import java.sql.Timestamp;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Date;
 
 import org.eweb4j.config.EWeb4JConfig;
 import org.eweb4j.orm.Db;
@@ -29,7 +30,27 @@ public class TestDb {
 		}
 	}
 	
-	@Test
+	public void testInsert() throws Exception{
+		Pet pet = new Pet();
+		pet.setName("testName");
+		
+		Db.ar(pet).create();
+	}
+	
+	public void testShow() throws Exception{
+		
+		Pet db_pet = Pet.inst.find("name = ? and createAt > ?", "testName", Timestamp.valueOf("2013-03-06 14:30:10")).first();
+		
+		db_pet = Db.ar(Pet.class)
+					.dao()
+					.selectAll()
+					.where()
+						.field("name").equal("testName")
+						.and("createAt").moreThan(Timestamp.valueOf("2013-03-06 14:30:10"))
+					.queryOne();
+		System.out.println(CommonUtil.toJson(db_pet));
+	}
+	
 	public void testDel() throws Exception{
 		Db.ar(Pet.class).delete("byMaster", 12);
 	}

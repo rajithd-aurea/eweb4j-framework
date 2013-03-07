@@ -261,18 +261,14 @@ public class ThumbUtil {
 //		String remoteImageUrl = "http://test.shoplay.com/cache/bigpic/20121108/470/55c5b78e5c_w470.jpg";
 		
 		String remoteImageUrl = "d:/test3.jpg";
-		Thumbnails.of("d:/test3.jpg")
-			.size(192, 288)
-			.toFile("d:/test333333333.jpg");
-		
-		int sharpenTimes = 1;// 锐化次数
+		int sharpenTimes = 0;// 锐化次数
 		float quality = 1f;// 质量
 		String outputFormat = "jpg";// 输出格式
 		String name = CommonUtil.getNowTime("yyyyMMddHHmmss");
 		int outputWidth = 192;// 宽度
 		int outputHeight = 288;// 高度
-		float contrast = 1.1f; // 对比度
-		float brightness = 1f; // 亮度 0 表示不调整
+		float contrast = 0f; // 对比度
+		float brightness = 0f; // 亮度 0 表示不调整
 
 		File file = new File("d:/" + name + "_w" + outputWidth + "h" + outputHeight + "_sharpen" + sharpenTimes + "_contrat" + contrast + "_quality"+quality + "." + outputFormat);
 		BufferedImage image = ThumbUtil.generate(

@@ -47,7 +47,6 @@ public class CRUDTest {
 		Assert.assertEquals("i'm laiweiwei too", pet.getName());
 	}
 	
-	@Test
 	public void testSelect() throws Exception{
 		Pet pet = DAOFactory.getDAO(Pet.class)
 			.selectAll()

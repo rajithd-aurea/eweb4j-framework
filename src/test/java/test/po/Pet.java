@@ -35,7 +35,8 @@ public class Pet extends Model<Pet> {
 	private String name;
 
 	private int age;
-
+	
+	
 	@Column(name = "cate")
 	private String type;// 只能添加猫和狗两种类型
 
