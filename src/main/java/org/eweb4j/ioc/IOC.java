@@ -34,7 +34,7 @@ public class IOC {
 	 * @param beanID
 	 * @return
 	 */
-	public static boolean containsBean(String beanID) {
+	public synchronized static boolean containsBean(String beanID) {
 		return IOCConfigBeanCache.containsKey(beanID);
 	}
 
@@ -45,7 +45,7 @@ public class IOC {
 	 * @return
 	 * @throws Exception
 	 */
-	public Class<?> getType(String beanID) throws Exception {
+	public synchronized static Class<?> getType(String beanID) throws Exception {
 		return IOCConfigBeanCache.get(beanID).getClass();
 	}
 
@@ -56,7 +56,7 @@ public class IOC {
 	 * @return
 	 * @throws Exception
 	 */
-	public boolean isPrototype(String beanID) throws Exception {
+	public synchronized static boolean isPrototype(String beanID) throws Exception {
 		return IOCConfigConstant.PROTOTYPE_SCOPE.equals(IOCConfigBeanCache.get(
 				beanID).getScope());
 	}
@@ -68,7 +68,7 @@ public class IOC {
 	 * @return
 	 * @throws Exception
 	 */
-	public boolean isSingleton(String beanID) throws Exception {
+	public synchronized static boolean isSingleton(String beanID) throws Exception {
 		return IOCConfigConstant.SINGLETON_SCOPE.equals(IOCConfigBeanCache.get(
 				beanID).getScope());
 	}
@@ -81,7 +81,7 @@ public class IOC {
 	 * @return
 	 * @throws Exception
 	 */
-	public boolean isTypeMatch(String beanID, Class<?> targetType)
+	public synchronized static boolean isTypeMatch(String beanID, Class<?> targetType)
 			throws Exception {
 		return targetType.equals(IOCConfigBeanCache.get(beanID).getClass());
 	}
@@ -94,14 +94,14 @@ public class IOC {
 	 * @return
 	 * @throws Exception
 	 */
-	public static <T> T getBean(String beanID) {
+	public synchronized static <T> T getBean(String beanID) {
 		if (!containsBean(beanID)) {
 			return null;
 		}
 		// 声明用来返回的对象
 		T t = null;
 		try {
-			// 声明构造方法参数列表的初始化值
+			// 声明构造方法参数列表的初始化值 
 			Object[] initargs = null;
 			// 声明构造方法参数列表
 			Class<?>[] args = null;
