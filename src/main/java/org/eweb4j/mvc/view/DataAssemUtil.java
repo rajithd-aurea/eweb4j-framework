@@ -3,7 +3,7 @@ package org.eweb4j.mvc.view;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 
 import org.eweb4j.orm.config.ORMConfigBeanUtil;
@@ -26,8 +26,7 @@ public class DataAssemUtil {
 			return assemHead(listPage, null, prop);
 	}
 
-	public static <T> ListPage assemHead(ListPage listPage, List<T> pojos,
-			Map<String, String> prop) throws Exception {
+	public static <T> ListPage assemHead(ListPage listPage, Collection<T> pojos, Map<String, String> prop) throws Exception {
 		if (listPage == null || pojos == null || prop == null)
 			return listPage;
 

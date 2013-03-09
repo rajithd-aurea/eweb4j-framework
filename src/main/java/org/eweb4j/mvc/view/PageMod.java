@@ -1,21 +1,21 @@
 package org.eweb4j.mvc.view;
 
-import java.util.List;
+import java.util.Collection;
 
 public class PageMod<T> {
-	private List<T> pojos;
+	private Collection<T> pojos;
 	private long allCount;
 
-	public PageMod(List<T> pojos, long allCount) {
+	public PageMod(Collection<T> pojos, long allCount) {
 		this.pojos = pojos;
 		this.allCount = allCount;
 	}
 
-	public List<T> getPojos() {
+	public Collection<T> getPojos() {
 		return pojos;
 	}
 
-	public void setPojos(List<T> pojos) {
+	public void setPojos(Collection<T> pojos) {
 		this.pojos = pojos;
 	}
 

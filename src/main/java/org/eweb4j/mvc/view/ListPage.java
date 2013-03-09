@@ -1,9 +1,8 @@
 package org.eweb4j.mvc.view;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-
-
 
 /**
  * 列表页视图数据对象
@@ -14,21 +13,19 @@ import java.util.List;
 public class ListPage {
 	private String model;
 	private SearchForm searchForm;
-	private List<?> pojos;
+	private Collection<?> pojos;
 	private DivPageComp dpc;
-	private List<THeadCell> thead = new ArrayList<THeadCell>();
-	private List<TRData> trdatas = new ArrayList<TRData>();
+	private Collection<THeadCell> thead = new ArrayList<THeadCell>();
+	private Collection<TRData> trdatas = new ArrayList<TRData>();
 
-	public ListPage(String model, SearchForm searchForm, List<?> pojos,
-			DivPageComp dpc) {
+	public ListPage(String model, SearchForm searchForm, Collection<?> pojos, DivPageComp dpc) {
 		this.model = model;
 		this.searchForm = searchForm;
 		this.pojos = pojos;
 		this.dpc = dpc;
 	}
 
-	public ListPage(String model, SearchForm searchForm, DivPageComp dpc,
-			List<THeadCell> thead, List<TRData> trdatas) {
+	public ListPage(String model, SearchForm searchForm, DivPageComp dpc, Collection<THeadCell> thead, Collection<TRData> trdatas) {
 		this.model = model;
 		this.searchForm = searchForm;
 		this.thead = thead;
@@ -52,11 +49,11 @@ public class ListPage {
 		this.searchForm = searchForm;
 	}
 
-	public List<?> getPojos() {
+	public Collection<?> getPojos() {
 		return pojos;
 	}
 
-	public void setPojos(List<?> pojos) {
+	public void setPojos(Collection<?> pojos) {
 		this.pojos = pojos;
 	}
 
@@ -68,15 +65,15 @@ public class ListPage {
 		this.dpc = dpc;
 	}
 
-	public List<THeadCell> getThead() {
+	public Collection<THeadCell> getThead() {
 		return thead;
 	}
 
-	public void setThead(List<THeadCell> thead) {
+	public void setThead(Collection<THeadCell> thead) {
 		this.thead = thead;
 	}
 
-	public List<TRData> getTrdatas() {
+	public Collection<TRData> getTrdatas() {
 		return trdatas;
 	}
 
