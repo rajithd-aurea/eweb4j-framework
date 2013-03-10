@@ -1,7 +1,6 @@
 package test;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.eweb4j.cache.ActionConfigBeanCache;
 import org.eweb4j.config.EWeb4JConfig;
@@ -59,7 +58,7 @@ public class UserControl {
 		user.cascade().refresh(222, "master");
 		user.cascade().remove("master");
 		
-		List<User> users = User.inst.findAll();
+		Collection<User> users = User.inst.findAll();
 		/* 分页 */
 		Collection<User> page = User.inst.find().fetch(10);
 		page = User.inst.find().fetch(2, 5);

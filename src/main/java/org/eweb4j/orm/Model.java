@@ -1,6 +1,6 @@
 package org.eweb4j.orm;
 
-import java.util.List;
+import java.util.Collection;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -70,7 +70,7 @@ public class Model<T>{
 		return this.helper.find(query, params);
 	}
 
-	public List<T> findAll() {
+	public Collection<T> findAll() {
 		return this.helper.findAll();
 	}
 

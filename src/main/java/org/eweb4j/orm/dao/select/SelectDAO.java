@@ -171,8 +171,7 @@ public interface SelectDAO {
 	 * @return
 	 * @throws DAOException
 	 */
-	public <T> long selectCount(Class<T> clazz, String condition,
-			Object... args) throws DAOException;
+	public <T> long selectCount(Class<T> clazz, String condition, Object... args) throws DAOException;
 
 	/**
 	 * <b>自定义条件查询</b> <code>

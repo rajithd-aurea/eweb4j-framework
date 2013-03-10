@@ -81,8 +81,7 @@ public class SelectSqlCreator<T> {
 		if (condition == null) {
 			return String.format("SELECT COUNT(*) FROM %s ;", table);
 		}
-		return String.format("SELECT COUNT(*) FROM %s WHERE %s ;", table,
-				condition);
+		return String.format("SELECT COUNT(*) FROM %s WHERE %s ;", table, condition);
 	}
 
 	/**

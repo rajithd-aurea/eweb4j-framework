@@ -1,7 +1,7 @@
 package org.eweb4j.orm;
 
 import java.lang.reflect.Method;
-import java.util.List;
+import java.util.Collection;
 
 import org.eweb4j.orm.annotation.Ignore;
 import org.eweb4j.orm.config.ORMConfigBeanUtil;
@@ -149,8 +149,8 @@ public class ModelHelper<T> implements IModel<T>{
 		return _query;
 	}
 
-	public List<T> findAll() {
-		return (List<T>) find().fetch();
+	public Collection<T> findAll() {
+		return find().fetch();
 	}
 
 	public long count() {

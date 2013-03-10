@@ -22,6 +22,7 @@ import test.po.Pet;
  * @date 2013-1-22 下午04:02:15
  */
 public class TestDb {
+	
 	@BeforeClass
 	public static void prepare() throws Exception {
 		String err = EWeb4JConfig.start("start.eweb.xml");
@@ -69,6 +70,19 @@ public class TestDb {
 		System.out.println(m);
 	}
 	
+	@Test
+	public void testBatchDelete() throws Exception{
+		Pet p1 = new Pet();
+		p1.setPetId(31L);
+		Pet p2 = new Pet();
+		p2.setPetId(32L);
+		Pet p3 = new Pet();
+		p3.setPetId(33L);
+		
+		Number[] rs = Db.batchDelete(new Pet[]{p1, p2, p3});
+		System.out.println(Arrays.asList(rs));
+	}
+	
 	public void testBatchInsert() throws Exception {
 		Pet p1 = new Pet();
 		p1.setName("pet_1");
@@ -99,7 +113,7 @@ public class TestDb {
 		p4.setPetId(17);
 		p4.setName("name up 44");
 		
-		Number[] rs = DAOFactory.getUpdateDAO().batchUpdate(new Pet[]{p1, p2, p3, p4}, "name");
+		Number[] rs = Db.batchUpdate(new Pet[]{p1, p2, p3, p4}, "name");
 		System.out.println(Arrays.asList(rs));
 	}
 }

@@ -1,6 +1,8 @@
 package org.eweb4j.orm.dao.delete;
 
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -34,14 +36,17 @@ public class DeleteDAOImpl implements DeleteDAO {
 		ids = new Number[ts.length];
 		try {
 			con = ds.getConnection();
-			for (int i = 0; i < ts.length; i++) {
-				Sql[] sqls = SqlFactory.getDeleteSql(new Object[] { ts[i] }).delete();
-				if (sqls == null)
-					ids[i] = -1;
-				else {
-					ids[i] = JdbcUtil.updateWithArgs(con, sqls[i].sql, sqls[i].args.toArray());
-				}
+			Sql[] sqls = SqlFactory.getDeleteSql(ts).delete();
+			List<Object[]> argList = new ArrayList<Object[]>(ts.length);
+			for (Sql sql : sqls){
+				argList.add(sql.args.toArray());
 			}
+			Object[][] args = new Object[argList.size()][];
+			for (int i = 0; i < argList.size(); i++){
+				args[i] = argList.get(i);
+			}
+			
+			ids = JdbcUtil.batchUpdateWithArgs(con, sqls[0].sql, args);
 		} catch (Exception e) {
 			throw new DAOException("", e);
 		}
@@ -54,8 +59,7 @@ public class DeleteDAOImpl implements DeleteDAO {
 		return rs == null ? 0 : rs[0];
 	}
 
-	public <T> Number[] deleteByFieldIsValue(Class<T>[] clazz, String[] fields,
-			String[] values) throws DAOException {
+	public <T> Number[] deleteByFieldIsValue(Class<T>[] clazz, String[] fields, String[] values) throws DAOException {
 		Number[] ids = null;
 		Connection con = null;
 		if (clazz == null || clazz.length == 0)
@@ -69,14 +73,17 @@ public class DeleteDAOImpl implements DeleteDAO {
 				ts[i] = clazz[i].newInstance();
 			}
 
-			for (int i = 0; i < ts.length; i++) {
-				Sql[] sqls = SqlFactory.getDeleteSql(ts[i]).delete(fields,values);
-				if (sqls == null)
-					ids[i] = -1;
-				else {
-					ids[i] = JdbcUtil.updateWithArgs(con, sqls[i].sql, sqls[i].args.toArray());
-				}
+			Sql[] sqls = SqlFactory.getDeleteSql(ts).delete(fields,values);
+			List<Object[]> argList = new ArrayList<Object[]>(ts.length);
+			for (Sql sql : sqls){
+				argList.add(sql.args.toArray());
 			}
+			Object[][] args = new Object[argList.size()][];
+			for (int i = 0; i < argList.size(); i++){
+				args[i] = argList.get(i);
+			}
+			
+			ids = JdbcUtil.batchUpdateWithArgs(con, sqls[0].sql, args);
 		} catch (Exception e) {
 			throw new DAOException("", e);
 		}
@@ -84,10 +91,8 @@ public class DeleteDAOImpl implements DeleteDAO {
 		return ids;
 	}
 
-	public <T> Number[] deleteByFieldIsValue(Class<T>[] clazz, String field,
-			String value) throws DAOException {
-		return this.deleteByFieldIsValue(clazz, new String[] { field },
-				new String[] { value });
+	public <T> Number[] deleteByFieldIsValue(Class<T>[] clazz, String field, String value) throws DAOException {
+		return this.deleteByFieldIsValue(clazz, new String[] { field }, new String[] { value });
 	}
 
 	public <T> Number deleteByFields(T t, String[] fields) throws DAOException {
@@ -105,8 +110,7 @@ public class DeleteDAOImpl implements DeleteDAO {
 		return id;
 	}
 
-	public <T> Number deleteByFieldIsValue(Class<T> clazz, String[] fields,
-			String[] values) throws DAOException {
+	public <T> Number deleteByFieldIsValue(Class<T> clazz, String[] fields, String[] values) throws DAOException {
 		Number id = 0;
 		if (clazz != null && fields != null && values != null
 				&& fields.length == values.length) {

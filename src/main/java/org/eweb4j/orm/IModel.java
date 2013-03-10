@@ -1,6 +1,6 @@
 package org.eweb4j.orm;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.eweb4j.orm.dao.DAO;
 
@@ -34,12 +34,12 @@ public interface IModel<T> {
 
 	public Query find(String query, Object... params) ;
 
-	public List<T> findAll() ;
+	public Collection<T> findAll() ;
 
 	public long count() ;
 
 	public long count(String query, Object... params) ;
 	
-	public Cascade cascade() ;
+	public Cascade<T> cascade() ;
 
 }

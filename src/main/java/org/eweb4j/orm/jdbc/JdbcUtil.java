@@ -248,8 +248,7 @@ public class JdbcUtil {
 	 * @throws JdbcUtilException
 	 */
 	public static Number updateWithArgs(Connection con, String sql,Object[] args) throws JdbcUtilException {
-		Number[] res = updateWithArgs(con, new String[] { sql },
-				new Object[][] { args });
+		Number[] res = updateWithArgs(con, new String[] { sql }, new Object[][] { args });
 		return res == null ? 0 : res[0];
 	}
 
