@@ -17,12 +17,20 @@ public class Db {
 		return DAOFactory.getDeleteDAO(dsName).batchDelete(ts);
 	}
 	
+	public static <T> Number[] batchUpdate(T[] ts){
+		return batchUpdate(ts, null);
+	}
+	
 	public static <T> Number[] batchUpdate(T[] ts, String[] fields){
 		return DAOFactory.getUpdateDAO().batchUpdate(ts, fields);
 	}
 	
 	public static <T> Number[] batchUpdate(T[] ts, String dsName, String... fields){
 		return DAOFactory.getUpdateDAO(dsName).batchUpdate(ts, fields);
+	}
+	
+	public static <T> Number[] batchInsert(T[] ts){
+		return batchInsert(ts, null);
 	}
 	
 	public static <T> Number[] batchInsert(T[] ts, String[] fields){

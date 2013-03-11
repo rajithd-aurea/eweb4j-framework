@@ -82,13 +82,11 @@ public class ActionAnnotationConfig extends ScanPackage {
 
 			} catch (Error er) {
 				// er.printStackTrace();
-				log.debug("the action class new instance failued -> " + clsName
-						+ " | " + er.toString());
+				log.debug("the action class new instance failued -> " + clsName + " | " + er.toString());
 				return false;
 			} catch (Exception e) {
 				// e.printStackTrace();
-				log.warn("the action class new instance failued -> " + clsName
-						+ " | " + e.toString());
+				log.warn("the action class new instance failued -> " + clsName + " | " + e.toString());
 				return false;
 			}
 
