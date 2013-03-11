@@ -71,17 +71,20 @@ public class CommonUtil {
 		return str.replace("\n", "");
 	}
 	
-	public static Double addDouble(Double d1, Double d2) {
-		return d1+d2;
+	public static Double addDouble(Object d1, Object d2) {
+		return toDouble(String.valueOf(d1))+toDouble(String.valueOf(d2));
 	}
-	public static Float addFloat(Float d1, Float d2) {
-		return d1+d2;
+	
+	public static Float addFloat(Object d1, Object d2) {
+		return toFloat(String.valueOf(d1))+toFloat(String.valueOf(d2));
 	}
-	public static Integer addInteger(Integer d1, Integer d2) {
-		return d1+d2;
+	
+	public static Integer addInteger(Object d1, Object d2) {
+		return toInt(String.valueOf(d1))+toInt(String.valueOf(d2));
 	}
-	public static Long addLong(Long d1, Long d2) {
-		return d1+d2;
+	
+	public static Long addLong(Object d1, Object d2) {
+		return toLong(String.valueOf(d1))+toLong(String.valueOf(d2));
 	}
 	
 	public static Integer toInt(String str) {

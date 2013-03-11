@@ -1,0 +1,34 @@
+<!-- eweb4j -->
+<filter>
+	<filter-name>EWebFilter</filter-name>
+	<filter-class>org.eweb4j.mvc.EWebFilter</filter-class>
+	<init-param>
+		<param-name>StartFileName</param-name>
+		<param-value>start.xml</param-value>
+	</init-param>
+	<init-param>
+		<param-name>CheckStartFileExist</param-name>
+		<param-value>false</param-value>
+	</init-param>
+	<init-param>
+		<param-name>ConfigBasePath</param-name>
+		<param-value>${RootPath}/WEB-INF/classes/</param-value>
+	</init-param>
+	<init-param>
+		<param-name>BaseURLKey</param-name>
+		<param-value>BaseURL</param-value>
+	</init-param>
+	<init-param>
+		<param-name>ReqParamMapKey</param-name>
+		<param-value>ReqParamMap</param-value>
+	</init-param>
+	<init-param>
+		<param-name>ForwardBasePath</param-name>
+		<param-value>/</param-value>
+	</init-param>
+</filter>
+<filter-mapping>
+	<filter-name>EWebFilter</filter-name>
+	<url-pattern>/*</url-pattern>
+</filter-mapping>
+<!-- eweb4j -->
