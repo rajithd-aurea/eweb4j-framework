@@ -1246,7 +1246,7 @@ public class CommonUtil {
 		String s4 = s3.replace("&gt;", ">"); // 转换字符串中的">"符号
 		String s5 = s4.replace("<br />", "\t\n"); // 转换字符串中的回车换行
 		String s6 = s5.replace("&quot;", "\""); // 转换字符串中的"\""符号
-		String s7 = s5.replace("&apos;", "'"); // 转换字符串中的"'"符号
+		String s7 = s6.replace("&apos;", "'"); // 转换字符串中的"'"符号
 
 		return s7;
 	}
