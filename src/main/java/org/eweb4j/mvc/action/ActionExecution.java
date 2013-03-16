@@ -19,7 +19,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -36,15 +35,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
 import org.eweb4j.cache.ActionConfigBeanCache;
 import org.eweb4j.cache.SingleBeanCache;
 import org.eweb4j.config.ConfigConstant;
 import org.eweb4j.config.Log;
 import org.eweb4j.config.LogFactory;
 import org.eweb4j.ioc.IOC;
-import org.eweb4j.mvc.ActionMethod;
 import org.eweb4j.mvc.Context;
 import org.eweb4j.mvc.MIMEType;
 import org.eweb4j.mvc.ParamUtil;
@@ -62,6 +58,8 @@ import org.eweb4j.mvc.upload.UploadFile;
 import org.eweb4j.mvc.validator.ValidateExecution;
 import org.eweb4j.mvc.validator.annotation.DateFormat;
 import org.eweb4j.mvc.validator.annotation.Upload;
+import org.eweb4j.mvc.view.RenderFactory;
+import org.eweb4j.mvc.view.Renderer;
 import org.eweb4j.orm.dao.DAO;
 import org.eweb4j.orm.dao.DAOFactory;
 import org.eweb4j.orm.dao.DAOImpl;
@@ -709,45 +707,49 @@ public class ActionExecution {
 			}
 
 			// 服务端跳转
-			request.getRequestDispatcher(MVCConfigConstant.FORWARD_BASE_PATH + "/"+ location).forward(request, this.context.getResponse());
+			request
+				.getRequestDispatcher(MVCConfigConstant.FORWARD_BASE_PATH + "/"+ location)
+				.forward(request, this.context.getResponse());
 
 			return;
 		} else if (re.startsWith(RenderType.FREEMARKER + ":") 
 				|| re.startsWith(RenderType.FREEMARKER2 + ":")
 				|| re.endsWith("."+RenderType.FREEMARKER2)) {
+			String[] str = re.split("@");
+			re = str[0];
 			String location = re;
 			if (re.startsWith(RenderType.FREEMARKER + ":"))
 				location = re.substring((RenderType.FREEMARKER + ":").length());
 			else if (re.startsWith(RenderType.FREEMARKER2 + ":"))
 				location = re.substring((RenderType.FREEMARKER2 + ":").length());
 			
-			Configuration cfg =  (Configuration) context.getServletContext().getAttribute("ftlConfig");
-			Template template = cfg.getTemplate(location);
-			template.setEncoding("UTF-8");
-
-			template.process(this.context.getModel(), this.context.getWriter());
-
+			//渲染Freemarker
+	        Renderer render = RenderFactory.create(RenderType.FREEMARKER).target(location);
+	        if (str.length > 1)
+	        	render.layout(str[1]);
+	        
+	        render.render(context.getWriter(), context.getModel());
+			
+	        this.context.getWriter().flush();
 			return;
 		}else if (re.startsWith(RenderType.VELOCITY + ":") 
 				|| re.startsWith(RenderType.VELOCITY2 + ":")
 				|| re.endsWith("."+RenderType.VELOCITY2)) {
+			String[] str = re.split("@");
+			re = str[0];
 			String location = re;
 			if (re.startsWith(RenderType.VELOCITY + ":"))
 				location = re.substring((RenderType.VELOCITY + ":").length());
 			else if (re.startsWith(RenderType.VELOCITY2 + ":"))
 				location = re.substring((RenderType.VELOCITY2 + ":").length());
 			
-	        // Velocity获取模板文件，得到模板引用
-			VelocityEngine ve = (VelocityEngine) context.getServletContext().getAttribute("vmEngine");
-	        org.apache.velocity.Template t = ve.getTemplate(location);
-			VelocityContext velocityCtx = new VelocityContext();
-			for (Iterator<Entry<String, Object>> it = this.context.getModel().entrySet().iterator(); it.hasNext(); ){
-				Entry<String, Object> e = it.next();
-				velocityCtx.put(e.getKey(), e.getValue());
-			}
+			//渲染Velocity
+	        Renderer render = RenderFactory.create(RenderType.VELOCITY).target(location);
+	        if (str.length > 1)
+	        	render.layout(str[1]);
+	        
+	        render.render(context.getWriter(),context.getModel());
 			
-			// 将环境变量和输出部分结合
-	        t.merge(velocityCtx, this.context.getWriter());
 	        this.context.getWriter().flush();
 			return;
 		} else {

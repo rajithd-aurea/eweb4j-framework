@@ -63,12 +63,13 @@ public class ActionAnnotationConfig extends ScanPackage {
 					&& !simpleName.endsWith("Control"))
 				return false;
 
-			String moduleName = CommonUtil.toLowCaseFirst(simpleName.replace(
-					"Controller", "").replace("Control", ""));
-			if (simpleName.endsWith("Action")) {
+			String moduleName = CommonUtil.toLowCaseFirst(simpleName.replace("Controller", "").replace("Control", ""));
+			if (simpleName.endsWith("Action")) 
 				moduleName = "";
-			}
-
+			
+			if ("application".equals(moduleName))
+				moduleName = "/";
+			
 			Object obj = null;
 			try {
 				if (cls.getAnnotation(Singleton.class) != null) {

@@ -25,6 +25,8 @@ import org.eweb4j.mvc.upload.UploadFile;
  */
 public class Context {
 	
+	private TemplateEngine templateEngine;
+	
 	/**
 	 * 一次Action执行的验证器验证结果封装
 	 */
@@ -287,6 +289,14 @@ public class Context {
 
 	public void setValidation(Validation validation) {
 		this.validation = validation;
+	}
+
+	public TemplateEngine getTemplateEngine() {
+		return templateEngine;
+	}
+
+	public void setTemplateEngine(TemplateEngine templateEngine) {
+		this.templateEngine = templateEngine;
 	}
 
 }

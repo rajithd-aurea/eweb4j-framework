@@ -1,6 +1,5 @@
 package org.eweb4j.mvc;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
@@ -9,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -24,8 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.HttpMethod;
 
-import org.apache.velocity.app.Velocity;
-import org.apache.velocity.app.VelocityEngine;
 import org.eweb4j.config.ConfigConstant;
 import org.eweb4j.config.EWeb4JConfig;
 import org.eweb4j.config.LogFactory;
@@ -37,9 +33,6 @@ import org.eweb4j.mvc.interceptor.InterExecution;
 import org.eweb4j.mvc.upload.UploadFile;
 import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.FileUtil;
-
-import freemarker.template.Configuration;
-import freemarker.template.DefaultObjectWrapper;
 
 /**
  * eweb4j.MVC filter
@@ -102,37 +95,6 @@ public class EWebFilter implements Filter, Servlet {
 		Map<String, String[]> qpMap = new HashMap<String, String[]>();
 		qpMap.putAll(ParamUtil.copyReqParams(context.getRequest()));
 		context.setQueryParamMap(qpMap);
-		
-		// FreeMarker 渲染
-		Configuration cfg = (Configuration) servletContext.getAttribute("ftlConfig");
-		if (cfg == null){
-			cfg = new Configuration();
-			// 指定模板从何处加载的数据源，这里设置成一个文件目录。
-			cfg.setDirectoryForTemplateLoading(new File(ConfigConstant.ROOT_PATH + MVCConfigConstant.FORWARD_BASE_PATH));
-			// 指定模板如何检索数据模型
-			cfg.setObjectWrapper(new DefaultObjectWrapper());
-			cfg.setDefaultEncoding("GBK");
-			servletContext.setAttribute("ftlConfig", cfg);
-		}
-		
-		// 初始化Velocity模板引擎
-		VelocityEngine ve = (VelocityEngine) servletContext.getAttribute("vmEngine");
-		if (ve == null) {
-			File viewsDir = new File(ConfigConstant.ROOT_PATH + MVCConfigConstant.FORWARD_BASE_PATH);
-	        Properties p = new Properties();
-	        p.setProperty("resource.loader", "file");
-	        p.setProperty("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.FileResourceLoader");
-	        p.setProperty("file.resource.loader.path", viewsDir.getAbsolutePath());
-	        p.setProperty("file.resource.loader.cache", "true");
-	        p.setProperty("file.resource.loader.modificationCheckInterval", "2");
-	        p.setProperty(Velocity.ENCODING_DEFAULT, "GBK");
-	        p.setProperty(Velocity.INPUT_ENCODING, "GBK");
-	        p.setProperty(Velocity.OUTPUT_ENCODING, "GBK");    
-	        ve = new VelocityEngine();
-	        ve.init(p);
-	        
-	        servletContext.setAttribute("vmEngine", ve);
-		}
 		
 		//将上传的表单元素注入到context中
 		ParamUtil.handleUpload(context);
