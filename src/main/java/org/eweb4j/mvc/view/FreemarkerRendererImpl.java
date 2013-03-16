@@ -61,7 +61,7 @@ public class FreemarkerRendererImpl extends Renderer{
 				template.setEncoding("UTF-8");
 				template.process(datas, w);
 				String screenContent = w.toString();
-				datas.put("screen_content", screenContent);
+				datas.put(MVCConfigConstant.LAYOUT_SCREEN_CONTENT_KEY, screenContent);
 				tplPath = layout;
 			}
 			

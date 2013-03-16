@@ -81,7 +81,7 @@ public class VelocityRendererImpl extends Renderer {
 			StringWriter w = new StringWriter();
 			ve.getTemplate(path).merge(context, w);
 			String screenContent = w.toString();
-			context.put("screen_content", screenContent);
+			context.put(MVCConfigConstant.LAYOUT_SCREEN_CONTENT_KEY, screenContent);
 			tplPath = layout;
 		}
 		

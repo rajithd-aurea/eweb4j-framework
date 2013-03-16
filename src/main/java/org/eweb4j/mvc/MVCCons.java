@@ -10,6 +10,8 @@ public interface MVCCons {
 	String CHECK_START_FILE_EXIST = "CheckStartFileExist";
 	String WEB_ROOT_KEY = "WebRootKey";
 	String FORWARD_BASE_PATH = "ForwardBasePath";
+	String VIEW_BASE_PATH = "ViewBasePath";
+	String LAYOUT_SCREEN_CONTENT_KEY = "ScreenContent";
 	String BASE_URL_KEY = "BaseURLKey";
 	String REQ_PARAM_MAP_KEY = "ReqParamMapKey";
 	String COOKIE_KEY_LOCALE = "_EWEB4J_LOCALE";

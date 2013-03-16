@@ -134,6 +134,13 @@ public class ActionConfig {
 		return error;
 	}
 
+	public static void setLAYOUT_SCREEN_CONTENT_KEY(String key){
+		if (key == null || key.trim().length() == 0)
+			return;
+		
+		MVCConfigConstant.LAYOUT_SCREEN_CONTENT_KEY = key;
+	}
+	
 	public static void setBASE_URL_KEY(String key) {
 		if (key == null || key.trim().length() == 0)
 			return;

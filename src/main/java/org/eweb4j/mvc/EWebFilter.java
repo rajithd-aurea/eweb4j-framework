@@ -57,7 +57,11 @@ public class EWebFilter implements Filter, Servlet {
 		EWeb4JConfig.setSTART_FILE_NAME(config.getInitParameter(MVCCons.START_FILE_NAME));
 
 		ActionConfig.setFORWARD_BASE_PATH(config.getInitParameter(MVCCons.FORWARD_BASE_PATH));
-
+		
+		ActionConfig.setFORWARD_BASE_PATH(config.getInitParameter(MVCCons.VIEW_BASE_PATH));
+		
+		ActionConfig.setLAYOUT_SCREEN_CONTENT_KEY(config.getInitParameter(MVCCons.LAYOUT_SCREEN_CONTENT_KEY));
+		
 		ActionConfig.setBASE_URL_KEY(config.getInitParameter(MVCCons.BASE_URL_KEY));
 
 		ActionConfig.setREQ_PARAM_MAP_NAME(config.getInitParameter(MVCCons.REQ_PARAM_MAP_KEY));
@@ -73,6 +77,8 @@ public class EWebFilter implements Filter, Servlet {
 		info.append("StartFileName --> ").append(ConfigConstant.START_FILE_NAME).append("\n");
 
 		info.append("BaseURLKey --> ").append(MVCConfigConstant.BASE_URL_KEY).append("\n");
+		
+		info.append("LayoutScreenContentKey --> ").append(MVCConfigConstant.LAYOUT_SCREEN_CONTENT_KEY).append("\n");
 
 		info.append("ReqParamMapKey --> ").append(MVCConfigConstant.REQ_PARAM_MAP_NAME).append("\n");
 
@@ -98,7 +104,6 @@ public class EWebFilter implements Filter, Servlet {
 		
 		//将上传的表单元素注入到context中
 		ParamUtil.handleUpload(context);
-		
 		return context;
 	}
 

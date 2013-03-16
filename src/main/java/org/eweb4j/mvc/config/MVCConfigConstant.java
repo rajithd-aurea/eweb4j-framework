@@ -20,6 +20,7 @@ public class MVCConfigConstant {
 	public static String BASE_URL = "";
 	
 	public static String BASE_URL_KEY = "BaseURL";
+	public static String LAYOUT_SCREEN_CONTENT_KEY = "ScreenContent";
 	public static String FORWARD_BASE_PATH = "";
 	
 	public static String HTTP_METHOD_PARAM = "_method";

@@ -58,6 +58,7 @@ import org.eweb4j.mvc.upload.UploadFile;
 import org.eweb4j.mvc.validator.ValidateExecution;
 import org.eweb4j.mvc.validator.annotation.DateFormat;
 import org.eweb4j.mvc.validator.annotation.Upload;
+import org.eweb4j.mvc.view.JSPRendererImpl;
 import org.eweb4j.mvc.view.RenderFactory;
 import org.eweb4j.mvc.view.Renderer;
 import org.eweb4j.orm.dao.DAO;
@@ -666,9 +667,10 @@ public class ActionExecution {
 			
 			this.context.getModel().put(name, getter.invoke(actionObject));
 		}
-
+		
 		this.context.getModel().put(MVCConfigConstant.BASE_URL_KEY, baseUrl);
-
+		this.context.getModel().put(MVCConfigConstant.REQ_PARAM_MAP_NAME, this.context.getQueryParamMap());
+		
 		// 客户端重定向
 		if (re.startsWith(RenderType.REDIRECT + ":")) {
 			String url = re.substring((RenderType.REDIRECT + ":").length());
@@ -692,25 +694,22 @@ public class ActionExecution {
 		} else if (re.startsWith(RenderType.FORWARD + ":") 
 				|| re.startsWith(RenderType.JSP + ":")
 				|| re.endsWith("."+RenderType.JSP)) {
+			String[] str = re.split("@");
+			re = str[0];
 			String location = re;
 			if (re.startsWith(RenderType.FORWARD + ":"))
 				location = re.substring((RenderType.FORWARD + ":").length());
 			else if (re.startsWith(RenderType.JSP + ":"))
 				location = re.substring((RenderType.JSP + ":").length());
 			
-			HttpServletRequest request = this.context.getRequest();
-			request.setAttribute(MVCConfigConstant.REQ_PARAM_MAP_NAME, this.context.getQueryParamMap());
-
-			for (Iterator<Entry<String, Object>> it = this.context.getModel().entrySet().iterator(); it.hasNext(); ) {
-				Entry<String, Object> entry = it.next();
-				request.setAttribute(entry.getKey(), entry.getValue());
-			}
-
-			// 服务端跳转
-			request
-				.getRequestDispatcher(MVCConfigConstant.FORWARD_BASE_PATH + "/"+ location)
-				.forward(request, this.context.getResponse());
-
+			//渲染JSP
+	        JSPRendererImpl render = new JSPRendererImpl();
+	        render.setContext(context);
+	        if (str.length > 1)
+	        	render.layout(str[1]);
+	        
+	        render.target(location).render(context.getWriter(), context.getModel());
+			
 			return;
 		} else if (re.startsWith(RenderType.FREEMARKER + ":") 
 				|| re.startsWith(RenderType.FREEMARKER2 + ":")
