@@ -176,7 +176,7 @@ public class PojoAnnotationConfig extends ScanPackage {
 				p.setSize("20");
 			else if (Integer.class.isAssignableFrom(f.getType())
 					|| int.class.isAssignableFrom(f.getType()))
-				p.setSize("4");
+				p.setSize("8");
 			else if (String.class.isAssignableFrom(f.getType()))
 				p.setSize("255");
 			else if (Boolean.class.isAssignableFrom(f.getType())

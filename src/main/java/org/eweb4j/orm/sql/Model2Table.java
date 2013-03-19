@@ -195,7 +195,7 @@ public class Model2Table {
 
 	private static String getType(String type) {
 		if ("int".equalsIgnoreCase(type) || "java.lang.Integer".equalsIgnoreCase(type)) 
-			return "tinyint";
+			return "int";
 		
 		if ("long".equalsIgnoreCase(type) || "java.lang.Long".equalsIgnoreCase(type)) 
 			return "bigint";
@@ -214,6 +214,9 @@ public class Model2Table {
 		
 		if ("date".equalsIgnoreCase(type) || "java.sql.Date".equalsIgnoreCase(type) || "java.util.Date".equalsIgnoreCase(type)) 
 			return "datetime";
+		
+		if ("timestamp".equalsIgnoreCase(type) || "java.sql.Timestamp".equalsIgnoreCase(type)) 
+			return "timestamp";
 		
 		if (PropType.MANY_ONE.equals(type))
 			return "bigint";

@@ -287,7 +287,9 @@ public class EWeb4JConfig {
 								DBInfoConfigBean dcb = DBInfoConfigBeanCache.get(cb.getOrm().getDdl().getDs());
 								if (DBType.MYSQL_DB.equals(dcb.getDataBaseType())) {
 									File sqlFile = new File(ConfigConstant.CONFIG_BASE_PATH()+ cb.getOrm().getDdl().getDs() + "-create.sql");
-									if (!sqlFile.exists()) {
+									if ("1".equals(cb.getOrm().getDdl().getOverride()) 
+											|| "true".equals(cb.getOrm().getDdl().getOverride()) 
+											|| !sqlFile.exists()) {
 										String errr12 = Model2Table.write(cb.getOrm().getDdl().getDs());
 										if (errr12 != null) {
 											error = errr12;

@@ -487,7 +487,7 @@ public class CommonUtil {
 		}
 		return value;
 	}
-
+	
 	public static boolean hasBinaryContent(String contentType) {
 		if (contentType != null) {
 			String typeStr = contentType.toLowerCase();
@@ -632,13 +632,21 @@ public class CommonUtil {
 				.matches("^\\d{4}(\\-|\\/|\\.)\\d{1,2}\\1\\d{1,2}$") : false;
 	}
 
-	public static boolean isValidDateTime(String source) {
-		return isValidDateTime(source, "yyyy-MM-dd HH:mm:ss");
+	public static boolean isValidDateTime(String source){
+		return isValidDateTime(source, Locale.getDefault());
+	}
+	
+	public static boolean isValidDateTime(String source, Locale locale) {
+		return isValidDateTime(source, "yyyy-MM-dd HH:mm:ss", locale);
 	}
 
-	public static boolean isValidDateTime(String source, String format) {
+	public static boolean isValidDateTime(String source, String format){
+		return isValidDateTime(source, format, Locale.getDefault());
+	}
+	
+	public static boolean isValidDateTime(String source, String format, Locale locale) {
 		try {
-			Date date = parse(format, source);
+			Date date = parse(format, source, locale);
 			return date != null;
 		} catch (Throwable e) {
 			return false;
@@ -793,14 +801,28 @@ public class CommonUtil {
 	}
 
 	public static Date parse(String format, String source) {
+		return parse(format, source, Locale.getDefault());
+	}
+	
+	public static Locale getLocale(String lang){
+		Locale[] locs = Locale.getAvailableLocales();
+		for (Locale l : locs){
+			if (lang.equals(l.getLanguage()))
+				return l;
+		}
+		
+		return Locale.ENGLISH;
+	}
+	
+	public static Date parse(String format, String source, Locale locale) {
 		int aaIndex = format.indexOf(" aa");
 		if (aaIndex > -1){
 			format = format.replace(" aa", "");
 			String apm = source.substring(aaIndex+1, aaIndex+1+2);
-			return parse(format, source.substring(0, aaIndex), apm);
+			return parse(format, source.substring(0, aaIndex), apm, locale);
 		}
 		
-		SimpleDateFormat sdf = new java.text.SimpleDateFormat(format);
+		SimpleDateFormat sdf = new java.text.SimpleDateFormat(format, locale);
 		try {
 			return sdf.parse(source);
 		} catch (ParseException e) {
@@ -808,8 +830,12 @@ public class CommonUtil {
 		}
 	}
 	
-	public static Date parse(String format, String source, String amOrPm) {
-		SimpleDateFormat sdf = new java.text.SimpleDateFormat(format);
+	public static Date parse(String format, String source, String amOrPm){
+		return parse(format, source, amOrPm, Locale.getDefault());
+	}
+	
+	public static Date parse(String format, String source, String amOrPm, Locale locale) {
+		SimpleDateFormat sdf = new java.text.SimpleDateFormat(format, locale);
 		try {
 			Date date = sdf.parse(source);
 			if ("PM".equalsIgnoreCase(amOrPm)){
@@ -821,8 +847,12 @@ public class CommonUtil {
 		}
 	}
 
-	public static Date parse(String source) {
-		return parse("yyyy-MM-dd HH:mm:ss", source);
+	public static Date parse(String source){
+		return parse(source, Locale.getDefault());
+	}
+	
+	public static Date parse(String source, Locale locale) {
+		return parse("yyyy-MM-dd HH:mm:ss", source, locale);
 	}
 
 	public static String upperFirst(String s) {
@@ -913,7 +943,21 @@ public class CommonUtil {
 		String time = new java.text.SimpleDateFormat(format).format(date);
 		return time;
 	}
-
+	
+	public static String resoveUrl(String url, String host){
+		if (url.startsWith("http://") || url.startsWith("https://"))
+			return url;
+		
+		String rep = host;
+		if (host.endsWith("/"))
+			rep = host.substring(0, host.length()-1);
+		return host+url.replace(rep, "");
+	}
+	
+	public static Date newDate(){
+		return new Date();
+	}
+	
 	public static Date newDate(String pattern, String time) {
 		SimpleDateFormat sdf = new SimpleDateFormat(pattern);
 		try {

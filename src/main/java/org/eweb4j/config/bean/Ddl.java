@@ -7,6 +7,9 @@ public class Ddl {
 
 	@AttrTag
 	private String generate = "true";
+	
+	@AttrTag
+	private String override = "false";
 
 	@AttrTag
 	private String run = "false";
@@ -20,6 +23,14 @@ public class Ddl {
 
 	public void setGenerate(String generate) {
 		this.generate = generate;
+	}
+	
+	public String getOverride() {
+		return override;
+	}
+
+	public void setOverride(String override) {
+		this.override = override;
 	}
 
 	public String getRun() {
