@@ -10,30 +10,51 @@ import org.eweb4j.orm.dao.DAOFactory;
 public class Db {
 	
 	public static <T> Number[] batchDelete(T[] ts){
+		if (ts == null || ts.length == 0)
+			return null;
+		
 		return DAOFactory.getDeleteDAO().batchDelete(ts);
 	}
 	
-	public static <T> Number[] batchDelete(T[] ts, String dsName){
+	public static <T> Number[] batchDelete(String dsName, T[] ts){
+		if (ts == null || ts.length == 0)
+			return null;
+		
 		return DAOFactory.getDeleteDAO(dsName).batchDelete(ts);
 	}
 	
 	public static <T> Number[] batchUpdate(T[] ts){
-		return batchUpdate(ts, null);
+		if (ts == null || ts.length == 0)
+			return null;
+		
+		return batchUpdate(null, ts);
 	}
 	
-	public static <T> Number[] batchUpdate(T[] ts, String[] fields){
+	public static <T> Number[] batchUpdate(T[] ts, String... fields){
+		if (ts == null || ts.length == 0)
+			return null;
+		
 		return DAOFactory.getUpdateDAO().batchUpdate(ts, fields);
 	}
 	
-	public static <T> Number[] batchUpdate(T[] ts, String dsName, String... fields){
+	public static <T> Number[] batchUpdate(String dsName, T[] ts, String... fields){
+		if (ts == null || ts.length == 0)
+			return null;
+		
 		return DAOFactory.getUpdateDAO(dsName).batchUpdate(ts, fields);
 	}
 	
 	public static <T> Number[] batchInsert(T[] ts){
-		return batchInsert(ts, null);
+		if (ts == null || ts.length == 0)
+			return null;
+		
+		return batchInsert(null, ts);
 	}
 	
-	public static <T> Number[] batchInsert(T[] ts, String[] fields){
+	public static <T> Number[] batchInsert(T[] ts, String... fields){
+		if (ts == null || ts.length == 0)
+			return null;
+		
 		Number[] ids = DAOFactory.getInsertDAO().batchInsert(ts, fields);
 		if (ids != null && ids.length > 0){
 			for (int i = 0; i < ts.length; i++){
@@ -44,7 +65,10 @@ public class Db {
 		return ids;
 	}
 	
-	public static <T> Number[] batchInsert(T[] ts, String dsName, String... fields){
+	public static <T> Number[] batchInsert(String dsName, T[] ts, String... fields){
+		if (ts == null || ts.length == 0)
+			return null;
+		
 		Number[] ids = DAOFactory.getInsertDAO(dsName).batchInsert(ts, fields);
 		if (ids != null && ids.length > 0){
 			for (int i = 0; i < ts.length; i++){

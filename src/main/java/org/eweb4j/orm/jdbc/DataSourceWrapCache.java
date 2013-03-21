@@ -35,8 +35,8 @@ public class DataSourceWrapCache {
 		
 		DataSource ds = ht.get(key);
 		if (ds == null) {
-			log.error("can not create DataSource");
-			throw new RuntimeException("can not create DataSource");
+			log.error("can not create DataSource dsName->"+key);
+			throw new RuntimeException("can not create DataSource dsName->"+key);
 		}
 		return ds;
 	}
