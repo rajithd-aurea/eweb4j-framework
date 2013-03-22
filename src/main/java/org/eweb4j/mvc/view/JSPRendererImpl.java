@@ -48,14 +48,21 @@ public class JSPRendererImpl extends Renderer{
 			}
 
 			if(layout != null){
-				BufferedResponse my_res = new BufferedResponse(res);
-				context.getServletContext().getRequestDispatcher(MVCConfigConstant.FORWARD_BASE_PATH + "/" + path).include(req, my_res);
-				String screenContent = my_res.getScreenContent();
-				req.setAttribute(MVCConfigConstant.LAYOUT_SCREEN_CONTENT_KEY, screenContent);
+				for (Iterator<Entry<String, String>> it = this.paths.entrySet().iterator(); it.hasNext(); ){
+					Entry<String, String> e = it.next();
+					String paramName = e.getKey();
+					String path = e.getValue();
+					BufferedResponse my_res = new BufferedResponse(res);
+					context.getServletContext().getRequestDispatcher(MVCConfigConstant.FORWARD_BASE_PATH + "/" + path).include(req, my_res);
+					String screenContent = my_res.getScreenContent();
+					req.setAttribute(paramName, screenContent);
+				}
+				
 				context.getServletContext().getRequestDispatcher(MVCConfigConstant.FORWARD_BASE_PATH + "/" + layout).forward(req, res);
-			} else
-				context.getServletContext().getRequestDispatcher(MVCConfigConstant.FORWARD_BASE_PATH + "/" + path).forward(req, res);
-			
+			} else {
+				String defaultPath = paths.get(MVCConfigConstant.LAYOUT_SCREEN_CONTENT_KEY);
+				context.getServletContext().getRequestDispatcher(MVCConfigConstant.FORWARD_BASE_PATH + "/" + defaultPath).forward(req, res);
+			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

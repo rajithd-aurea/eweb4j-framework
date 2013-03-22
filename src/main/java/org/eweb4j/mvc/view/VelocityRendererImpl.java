@@ -65,23 +65,30 @@ public class VelocityRendererImpl extends Renderer {
 	        p.setProperty("file.resource.loader.path", viewsDir.getAbsolutePath());
 	        p.setProperty("file.resource.loader.cache", "true");
 	        p.setProperty("file.resource.loader.modificationCheckInterval", "2");
-	        p.setProperty(Velocity.ENCODING_DEFAULT, "GBK");
-	        p.setProperty(Velocity.INPUT_ENCODING, "GBK");
-	        p.setProperty(Velocity.OUTPUT_ENCODING, "GBK");    
+	        p.setProperty(Velocity.ENCODING_DEFAULT, "UTF-8");
+	        p.setProperty(Velocity.INPUT_ENCODING, "UTF-8");
+	        p.setProperty(Velocity.OUTPUT_ENCODING, "UTF-8");
 	        ve = new VelocityEngine();
 	        ve.init(p);
 	        
 	        SingleBeanCache.add("velocity", ve);
 		}
 		
-		String tplPath = path;
+		String tplPath = paths.get(MVCConfigConstant.LAYOUT_SCREEN_CONTENT_KEY);
 		
 		// 将环境变量和输出部分结合
 		if (this.layout != null){
-			StringWriter w = new StringWriter();
-			ve.getTemplate(path).merge(context, w);
-			String screenContent = w.toString();
-			context.put(MVCConfigConstant.LAYOUT_SCREEN_CONTENT_KEY, screenContent);
+			for (Iterator<Entry<String, String>> it = this.paths.entrySet().iterator(); it.hasNext(); ){
+				Entry<String, String> e = it.next();
+				String paramName = e.getKey();
+				String path = e.getValue();
+				
+				StringWriter w = new StringWriter();
+				ve.getTemplate(path).merge(context, w);
+				String screenContent = w.toString();
+				context.put(paramName, screenContent);
+			}
+			
 			tplPath = layout;
 		}
 		

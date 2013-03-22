@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eweb4j.cache.SingleBeanCache;
 import org.eweb4j.config.ConfigConstant;
@@ -48,20 +50,29 @@ public class FreemarkerRendererImpl extends Renderer{
 				cfg.setDirectoryForTemplateLoading(new File(ConfigConstant.ROOT_PATH + MVCConfigConstant.FORWARD_BASE_PATH));
 				// 指定模板如何检索数据模型
 				cfg.setObjectWrapper(new DefaultObjectWrapper());
-				cfg.setDefaultEncoding("GBK");
+				cfg.setDefaultEncoding("UTF-8");
 				SingleBeanCache.add("freemarker", cfg);
 			}
 			
-			String tplPath = path;
+			String tplPath = paths.get(MVCConfigConstant.LAYOUT_SCREEN_CONTENT_KEY);
 			
 			// 将环境变量和输出部分结合
 			if (this.layout != null){
-				StringWriter w = new StringWriter();
-				Template template = cfg.getTemplate(path);
-				template.setEncoding("UTF-8");
-				template.process(datas, w);
-				String screenContent = w.toString();
-				datas.put(MVCConfigConstant.LAYOUT_SCREEN_CONTENT_KEY, screenContent);
+				
+				for (Iterator<Entry<String, String>> it = this.paths.entrySet().iterator(); it.hasNext(); ){
+					Entry<String, String> e = it.next();
+					String paramName = e.getKey();
+					String path = e.getValue();
+					
+					StringWriter w = new StringWriter();
+					Template template = cfg.getTemplate(path);
+					template.setEncoding("UTF-8");
+					template.process(datas, w);
+					String screenContent = w.toString();
+					
+					datas.put(paramName, screenContent);
+				}
+				
 				tplPath = layout;
 			}
 			

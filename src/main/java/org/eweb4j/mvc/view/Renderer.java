@@ -2,6 +2,7 @@ package org.eweb4j.mvc.view;
 
 import java.io.File;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eweb4j.config.ConfigConstant;
@@ -9,7 +10,7 @@ import org.eweb4j.mvc.config.MVCConfigConstant;
 
 public abstract class Renderer {
 
-	protected String path;
+	protected Map<String, String> paths = new HashMap<String, String>();
 	protected String layout;
 	
 	private void checkFile(String path) {
@@ -22,13 +23,32 @@ public abstract class Renderer {
 		
 	}
 	
-	public Renderer target(String path) {
-		checkFile(path);
-		this.path = path;
+	public Renderer target(String _path) {
+		String path = _path.trim();
+		if (!path.contains("->") && !path.contains(",")){
+			String file = path;
+			checkFile(file);
+			this.paths.put(MVCConfigConstant.LAYOUT_SCREEN_CONTENT_KEY, file);
+		} else{
+			//处理形如 key1->value1,key2->value2
+			//1.split by ,
+			String[] pathStrs = path.split(",");
+			//继续split by ->
+			for (String ps : pathStrs){
+				String str = ps.trim();
+				String[] kv = str.split("->");
+				String key = kv[0].trim();
+				String value = kv[1].trim();
+				checkFile(value);
+				paths.put(key, value);
+			}
+		}
+		
 		return this;
 	}
 	
-	public Renderer layout(String path){
+	public Renderer layout(String _path){
+		String path = _path.trim();
 		checkFile(path);
 		this.layout = path;
 		return this;

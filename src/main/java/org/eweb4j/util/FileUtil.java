@@ -268,15 +268,8 @@ public class FileUtil {
 	}
 
 	public static void main(String[] args) throws Exception {
-		String imageUrl = "http://beautydeals.sg/components/com_enmasse/upload/438081254ladies_watch_main - copy.jpg";
-		String format = "jpg";
-		int retryTimes = 5;
-
-		BufferedImage im = FileUtil.getBufferedImage(imageUrl, retryTimes,
-				1 * 1000);
-		FileOutputStream os = new FileOutputStream(
-				new File("d:/testxxxxxx.jpg"));
-		ImageIO.write(im, format, os);
+		String c = FileUtil.readFile(new File("d:/seasky.lrc"));
+		System.out.println(c);
 	}
 
 	/**
