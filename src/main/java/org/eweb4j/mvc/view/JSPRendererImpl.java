@@ -72,4 +72,8 @@ public class JSPRendererImpl extends Renderer{
 		render(writer, new HashMap<String, Object>());
 	}
 
+	public String render(Map<String, Object> datas, String template) {
+		return template;
+	}
+
 }

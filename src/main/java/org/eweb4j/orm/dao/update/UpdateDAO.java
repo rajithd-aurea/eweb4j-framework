@@ -11,6 +11,15 @@ public interface UpdateDAO {
 	 * @return
 	 */
 	public <T> Number[] batchUpdate(T[] ts, String... fields) throws DAOException;
+	
+	/**
+	 * 修改表记录,给定要修改的字段名和字段值，通过主键值作为条件
+	 * 
+	 * @param <T>
+	 * @param ts
+	 * @return
+	 */
+	public <T> Number[] batchUpdate(T[] ts, String[] fields, Object[] values) throws DAOException;
 
 	public <T> Number update(T t) throws DAOException;
 

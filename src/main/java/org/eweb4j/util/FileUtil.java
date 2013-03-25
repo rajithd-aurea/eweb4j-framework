@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -131,6 +132,9 @@ public class FileUtil {
 		return true;
 	}
 
+	public static BufferedImage getBufferedImage(String imagePath, int retryTimes, long sleep) throws Exception {
+		return getBufferedImage(imagePath, false, retryTimes, sleep);
+	}
 	/**
 	 * 
 	 * @param imagePath
@@ -140,35 +144,20 @@ public class FileUtil {
 	 * @param sleep
 	 * @return
 	 */
-	public static BufferedImage getBufferedImage(String imagePath,int retryTimes, long sleep) throws Exception {
+	public static BufferedImage getBufferedImage(String imagePath, boolean isRemote, int retryTimes, long sleep) throws Exception {
 		if (imagePath == null || imagePath.trim().length() == 0)
 			throw new Exception("image url can not be empty");
 
 		int count = 0;
 		while (true) {
 			try {
-//				PicsModel mod = PicUtil.getAttrs(imagePath);
-//				boolean isPng = false;
-//				if (mod != null && "PNG".equalsIgnoreCase(mod.getExtName())){
-//					isPng = true;
-//				}
+				if (isRemote)
+					return getRemote(imagePath);
 				
 				try {
-					try {
-						return toBufferedImage(Toolkit.getDefaultToolkit().getImage(imagePath));
-					} catch (Throwable e){
-						return ImageIO.read(new File(imagePath));
-					}
+					return getLocal(imagePath);
 				} catch (Throwable e) {
-					URL url = new URL(imagePath.replace(" ","%20"));
-//					URI uri = new URI(host.getProtocol(),null,host.getHost(),host.getPort(),host.getPath(),host.getQuery(),null);
-//					URL url = uri.toURL();
-					
-					try {
-						return toBufferedImage(Toolkit.getDefaultToolkit().getImage(url));
-					}catch (Throwable e1){
-						return ImageIO.read(url);
-					}
+					return getRemote(imagePath);
 				}
 			} catch (Throwable e) {
 				if (count >= retryTimes) {
@@ -177,6 +166,24 @@ public class FileUtil {
 				Thread.sleep(sleep);
 			}
 			count++;
+		}
+	}
+
+	private static BufferedImage getLocal(String imagePath) throws IOException {
+		try {
+			return toBufferedImage(Toolkit.getDefaultToolkit().getImage(imagePath));
+		} catch (Throwable e){
+			return ImageIO.read(new File(imagePath));
+		}
+	}
+
+	private static BufferedImage getRemote(String imagePath)
+			throws MalformedURLException, IOException {
+		URL url = new URL(imagePath.replace(" ","%20"));
+		try {
+			return toBufferedImage(Toolkit.getDefaultToolkit().getImage(url));
+		}catch (Throwable e1){
+			return ImageIO.read(url);
 		}
 	}
 

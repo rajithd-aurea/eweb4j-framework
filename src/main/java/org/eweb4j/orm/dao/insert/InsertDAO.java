@@ -25,6 +25,23 @@ public interface InsertDAO {
 	 * 
 	 */
 	public <T> Number[] batchInsert(T[] ts, String... fields) throws DAOException;
+	
+	/**
+	 * 将若干个POJO的所有属性值插入数据库 例如： <code>
+	 *  class Pet{
+	 *  	private Integer id;
+	 *  	private String name;
+	 *  	private int age;
+	 *      //此处省略setter和getter方法
+	 *  }
+	 * 	Pet pet = new Pet();
+	 *  pet.setName("小黑");
+	 *  pet.setAge(3);
+	 *  insert(new Pet[]{pet}, new String[]{}, new Object[]{});
+	 * </code> 会执行sql:INSERT INTO $table values('小黑','3');
+	 * 
+	 */
+	public <T> Number[] batchInsert(T[] ts, String[] fields, Object[] values) throws DAOException;
 
 	/**
 	 * 

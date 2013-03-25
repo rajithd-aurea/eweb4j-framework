@@ -28,6 +28,29 @@ public class VelocityRendererImpl extends Renderer {
 	
 	public static final Log log = LogFactory.getLogger(VelocityRendererImpl.class);
 
+	public VelocityEngine ve = null;
+	
+	public VelocityRendererImpl(){
+		// 初始化Velocity模板引擎
+		ve = (VelocityEngine) SingleBeanCache.get("velocity");
+		if (ve == null) {
+			File viewsDir = new File(ConfigConstant.ROOT_PATH + MVCConfigConstant.FORWARD_BASE_PATH);
+	        Properties p = new Properties();
+	        p.setProperty("resource.loader", "file");
+	        p.setProperty("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.FileResourceLoader");
+	        p.setProperty("file.resource.loader.path", viewsDir.getAbsolutePath());
+	        p.setProperty("file.resource.loader.cache", "true");
+	        p.setProperty("file.resource.loader.modificationCheckInterval", "2");
+	        p.setProperty(Velocity.ENCODING_DEFAULT, "UTF-8");
+	        p.setProperty(Velocity.INPUT_ENCODING, "UTF-8");
+	        p.setProperty(Velocity.OUTPUT_ENCODING, "UTF-8");
+	        ve = new VelocityEngine();
+	        ve.init(p);
+	        
+	        SingleBeanCache.add("velocity", ve);
+		}
+	}
+	
 	public String render(String name, Object value){
 		return render(CommonUtil.map(name, value));
 	}
@@ -55,25 +78,6 @@ public class VelocityRendererImpl extends Renderer {
 			}
 		}
 		
-		// 初始化Velocity模板引擎
-		VelocityEngine ve = (VelocityEngine) SingleBeanCache.get("velocity");
-		if (ve == null) {
-			File viewsDir = new File(ConfigConstant.ROOT_PATH + MVCConfigConstant.FORWARD_BASE_PATH);
-	        Properties p = new Properties();
-	        p.setProperty("resource.loader", "file");
-	        p.setProperty("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.FileResourceLoader");
-	        p.setProperty("file.resource.loader.path", viewsDir.getAbsolutePath());
-	        p.setProperty("file.resource.loader.cache", "true");
-	        p.setProperty("file.resource.loader.modificationCheckInterval", "2");
-	        p.setProperty(Velocity.ENCODING_DEFAULT, "UTF-8");
-	        p.setProperty(Velocity.INPUT_ENCODING, "UTF-8");
-	        p.setProperty(Velocity.OUTPUT_ENCODING, "UTF-8");
-	        ve = new VelocityEngine();
-	        ve.init(p);
-	        
-	        SingleBeanCache.add("velocity", ve);
-		}
-		
 		String tplPath = paths.get(MVCConfigConstant.LAYOUT_SCREEN_CONTENT_KEY);
 		
 		// 将环境变量和输出部分结合
@@ -93,5 +97,18 @@ public class VelocityRendererImpl extends Renderer {
 		}
 		
 		ve.getTemplate(tplPath).merge(context, writer);
+	}
+
+	public String render(Map<String, Object> datas, String template) {
+		Velocity.init();
+		VelocityContext context = new VelocityContext();
+		for (Iterator<Entry<String, Object>> it = datas.entrySet().iterator(); it.hasNext(); ){
+			Entry<String, Object> e = it.next();
+			context.put(e.getKey(), e.getValue());
+		}
+		StringWriter writer = new StringWriter();
+		Velocity.evaluate(context, writer, "", template);
+		
+		return writer.toString();
 	}
 }

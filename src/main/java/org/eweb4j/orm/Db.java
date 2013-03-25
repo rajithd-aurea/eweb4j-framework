@@ -37,11 +37,25 @@ public class Db {
 		return DAOFactory.getUpdateDAO().batchUpdate(ts, fields);
 	}
 	
+	public static <T> Number[] batchUpdate(T[] ts, String[] fields, Object[] values){
+		if (ts == null || ts.length == 0)
+			return null;
+		
+		return DAOFactory.getUpdateDAO().batchUpdate(ts, fields, values);
+	}
+	
 	public static <T> Number[] batchUpdate(String dsName, T[] ts, String... fields){
 		if (ts == null || ts.length == 0)
 			return null;
 		
 		return DAOFactory.getUpdateDAO(dsName).batchUpdate(ts, fields);
+	}
+	
+	public static <T> Number[] batchUpdate(String dsName, T[] ts, String[] fields, Object[] values){
+		if (ts == null || ts.length == 0)
+			return null;
+		
+		return DAOFactory.getUpdateDAO(dsName).batchUpdate(ts, fields, values);
 	}
 	
 	public static <T> Number[] batchInsert(T[] ts){
@@ -56,6 +70,20 @@ public class Db {
 			return null;
 		
 		Number[] ids = DAOFactory.getInsertDAO().batchInsert(ts, fields);
+		if (ids != null && ids.length > 0){
+			for (int i = 0; i < ts.length; i++){
+				ModelHelper<T> helper = new ModelHelper<T>(ts[i]);
+				helper._setId(ids[i].longValue());
+			}
+		}
+		return ids;
+	}
+	
+	public static <T> Number[] batchInsert(T[] ts, String[] fields, Object[] values){
+		if (ts == null || ts.length == 0)
+			return null;
+		
+		Number[] ids = DAOFactory.getInsertDAO().batchInsert(ts, fields, values);
 		if (ids != null && ids.length > 0){
 			for (int i = 0; i < ts.length; i++){
 				ModelHelper<T> helper = new ModelHelper<T>(ts[i]);

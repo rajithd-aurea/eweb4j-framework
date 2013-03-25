@@ -31,6 +31,11 @@ public class TestDb {
 		}
 	}
 	
+	public void testNotMappingColumn() throws Exception{
+		Pet pet = Db.ar(Pet.class).find("byFuck", "heiehi").first();
+		System.out.println(pet);
+	}
+	
 	public void testInsert() throws Exception{
 		Pet pet = new Pet();
 		pet.setName("testName");

@@ -1463,7 +1463,9 @@ public class CommonUtil {
 		PrintWriter writer = new PrintWriter(strWriter, true);
 		e.printStackTrace(writer);
 		StringBuffer sb = strWriter.getBuffer();
-		return "cause by: \n\t" + sb.toString();
+		String s = "cause by: \n\t" + sb.toString();
+		
+		return s.replace("Caused by:", "<font color='red'>Caused by:");
 	}
 
 	@Deprecated

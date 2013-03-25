@@ -49,6 +49,32 @@ public class InsertDAOImpl implements InsertDAO {
 
 		return ids;
 	}
+	
+	public <T> Number[] batchInsert(T[] ts, String[] fields, Object[] values) throws DAOException {
+		Number[] ids = null;
+		Connection con = null;
+		if (ts == null || ts.length == 0)
+			return ids;
+
+		try {
+			con = ds.getConnection();
+			Sql[] sqls = SqlFactory.getInsertSql(ts).createByFieldsIsValues(fields, values);
+			List<Object[]> argList = new ArrayList<Object[]>(ts.length);
+			for (Sql sql : sqls){
+				argList.add(sql.args.toArray());
+			}
+			Object[][] args = new Object[argList.size()][];
+			for (int i = 0; i < argList.size(); i++){
+				args[i] = argList.get(i);
+			}
+			
+			ids = JdbcUtil.batchUpdateWithArgs(con, sqls[0].sql, args);
+		} catch (Exception e) {
+			throw new DAOException("", e);
+		}
+
+		return ids;
+	}
 
 	public <T> Number insert(T t) throws DAOException {
 		Number[] rs = batchInsert(new Object[] { t });

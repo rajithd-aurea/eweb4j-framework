@@ -48,6 +48,32 @@ public class UpdateDAOImpl implements UpdateDAO {
 		}
 		return ids;
 	}
+	
+	public <T> Number[] batchUpdate(T[] ts, String[] fields, Object[] values) throws DAOException {
+		Number[] ids = null;
+		if (ts != null && ts.length > 0) {
+			Connection con = null;
+			ids = new Number[ts.length];
+			try {
+				con = ds.getConnection();
+				
+				Sql[] sqls = SqlFactory.getUpdateSql(ts).update(fields, values);
+				List<Object[]> argList = new ArrayList<Object[]>(ts.length);
+				for (Sql sql : sqls){
+					argList.add(sql.args.toArray());
+				}
+				Object[][] args = new Object[argList.size()][];
+				for (int i = 0; i < argList.size(); i++){
+					args[i] = argList.get(i);
+				}
+				
+				ids = JdbcUtil.batchUpdateWithArgs(con, sqls[0].sql, args);
+			} catch (Exception e) {
+				throw new DAOException("batchUpdate exception ", e);
+			}
+		}
+		return ids;
+	}
 
 	public <T> Number updateByFields(T t, String... fields) throws DAOException {
 		Number[] rs = this.updateByFields(new Object[] { t }, fields);

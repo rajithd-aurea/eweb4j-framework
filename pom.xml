@@ -21,11 +21,11 @@
 		<mysql.version>3.1.14</mysql.version>
 		<jsr311.version>1.1.1</jsr311.version>
 		<jsr303.version>4.0.0.GA</jsr303.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<fastjson-version>1.1.23</fastjson-version>
 		<velocity-version>1.7</velocity-version>
 		<commons-net-version>2.2</commons-net-version>
 		<thumbnailator-version>0.4.2</thumbnailator-version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<developers>
 		<developer>

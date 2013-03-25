@@ -18,7 +18,27 @@ import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
 
 public class FreemarkerRendererImpl extends Renderer{
-
+	public Configuration cfg = null;
+	
+	public FreemarkerRendererImpl(){
+		cfg = (Configuration) SingleBeanCache.get("freemarker");
+		if (cfg == null){
+			//初始化
+			cfg = new Configuration();
+			// 指定模板从何处加载的数据源，这里设置成一个文件目录。
+			try {
+				cfg.setDirectoryForTemplateLoading(new File(ConfigConstant.ROOT_PATH + MVCConfigConstant.FORWARD_BASE_PATH));
+			} catch (Throwable e){
+				throw new RuntimeException(e);
+			}
+			
+			// 指定模板如何检索数据模型
+			cfg.setObjectWrapper(new DefaultObjectWrapper());
+			cfg.setDefaultEncoding("UTF-8");
+			SingleBeanCache.add("freemarker", cfg);
+		}
+	}
+	
 	public String render(String name, Object value){
 		return render(CommonUtil.map(name, value));
 	}
@@ -42,23 +62,11 @@ public class FreemarkerRendererImpl extends Renderer{
 			datas = new HashMap<String, Object>();
 		
 		try {
-			Configuration cfg = (Configuration) SingleBeanCache.get("freemarker");
-			if (cfg == null){
-				//初始化
-				cfg = new Configuration();
-				// 指定模板从何处加载的数据源，这里设置成一个文件目录。
-				cfg.setDirectoryForTemplateLoading(new File(ConfigConstant.ROOT_PATH + MVCConfigConstant.FORWARD_BASE_PATH));
-				// 指定模板如何检索数据模型
-				cfg.setObjectWrapper(new DefaultObjectWrapper());
-				cfg.setDefaultEncoding("UTF-8");
-				SingleBeanCache.add("freemarker", cfg);
-			}
 			
 			String tplPath = paths.get(MVCConfigConstant.LAYOUT_SCREEN_CONTENT_KEY);
 			
 			// 将环境变量和输出部分结合
 			if (this.layout != null){
-				
 				for (Iterator<Entry<String, String>> it = this.paths.entrySet().iterator(); it.hasNext(); ){
 					Entry<String, String> e = it.next();
 					String paramName = e.getKey();
@@ -82,7 +90,10 @@ public class FreemarkerRendererImpl extends Renderer{
 		} catch (Exception e){
 			throw new RuntimeException(e);
 		}
+	}
 
+	public String render(Map<String, Object> datas, String template) {
+		return template;
 	}
 
 }

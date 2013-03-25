@@ -63,4 +63,12 @@ public abstract class Renderer {
 	public abstract void render(Writer writer, Map<String, Object> datas);
 	
 	public abstract void render(Writer writer);
+	
+	public abstract String render(Map<String, Object> datas, String template);
+	
+	public String render(String name, Object value, String template){
+		Map<String, Object> datas = new HashMap<String, Object>();
+		datas.put(name, value);
+		return render(datas, template);
+	}
 }

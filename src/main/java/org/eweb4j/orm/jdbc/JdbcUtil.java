@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 import org.eweb4j.config.Log;
 import org.eweb4j.config.LogFactory;
 import org.eweb4j.orm.jdbc.transaction.ConThreadLocal;
+import org.eweb4j.util.CommonUtil;
 
 public class JdbcUtil {
 
@@ -83,7 +84,7 @@ public class JdbcUtil {
 			logToOrm(sql, args, result);
 		} catch (SQLException e) {
 			logException(new StringBuilder(sql), e);
-			throw new JdbcUtilException(sql + " exception", e);
+			throw new JdbcUtilException(sql + ", args->" + CommonUtil.toJson(args) + " exception", e);
 		} finally {
 			close(null, pstmt, null);
 			if (!ConThreadLocal.isTrans()) {
@@ -133,7 +134,7 @@ public class JdbcUtil {
 			} catch (SQLException e) {
 
 				logException(sql, e);
-				throw new JdbcUtilException(sql + " exception", e);
+				throw new JdbcUtilException(sql + ", args->"+CommonUtil.toJson(args) + " exception", e);
 			} finally {
 				close(null, pstmt, null);
 				if (!ConThreadLocal.isTrans()) {
@@ -216,7 +217,7 @@ public class JdbcUtil {
 				pstmt = con.prepareStatement(sql);
 				if (args != null && args.length > 0) {
 					for (int i = 0; i < args.length; ++i) {
-						pstmt.setString(i + 1, String.valueOf(args[i]));
+						pstmt.setObject(i + 1, args[i]);
 					}
 				}
 				rs = pstmt.executeQuery();
@@ -226,7 +227,7 @@ public class JdbcUtil {
 				logOrm(sql, args, list);
 			} catch (Exception e) {
 				logException(sql, args, e);
-				throw new JdbcUtilException(sql + " exception ", e);
+				throw new JdbcUtilException(sql + ", args->"+CommonUtil.toJson(args) + " exception ", e);
 			} finally {
 				close(rs, pstmt, null);
 				if (!ConThreadLocal.isTrans()) {
@@ -354,7 +355,7 @@ public class JdbcUtil {
 			} catch (Exception e) {
 
 				logException(sql, args, e);
-				throw new JdbcUtilException(sql + " exception ", e);
+				throw new JdbcUtilException(sql + ", args->"+CommonUtil.toJson(args) + " exception ", e);
 			} finally {
 				close(rs, pstmt, null);
 				if (!ConThreadLocal.isTrans()) {
@@ -440,7 +441,7 @@ public class JdbcUtil {
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("execute sql：").append(sql);
-		if (args != null && args.length > 0) {
+		if (args != null) {
 			sb.append(" args->");
 			for (Object[] arg : args){
 				sb.append(Arrays.asList(arg)).append(",");
@@ -454,7 +455,7 @@ public class JdbcUtil {
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("execute sql：").append(sqls[i]);
-		if (args != null && args[i] != null && args.length > 0 && args[i].length > 0)
+		if (args != null && args[i] != null)
 			sb.append(" args->").append(Arrays.asList(args[i]));
 		sb.append(" result->").append(result[i]).append(";");
 		log.debug(sb.toString());
@@ -466,7 +467,7 @@ public class JdbcUtil {
 			sb.append("\n").append(ste.toString());
 		}
 		sb.append(sql);
-		if (args != null && args.length > 0)
+		if (args != null)
 			sb.append(" args->").append(Arrays.asList(args));
 		sb.append(" execute sql fail!");
 		log.error(sb.toString());
@@ -477,7 +478,7 @@ public class JdbcUtil {
 		StringBuilder sb = new StringBuilder();
 		int count = list == null ? 0 : list.size();
 		sb.append("execute sql：").append(sql);
-		if (args != null && args.length > 0)
+		if (args != null)
 			sb.append(" args->").append(Arrays.asList(args));
 		sb.append(" affected rows：").append(count).append(";");
 		log.debug(sb.toString());
@@ -487,7 +488,7 @@ public class JdbcUtil {
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("execute sql：").append(sql);
-		if (args != null && args.length > 0)
+		if (args != null)
 			sb.append(" args->").append(Arrays.asList(args));
 		sb.append(" result rows：").append(result.size()).append(";");
 		log.debug(sb.toString());

@@ -68,7 +68,7 @@ public class UpdateSqlCreator<T> {
 		return sqls;
 	}
 
-	public Sql[] update(String[] fields, String[] values)
+	public Sql[] update(String[] fields, Object[] values)
 			throws SqlCreateException {
 		Sql[] sqls = new Sql[ts.length];
 		for (int i = 0; i < ts.length; ++i) {
@@ -290,7 +290,7 @@ public class UpdateSqlCreator<T> {
 		return sql;
 	}
 
-	private Sql makeSQL(T t, String[] fields, String[] values) throws SqlCreateException {
+	private Sql makeSQL(T t, String[] fields, Object[] values) throws SqlCreateException {
 		Sql sql = new Sql();
 		Class<?> clazz = t.getClass();
 		String table = ORMConfigBeanUtil.getTable(clazz, false);
