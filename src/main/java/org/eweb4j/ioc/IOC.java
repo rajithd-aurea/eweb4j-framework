@@ -115,7 +115,7 @@ public class IOC {
 			if (IOCConfigBeanCache.containsKey(beanID)) {
 				IOCConfigBean iocBean = IOCConfigBeanCache.get(beanID);
 				// 取出该bean的类型，便于最后使用反射调用构造方法实例化
-				Class<T> clazz = (Class<T>) Class.forName(iocBean.getClazz());
+				Class<T> clazz = (Class<T>) Thread.currentThread().getContextClassLoader().loadClass(iocBean.getClazz());
 				// 判断该bean的生命周期
 				if (IOCConfigConstant.SINGLETON_SCOPE.equalsIgnoreCase(iocBean.getScope())) {
 					// 如果是单件，就从单件缓存池中取
@@ -145,7 +145,7 @@ public class IOC {
 							initargList.add(obj);
 							String type = inj.getType();
 							if (type != null && type.trim().length() > 0){
-								Class<?> cls = Class.forName(type);
+								Class<?> cls = Thread.currentThread().getContextClassLoader().loadClass(type);
 								argList.add(cls);
 							}else{
 								argList.add(obj.getClass());

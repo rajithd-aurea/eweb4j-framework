@@ -107,7 +107,7 @@ public class Model2Table {
 			final String _sql = String.format(create_table_script, table, table, sb.toString());
 			sql.append(_sql);
 			try {
-				Class<?> clazz = Class.forName((String)e.getKey());
+				Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass((String)e.getKey());
 				ReflectUtil ru = new ReflectUtil(clazz);
 				for (Field f : ru.getFields()){
 					if (!ClassUtil.isListClass(f))

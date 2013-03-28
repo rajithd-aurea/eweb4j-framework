@@ -237,7 +237,7 @@ public class CheckConfigBean {
 			String dataSource = orm.getDataSource();
 			if (null != dataSource && dataSource.trim().length() > 0) {
 				try {
-					if (Class.forName(dataSource) == null) {
+					if (Thread.currentThread().getContextClassLoader().loadClass(dataSource) == null) {
 						sb.append("当前您填写的( dataSource=").append(dataSource)
 								.append(" )是错误的！它必须是一个有效的类 ;\n");
 					}
@@ -389,7 +389,7 @@ public class CheckConfigBean {
 			}
 			if (!"".equals(ioc.getClazz())) {
 				try {
-					if (Class.forName(ioc.getClazz()) == null) {
+					if (Thread.currentThread().getContextClassLoader().loadClass(ioc.getClazz()) == null) {
 						sb.append("当前您填写的( class=").append(ioc.getClazz())
 								.append(" )是错误的！它必须是一个有效的类 ;\n");
 					}
@@ -416,7 +416,7 @@ public class CheckConfigBean {
 			StringBuilder sb = new StringBuilder();
 			if (!"".equals(inter.getClazz())) {
 				try {
-					if (Class.forName(inter.getClazz()) == null) {
+					if (Thread.currentThread().getContextClassLoader().loadClass(inter.getClazz()) == null) {
 						sb.append("当前您填写的( class=").append(inter.getClazz())
 								.append(" )是错误的！它必须是一个有效的类 ;\n");
 					}
@@ -511,7 +511,7 @@ public class CheckConfigBean {
 							&& !"float".equalsIgnoreCase(inj.getType())) {
 						String type = inj.getType();
 						try {
-							Class.forName(type);
+							Thread.currentThread().getContextClassLoader().loadClass(type);
 						} catch (ClassNotFoundException e) {
 							sb.append("当前您填写的：( type=")
 							.append(inj.getType())
@@ -589,7 +589,7 @@ public class CheckConfigBean {
 			StringBuilder sb = new StringBuilder();
 			if (!"".equals(orm.getClazz())) {
 				try {
-					if (Class.forName(orm.getClazz()) == null) {
+					if (Thread.currentThread().getContextClassLoader().loadClass(orm.getClazz()) == null) {
 						sb.append("当前您填写的( class=").append(orm.getClazz())
 								.append(" )是错误的！它必须是一个有效的类 ;\n");
 					}
@@ -650,7 +650,7 @@ public class CheckConfigBean {
 			StringBuilder sb = new StringBuilder();
 			if (!"".equals(mvc.getClazz())) {
 				try {
-					Class<?> clazz = Class.forName(mvc.getClazz());
+					Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(mvc.getClazz());
 					if (clazz == null) {
 						sb.append("当前您填写的( class=").append(mvc.getClazz())
 								.append(" )是错误的！它必须是一个有效的类 ;\n");
@@ -893,7 +893,7 @@ public class CheckConfigBean {
 
 					if (!"".equals(v.getClazz())) {
 						try {
-							if (Class.forName(v.getClazz()) == null) {
+							if (Thread.currentThread().getContextClassLoader().loadClass(v.getClazz()) == null) {
 								sb.append("当前您填写的( class=")
 										.append(v.getClazz())
 										.append(" )是错误的！它必须是一个有效的类 ;\n");

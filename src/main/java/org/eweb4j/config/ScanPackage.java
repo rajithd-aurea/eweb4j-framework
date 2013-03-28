@@ -132,7 +132,8 @@ public abstract class ScanPackage {
 					continue;
 				}
 
-				String clsName = f.getAbsolutePath().replace(this.currentClassPath, "").replace(File.separator, ".").replace(".class", "").substring(1);
+				String packName = f.getAbsolutePath().replace(this.currentClassPath, "").replace(File.separator, ".");
+				String clsName = packName.substring(1, packName.lastIndexOf("."));
 				boolean isPkg = false;
 				for (String pkg : packages){
 					if (".".equals(pkg) || clsName.startsWith(pkg)){
@@ -184,8 +185,7 @@ public abstract class ScanPackage {
 					if (isPkg){
 						if (!entryName.endsWith(".class"))
 							continue;
-						
-						final String className = entryName.replace(".class", "");
+						final String className = entryName.substring(0, entryName.lastIndexOf("."));
 						try {
 							if (!handleClass(className))
 								continue;
@@ -205,6 +205,10 @@ public abstract class ScanPackage {
 				continue;
 			}
 		}
+	}
+	public static void main(String[] args){
+		String entryName = "sg.ilovedeals.classifer.Simple.class";
+		System.out.println(entryName.substring(0, entryName.lastIndexOf(".")));
 	}
 	
 	protected abstract boolean handleClass(String className);

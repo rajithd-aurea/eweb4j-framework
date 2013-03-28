@@ -169,7 +169,7 @@ public class ORMConfigBeanWriter {
 										.append(f.getName()).toString()
 										.lastIndexOf("."));
 				try {
-					list.add(Class.forName(result));
+					list.add(Thread.currentThread().getContextClassLoader().loadClass(result));
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
 				}

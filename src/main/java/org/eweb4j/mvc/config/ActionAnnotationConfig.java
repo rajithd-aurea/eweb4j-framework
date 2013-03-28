@@ -45,7 +45,7 @@ public class ActionAnnotationConfig extends ScanPackage {
 
 		Class<?> cls = null;
 		try {
-			cls = Class.forName(clsName);
+			cls = Thread.currentThread().getContextClassLoader().loadClass(clsName);
 
 			if (cls == null)
 				return false;
@@ -62,6 +62,10 @@ public class ActionAnnotationConfig extends ScanPackage {
 			if ("application".equals(moduleName))
 				moduleName = "/";
 			
+//			boolean hasPath = JAXWSUtil.hasPath(cls);
+//			if (hasPath){
+//				moduleName = PathUtil.getPathValue(cls);
+//			}
 			Object obj = null;
 			try {
 				if (cls.getAnnotation(Singleton.class) != null) {
@@ -75,7 +79,7 @@ public class ActionAnnotationConfig extends ScanPackage {
 
 			} catch (Error er) {
 				// er.printStackTrace();
-				//log.debug("the action class new instance failued -> " + clsName + " | " + er.toString());
+				log.warn("the action class new instance failued -> " + clsName + " | " + er.toString());
 				return false;
 			} catch (Exception e) {
 				// e.printStackTrace();
@@ -123,7 +127,7 @@ public class ActionAnnotationConfig extends ScanPackage {
 	 * @param moduleName
 	 */
 	private void handleActionConfigInfo(ReflectUtil ru, Class<?> controller, Method method, String moduleName) {
-
+		//log.debug("now parse the method...... moduleName->" + moduleName);
 		// 这一步解析约定好的方法名doXxxAtXxx
 		final ActionConfigBean action = parseUriMappingSuffix(moduleName, method);
 		//log.debug("parse uri mapping by default rule -> " + action);
@@ -190,11 +194,10 @@ public class ActionAnnotationConfig extends ScanPackage {
 	 */
 	private ActionConfigBean parseUriMappingSuffix(String moduleName, Method m) {
 		ActionConfigBean acb = new ActionConfigBean();
-
 		String methodName = m.getName();
 		String fullName = m.toString();
-//		//log.debug("parse action.method --> " + fullName);
 		boolean hasPath = JAXWSUtil.hasPath(m);
+		//log.debug("has path of method "+m+" ->" + hasPath);
 		String uriMapping = null;
 		if (methodName.startsWith(ActionMethod.PREFIX)) {
 			uriMapping = methodName.substring(ActionMethod.PREFIX.length());
@@ -267,17 +270,16 @@ public class ActionAnnotationConfig extends ScanPackage {
 			}
 
 		} else if (!hasPath) {
-//			Path m_path = m.getAnnotation(Path.class);
+			//log.debug("parse action by default rule......");
 			/* 8 个默认方法 */
-			ActionConfigBean defaultAcb = parseDefaultActionConfig(methodName,
-					moduleName);
+			ActionConfigBean defaultAcb = parseDefaultActionConfig(methodName, moduleName);
+			//log.debug("parse action by default rule......--->"+defaultAcb);
 			if (defaultAcb != null) {
 				acb.setHttpMethod(defaultAcb.getHttpMethod());
 				acb.getResult().addAll(defaultAcb.getResult());
 
 				uriMapping = defaultAcb.getUriMapping();
 			} else {
-
 				String info = fullName + " does not starts with '" + ActionMethod.PREFIX + "' so that can not be a valid action uri mapping";
 				//log.debug(info);
 				return null;
@@ -287,6 +289,8 @@ public class ActionAnnotationConfig extends ScanPackage {
 		if (hasPath) {
 			uriMapping = CommonUtil.parsePropValue(org.eweb4j.mvc.config.PathUtil.getPathValue(m));
 		}
+		
+		//log.debug("parse uri mapping first -> " + uriMapping + ", hasPath->" + hasPath);
 		
 		acb.setUriMapping(uriMapping);
 		return acb;
@@ -530,7 +534,7 @@ public class ActionAnnotationConfig extends ScanPackage {
 
 		return _sb.toString();
 	}
-
+	
 	/**
 	 * 解析 Uri Mapping 的前部分
 	 * 
@@ -540,7 +544,9 @@ public class ActionAnnotationConfig extends ScanPackage {
 	 */
 	private static String parseUriMappingPrefix(Class<?> cls, String moduleName) {
 		boolean hasPath = JAXWSUtil.hasPath(cls);
+		//log.debug("has path of cls->" + cls + " is " + hasPath);
 		String clazzUriMapping = hasPath ?  PathUtil.getPathValue(cls) : moduleName;
+		//log.debug("cls uri->" + clazzUriMapping);
 		clazzUriMapping = CommonUtil.parsePropValue(clazzUriMapping);
 
 		return clazzUriMapping;

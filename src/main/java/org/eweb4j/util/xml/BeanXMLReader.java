@@ -161,7 +161,7 @@ public class BeanXMLReader implements XMLReader {
 
 				String cls = this.classes.get(el.getName()).getName();
 
-				Object object = Class.forName(cls).newInstance();
+				Object object = Thread.currentThread().getContextClassLoader().loadClass(cls).newInstance();
 
 				// 递归
 				object = readRecursion(el);

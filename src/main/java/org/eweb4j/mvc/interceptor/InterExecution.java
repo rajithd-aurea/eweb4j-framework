@@ -178,7 +178,7 @@ public class InterExecution {
 			interceptor = SingleBeanCache.get(inter.getClazz());
 		
 		if (interceptor == null){
-			interceptor = Class.forName(inter.getClazz()).newInstance();
+			interceptor = Thread.currentThread().getContextClassLoader().loadClass(inter.getClazz()).newInstance();
 			if ("singleton".equalsIgnoreCase(inter.getScope()))
 				SingleBeanCache.add(inter.getClazz(), interceptor);
 		}

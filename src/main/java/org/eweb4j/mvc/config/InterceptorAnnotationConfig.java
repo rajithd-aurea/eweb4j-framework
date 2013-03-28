@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eweb4j.cache.InterConfigBeanCache;
+import org.eweb4j.config.Log;
+import org.eweb4j.config.LogFactory;
 import org.eweb4j.config.ScanPackage;
 import org.eweb4j.mvc.action.annotation.Singleton;
 import org.eweb4j.mvc.config.bean.InterConfigBean;
@@ -12,7 +14,8 @@ import org.eweb4j.mvc.interceptor.Interceptor;
 import org.eweb4j.mvc.interceptor.Uri;
 
 public class InterceptorAnnotationConfig extends ScanPackage{
-	
+
+	public final static Log log = LogFactory.getMVCLogger(InterceptorAnnotationConfig.class);
 
 	public InterceptorAnnotationConfig() {
 		super();
@@ -23,11 +26,11 @@ public class InterceptorAnnotationConfig extends ScanPackage{
 	 * 
 	 * @param clsName
 	 */
-	public boolean handleClass(String clsName) {
+	public boolean handleClass(final String clsName) {
 
 		Class<?> cls = null;
 		try {
-			cls = Class.forName(clsName);
+			cls = Thread.currentThread().getContextClassLoader().loadClass(clsName);
 
 			if (cls == null)
 				return false;

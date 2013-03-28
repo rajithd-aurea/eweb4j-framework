@@ -24,7 +24,7 @@ public class DataSourceCreator {
 			throws Exception {
 
 		ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
-		Class<?> cls = Class.forName(cb.getOrm().getDataSource());
+		Class<?> cls = Thread.currentThread().getContextClassLoader().loadClass(cb.getOrm().getDataSource());
 		DataSource ds = (DataSource) cls.newInstance();
 
 		List<Property> properties = dbInfo.getProperty();

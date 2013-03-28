@@ -11,13 +11,19 @@ import javax.ws.rs.PathParam;
 
 import org.eweb4j.config.LogFactory;
 import org.eweb4j.mvc.action.Validation;
+import org.eweb4j.mvc.config.JAXWSUtil;
 import org.eweb4j.mvc.validator.annotation.Required;
 import org.eweb4j.mvc.validator.annotation.Validate;
 
 import test.po.Pet;
 
+@Path("/test")
 public class PetControl {
 
+	public static void main(String[] args){
+		System.out.println(JAXWSUtil.hasPath(PetControl.class));
+	}
+	
 	@Required
 	private int age;
 

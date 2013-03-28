@@ -270,7 +270,7 @@ public class PojoAnnotationConfig extends ScanPackage {
 		Class<?> clazz = null;
 
 		try {
-			clazz = Class.forName(clsName);
+			clazz = Thread.currentThread().getContextClassLoader().loadClass(clsName);
 		} catch (Error e) {
 			return null;
 		} catch (Exception e) {
@@ -298,7 +298,7 @@ public class PojoAnnotationConfig extends ScanPackage {
 					continue;
 				
 				if (clazz == null)
-					clazz = Class.forName(orm.getClazz());
+					clazz = Thread.currentThread().getContextClassLoader().loadClass(orm.getClazz());
 				if (ru == null)
 					ru = new ReflectUtil(clazz);
 				

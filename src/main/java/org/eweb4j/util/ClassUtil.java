@@ -24,7 +24,7 @@ public class ClassUtil {
 	public static Class<?> getPojoClass(String className) {
 		Class<?> cls;
 		try {
-			cls = Class.forName(className);
+			cls = Thread.currentThread().getContextClassLoader().loadClass(className);
 
 			if (isPojo(cls))
 				return cls;

@@ -32,7 +32,7 @@ public class ValidateExecution {
 				validator = ValidatorFactory.getValidator(val.getName());
 				if (validator == null)
 					try {
-						validator = (ValidatorIF) Class.forName(val.getClazz()).newInstance();
+						validator = (ValidatorIF) Thread.currentThread().getContextClassLoader().loadClass(val.getClazz()).newInstance();
 					} catch (Exception e) {
 						log.error(CommonUtil.getExceptionString(e));
 					}
