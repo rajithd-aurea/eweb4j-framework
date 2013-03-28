@@ -1,8 +1,8 @@
 package test;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Arrays;
-import java.util.Date;
 
 import org.eweb4j.config.EWeb4JConfig;
 import org.eweb4j.orm.Db;
@@ -11,7 +11,6 @@ import org.eweb4j.orm.dao.DAOFactory;
 import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.ReflectUtil;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 import test.po.Master;
 import test.po.Pet;
@@ -31,9 +30,12 @@ public class TestDb {
 		}
 	}
 	
+	public static void main(String[] args) throws IOException{
+	}
+	
 	public void testNotMappingColumn() throws Exception{
-		Pet pet = Db.ar(Pet.class).find("byFuck", "heiehi").first();
-		System.out.println(pet);
+		Number n = Db.ar(Pet.class).dao().update("fuck").set(-1).where().field("id").equal(12).execute();
+		System.out.println("number---->"+n);
 	}
 	
 	public void testInsert() throws Exception{
@@ -75,7 +77,6 @@ public class TestDb {
 		System.out.println(m);
 	}
 	
-	@Test
 	public void testBatchDelete() throws Exception{
 		Pet p1 = new Pet();
 		p1.setPetId(31L);

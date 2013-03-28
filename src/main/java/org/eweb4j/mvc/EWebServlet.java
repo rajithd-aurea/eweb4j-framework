@@ -1,6 +1,5 @@
 package org.eweb4j.mvc;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
@@ -8,7 +7,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Map.Entry;
 
 import javax.servlet.ServletConfig;
@@ -17,9 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.HttpMethod;
 
-import org.apache.velocity.app.VelocityEngine;
 import org.eweb4j.config.ConfigConstant;
 import org.eweb4j.config.EWeb4JConfig;
 import org.eweb4j.config.LogFactory;
@@ -29,11 +25,9 @@ import org.eweb4j.mvc.config.ActionConfig;
 import org.eweb4j.mvc.config.MVCConfigConstant;
 import org.eweb4j.mvc.interceptor.InterExecution;
 import org.eweb4j.mvc.upload.UploadFile;
+import org.eweb4j.mvc.upload.UploadUtil;
 import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.FileUtil;
-
-import freemarker.template.Configuration;
-import freemarker.template.DefaultObjectWrapper;
 
 /**
  * eweb4j.MVC filter
@@ -168,7 +162,7 @@ public class EWebServlet extends HttpServlet {
 		context.setQueryParamMap(qpMap);
 		
 		//将上传的表单元素注入到context中
-		ParamUtil.handleUpload(context);
+		UploadUtil.handleUpload(context);
 		return context;
 	}
 
@@ -225,7 +219,7 @@ public class EWebServlet extends HttpServlet {
 	private String parseMethod(HttpServletRequest request) {
 		String reqMethod = request.getMethod();
 
-		if (!HttpMethod.POST.equalsIgnoreCase(reqMethod))
+		if (!Http.Method.POST.equalsIgnoreCase(reqMethod))
 			return reqMethod;
 
 		String _method = request.getParameter(MVCConfigConstant.HTTP_METHOD_PARAM);
@@ -233,10 +227,10 @@ public class EWebServlet extends HttpServlet {
 		if (_method == null)
 			return reqMethod;
 
-		if (HttpMethod.PUT.equalsIgnoreCase(_method.trim()))
-			reqMethod = HttpMethod.PUT;
-		else if (HttpMethod.DELETE.equalsIgnoreCase(_method.trim()))
-			reqMethod = HttpMethod.DELETE;
+		if (Http.Method.PUT.equalsIgnoreCase(_method.trim()))
+			reqMethod = Http.Method.PUT;
+		else if (Http.Method.DELETE.equalsIgnoreCase(_method.trim()))
+			reqMethod = Http.Method.DELETE;
 
 		return reqMethod;
 	}

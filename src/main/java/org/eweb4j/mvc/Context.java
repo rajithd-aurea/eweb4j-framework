@@ -101,6 +101,8 @@ public class Context {
 	 * a map for data of view render
 	 */
 	private Map<String, Object> model = new HashMap<String,Object>();
+	
+	private Map<String, Object> globalModel = new HashMap<String, Object>();
 
 	public Context() {
 	}

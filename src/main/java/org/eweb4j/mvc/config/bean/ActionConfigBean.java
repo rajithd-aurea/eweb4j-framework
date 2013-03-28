@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.ws.rs.HttpMethod;
-
+import org.eweb4j.mvc.Http;
 import org.eweb4j.util.xml.AttrTag;
 import org.eweb4j.util.xml.Skip;
 
@@ -16,6 +15,7 @@ import org.eweb4j.util.xml.Skip;
  * @since v1.a.0
  */
 public class ActionConfigBean {
+	
 	@AttrTag
 	private String level = "1";
 
@@ -27,7 +27,7 @@ public class ActionConfigBean {
 	private String[] pathParams;
 
 	@AttrTag
-	private String httpMethod = HttpMethod.GET+"|"+HttpMethod.POST+"|"+HttpMethod.PUT+"|"+HttpMethod.DELETE;
+	private String httpMethod = Http.Method.GET+"|"+Http.Method.POST+"|"+Http.Method.PUT+"|"+Http.Method.DELETE;
 
 	@AttrTag
 	private String uriMapping;
@@ -37,9 +37,6 @@ public class ActionConfigBean {
 
 	@AttrTag
 	private String clazz;
-
-	@AttrTag
-	private String showValErrorType;
 
 	private List<ParamConfigBean> param = new ArrayList<ParamConfigBean>();
 	private List<ResultConfigBean> result = new ArrayList<ResultConfigBean>();
@@ -101,14 +98,6 @@ public class ActionConfigBean {
 		this.clazz = clazz;
 	}
 
-	public String getShowValErrorType() {
-		return showValErrorType;
-	}
-
-	public void setShowValErrorType(String showValErrorType) {
-		this.showValErrorType = showValErrorType;
-	}
-
 	public List<ValidatorConfigBean> getValidator() {
 		return validator;
 	}
@@ -147,7 +136,7 @@ public class ActionConfigBean {
 				+ ", consumes=" + consumes + ", pathParams="
 				+ Arrays.toString(pathParams) + ", httpMethod=" + httpMethod
 				+ ", uriMapping=" + uriMapping + ", method=" + method
-				+ ", clazz=" + clazz + ", showValErrorType=" + showValErrorType
+				+ ", clazz=" + clazz
 				+ ", param=" + param + ", result=" + result + ", validator="
 				+ validator + "]";
 	}

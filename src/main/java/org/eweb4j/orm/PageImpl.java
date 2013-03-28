@@ -4,33 +4,42 @@ import java.util.Collection;
 
 import org.eweb4j.orm.dao.DAO;
 
-public class PageImpl<T> implements Page<T>{
+public final class PageImpl<T> implements Page<T>{
 
 	private final int pageIndex;
 	private final int pageSize;
-
 	private final DAO owner;
-
+	private Collection<T> pojos;
+	private Long totalCount;
+	private Long totalPageCount;
+	
 	public PageImpl(int pageIndex, int pageSize, DAO owner) {
 		this.pageIndex = pageIndex;
 		this.pageSize = pageSize;
 		this.owner = owner;
 	}
 	
-	public Collection<T> getList() {
-		return this.owner.query(pageIndex, pageSize);
+	public synchronized Collection<T> getList() {
+		if (this.pojos == null)
+			this.pojos = this.owner.query(pageIndex, pageSize);
+		return this.pojos;
 	}
 
-	public int getTotalRowCount() {
-		return Integer.parseInt(String.valueOf(this.owner.count()));
+	public synchronized long getTotalRowCount() {
+		if (totalCount == null)
+			totalCount = this.owner.count();
+		
+		return totalCount;
 	}
 
-	public int getTotalPageCount() {
-		final int all = getTotalRowCount();
+	public synchronized long getTotalPageCount() {
+		final long all = getTotalRowCount();
 		if (pageSize == 0)
 			return 0;
+		if (this.totalPageCount == null)
+			this.totalPageCount = all/pageSize + (all%pageSize > 0 ? 1 : 0);
 		
-		return all/pageSize + (all%pageSize > 0 ? 1 : 0);
+		return this.totalPageCount;
 	}
 
 	public int getPageIndex() {

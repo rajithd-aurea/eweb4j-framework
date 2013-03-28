@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -27,13 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
 
 import org.eweb4j.cache.ActionConfigBeanCache;
 import org.eweb4j.cache.SingleBeanCache;
@@ -42,13 +36,19 @@ import org.eweb4j.config.Log;
 import org.eweb4j.config.LogFactory;
 import org.eweb4j.ioc.IOC;
 import org.eweb4j.mvc.Context;
+import org.eweb4j.mvc.Http;
 import org.eweb4j.mvc.MIMEType;
 import org.eweb4j.mvc.ParamUtil;
 import org.eweb4j.mvc.action.annotation.Ioc;
 import org.eweb4j.mvc.action.annotation.Singleton;
 import org.eweb4j.mvc.action.annotation.Transactional;
 import org.eweb4j.mvc.config.ActionClassCache;
+import org.eweb4j.mvc.config.ConsumesUtil;
+import org.eweb4j.mvc.config.JAXWSUtil;
 import org.eweb4j.mvc.config.MVCConfigConstant;
+import org.eweb4j.mvc.config.PathUtil;
+import org.eweb4j.mvc.config.ProducesUtil;
+import org.eweb4j.mvc.config.QueryParamUtil;
 import org.eweb4j.mvc.config.bean.ActionConfigBean;
 import org.eweb4j.mvc.config.bean.ResultConfigBean;
 import org.eweb4j.mvc.interceptor.After;
@@ -78,10 +78,6 @@ import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.ReflectUtil;
 import org.eweb4j.util.xml.BeanXMLUtil;
 import org.eweb4j.util.xml.XMLWriter;
-
-import freemarker.template.Configuration;
-import freemarker.template.DefaultObjectWrapper;
-import freemarker.template.Template;
 
 /**
  * Action 执行器
@@ -290,23 +286,24 @@ public class ActionExecution {
 				continue;
 			}
 
-			PathParam pathParamAnn = this.getPathParamAnn(anns);
-            if (pathParamAnn != null) {
-                paramValue = this.getPathParamValue(pathParamAnn.value());
+//			PathParam pathParamAnn = this.getPathParamAnn(anns);
+			Annotation pathParam = JAXWSUtil.getPathParam(anns);
+            if (pathParam != null) {
+                paramValue = this.getPathParamValue(PathUtil.getPathParamValue(pathParam));
                 params[i] = ClassUtil.getParamVal(paramClass, paramValue[0]);
                 continue;
             }
 
-			QueryParam queryParamAnn = this.getQueryParamAnn(anns);
-
-            // 视图模型
+//			QueryParam queryParamAnn = this.getQueryParamAnn(anns);
+            Annotation queryParamAnn = JAXWSUtil.getQueryParam(anns);
             if (queryParamAnn == null && Map.class.isAssignableFrom(paramClass)) {
                 params[i] = this.context.getModel();
                 continue;
             }
 
+            //若参数有@QueryParam注解
             if (queryParamAnn != null) {
-            	final String fieldName = queryParamAnn.value();
+            	final String fieldName = QueryParamUtil.getQueryParamValue(queryParamAnn);
 				if (File.class.isAssignableFrom(paramClass)) {
 					if (!this.context.getUploadMap().containsKey(fieldName))
 						continue;
@@ -359,8 +356,10 @@ public class ActionExecution {
 				
 				// 根据参数名称获取http对应的参数值
 				String defaultValue = null;
-				DefaultValue defaultValueAnn = this.getDefaultValueAnn(anns);
-				if (defaultValueAnn != null)defaultValue = defaultValueAnn.value();
+//				DefaultValue defaultValueAnn = this.getDefaultValueAnn(anns);
+				Annotation defaultValueAnn = JAXWSUtil.getDefaultValue(anns);
+				if (defaultValueAnn != null)
+					defaultValue = QueryParamUtil.getDefaultValue(defaultValueAnn);
 	
 				paramValue = this.getQueryParamValue(fieldName, defaultValue);
 				
@@ -413,8 +412,9 @@ public class ActionExecution {
 
 		// 如果含有两个或以上同名的方法,优先拿到被@Path注解的第一个方法
 		for (Method mm : methods) {
-			Path p = mm.getAnnotation(Path.class);
-			if (p == null)
+//			Path p = mm.getAnnotation(Path.class);
+			boolean hasPath = JAXWSUtil.hasPath(mm);
+			if (!hasPath)
 				continue;
 
 			m = mm;
@@ -489,47 +489,47 @@ public class ActionExecution {
 		return map;
 	}
 
-	private PathParam getPathParamAnn(Annotation[] anns) {
-		for (Annotation a : anns) {
-			if (a == null)
-				continue;
+//	private PathParam getPathParamAnn(Annotation[] anns) {
+//		for (Annotation a : anns) {
+//			if (a == null)
+//				continue;
+//
+//			if (!a.annotationType().isAssignableFrom(PathParam.class))
+//				continue;
+//
+//			return (PathParam) a;
+//		}
+//
+//		return null;
+//	}
 
-			if (!a.annotationType().isAssignableFrom(PathParam.class))
-				continue;
-
-			return (PathParam) a;
-		}
-
-		return null;
-	}
-
-	private QueryParam getQueryParamAnn(Annotation[] anns) {
-		for (Annotation a : anns) {
-			if (a == null)
-				continue;
-
-			if (!a.annotationType().isAssignableFrom(QueryParam.class))
-				continue;
-
-			return (QueryParam) a;
-		}
-
-		return null;
-	}
-	
-	private DefaultValue getDefaultValueAnn(Annotation[] anns) {
-		for (Annotation a : anns) {
-			if (a == null)
-				continue;
-
-			if (!a.annotationType().isAssignableFrom(DefaultValue.class))
-				continue;
-
-			return (DefaultValue) a;
-		}
-
-		return null;
-	}
+//	private QueryParam getQueryParamAnn(Annotation[] anns) {
+//		for (Annotation a : anns) {
+//			if (a == null)
+//				continue;
+//
+//			if (!a.annotationType().isAssignableFrom(QueryParam.class))
+//				continue;
+//
+//			return (QueryParam) a;
+//		}
+//
+//		return null;
+//	}
+//	
+//	private DefaultValue getDefaultValueAnn(Annotation[] anns) {
+//		for (Annotation a : anns) {
+//			if (a == null)
+//				continue;
+//
+//			if (!a.annotationType().isAssignableFrom(DefaultValue.class))
+//				continue;
+//
+//			return (DefaultValue) a;
+//		}
+//
+//		return null;
+//	}
 
 	private void handleDownload(File file) throws Exception{
 		if (file.exists()){
@@ -602,9 +602,13 @@ public class ActionExecution {
 		
 		if (!String.class.isAssignableFrom(retn.getClass())) {
 			String mimeType = null;
-			Produces prod = this.method.getAnnotation(Produces.class);
-			if (prod != null && prod.value() != null && prod.value().length > 0)
-				mimeType = prod.value()[0];
+//			Produces prod = this.method.getAnnotation(Produces.class);
+			boolean hasProduces = JAXWSUtil.hasProduces(method);
+			if (hasProduces){
+				String[] mimeTypes = ProducesUtil.getProducesValue(method);
+				if (mimeTypes != null && mimeTypes.length > 0)
+					mimeType = mimeTypes[0];
+			}
 			
 			if (mimeType == null || mimeType.trim().length() == 0)
 				mimeType = this.context.getRequest().getParameter(MVCConfigConstant.HTTP_HEADER_ACCEPT_PARAM);
@@ -668,7 +672,10 @@ public class ActionExecution {
 			this.context.getModel().put(name, getter.invoke(actionObject));
 		}
 		
-		this.context.getModel().put(MVCConfigConstant.BASE_URL_KEY, baseUrl);
+		this.context.getModel().put(MVCConfigConstant.BASE_URL_KEY, this.context.getServletContext().getAttribute(MVCConfigConstant.BASE_URL_KEY));
+		this.context.getModel().put(MVCConfigConstant.APPLICATION_SCOPE_KEY, this.context.getServletContext());
+		this.context.getModel().put(MVCConfigConstant.SESSION_SCOPE_KEY, this.context.getSession());
+		
 		this.context.getModel().put(MVCConfigConstant.REQ_PARAM_MAP_NAME, this.context.getQueryParamMap());
 		
 		// 客户端重定向
@@ -792,18 +799,18 @@ public class ActionExecution {
 					
 					return ;
 				} else if (RenderType.FREEMARKER.equalsIgnoreCase(type)) {
-					// FreeMarker 渲染
-					Configuration cfg = new Configuration();
-					// 指定模板从何处加载的数据源，这里设置成一个文件目录。
-					cfg.setDirectoryForTemplateLoading(new File(ConfigConstant.ROOT_PATH + MVCConfigConstant.FORWARD_BASE_PATH));
-					// 指定模板如何检索数据模型
-					cfg.setObjectWrapper(new DefaultObjectWrapper());
-					cfg.setDefaultEncoding("utf-8");
-
-					Template template = cfg.getTemplate(location);
-					template.setEncoding("utf-8");
-
-					template.process(this.context.getModel(), this.context.getWriter());
+//					// FreeMarker 渲染
+//					Configuration cfg = new Configuration();
+//					// 指定模板从何处加载的数据源，这里设置成一个文件目录。
+//					cfg.setDirectoryForTemplateLoading(new File(ConfigConstant.ROOT_PATH + MVCConfigConstant.FORWARD_BASE_PATH));
+//					// 指定模板如何检索数据模型
+//					cfg.setObjectWrapper(new DefaultObjectWrapper());
+//					cfg.setDefaultEncoding("utf-8");
+//
+//					Template template = cfg.getTemplate(location);
+//					template.setEncoding("utf-8");
+//
+//					template.process(this.context.getModel(), this.context.getWriter());
 					
 					return ;
 				} else if (RenderType.ACTION.equalsIgnoreCase(type)) {
@@ -833,7 +840,7 @@ public class ActionExecution {
 		String method;
 		String location;
 		if (!path.contains("@")) {
-			method = HttpMethod.GET;
+			method = Http.Method.GET;
 			location = path;
 		} else {
 			int lastIndex = path.indexOf("@") + 1;
@@ -854,16 +861,16 @@ public class ActionExecution {
 			method = method.substring(0, method.indexOf("?"));
 		}
 
-		if (HttpMethod.GET.equalsIgnoreCase(method)) {
+		if (Http.Method.GET.equalsIgnoreCase(method)) {
 			String pa = param == null ? "" : "?" + CommonUtil.replaceChinese2Utf8(param);
 			context.getResponse().sendRedirect(baseUrl + location + pa);
 			return;
 		}
 
 		String _method = "";
-		if (HttpMethod.PUT.equalsIgnoreCase(method) || HttpMethod.DELETE.equalsIgnoreCase(method)) {
+		if (Http.Method.PUT.equalsIgnoreCase(method) || Http.Method.DELETE.equalsIgnoreCase(method)) {
 			_method = new String(method);
-			method = HttpMethod.POST;
+			method = Http.Method.POST;
 		}
 
 		String action = baseUrl + location;
@@ -1055,11 +1062,12 @@ public class ActionExecution {
 		if (method == null)
 			return;
 		
-		Consumes cons = method.getAnnotation(Consumes.class);
-		if (cons != null && cons.value() != null) {
-			String[] cts = cons.value();
+//		Consumes cons = method.getAnnotation(Consumes.class);
+		boolean hasConsumes = JAXWSUtil.hasConsumes(method);
+		if (hasConsumes) {
+			String[] cts = ConsumesUtil.getConsumesValue(method);
 			for (String ct : cts){
-				if ("json".equals(ct) || MediaType.APPLICATION_JSON.equals(ct)){
+				if ("json".equals(ct) || MIMEType.JSON.equals(ct)){
 					String[] jss = this.context.getQueryParamMap().get("_json_data_");
 					if (jss != null) {
 						for (String json : jss){

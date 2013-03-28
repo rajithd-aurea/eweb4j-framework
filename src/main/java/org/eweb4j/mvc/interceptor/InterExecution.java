@@ -1,22 +1,13 @@
 package org.eweb4j.mvc.interceptor;
 
-import java.io.File;
 import java.lang.reflect.Method;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
 import org.eweb4j.cache.ActionConfigBeanCache;
 import org.eweb4j.cache.InterConfigBeanCache;
 import org.eweb4j.cache.SingleBeanCache;
-import org.eweb4j.config.ConfigConstant;
 import org.eweb4j.config.Log;
 import org.eweb4j.config.LogFactory;
 import org.eweb4j.mvc.Context;
@@ -26,12 +17,11 @@ import org.eweb4j.mvc.config.MVCConfigConstant;
 import org.eweb4j.mvc.config.bean.ActionConfigBean;
 import org.eweb4j.mvc.config.bean.InterConfigBean;
 import org.eweb4j.mvc.config.bean.Uri;
+import org.eweb4j.mvc.view.JSPRendererImpl;
+import org.eweb4j.mvc.view.RenderFactory;
+import org.eweb4j.mvc.view.Renderer;
 import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.ReflectUtil;
-
-import freemarker.template.Configuration;
-import freemarker.template.DefaultObjectWrapper;
-import freemarker.template.Template;
 
 public class InterExecution {
 
@@ -254,7 +244,7 @@ public class InterExecution {
 	 */
 	public void showErr() throws Exception {
 
-		final String re = error;
+		String re = error;
 		final String baseUrl = (String) this.context.getServletContext().getAttribute(MVCConfigConstant.BASE_URL_KEY);
 		
 		// 客户端重定向
@@ -277,59 +267,64 @@ public class InterExecution {
 			this.context.getWriter().flush();
 
 			return;
-		} else if (re.startsWith(RenderType.FORWARD + ":")) {
-			String location = re.substring((RenderType.FORWARD + ":").length());
-			HttpServletRequest request = this.context.getRequest();
-			request.setAttribute(MVCConfigConstant.REQ_PARAM_MAP_NAME, this.context.getQueryParamMap());
-
-			for (Iterator<Entry<String, Object>> it = context.getModel().entrySet().iterator(); it.hasNext(); ) {
-				Entry<String, Object> entry = it.next();
-				request.setAttribute(entry.getKey(), entry.getValue());
-			}
-
-			// 服务端跳转
-			request.getRequestDispatcher(MVCConfigConstant.FORWARD_BASE_PATH + "/"+location).forward(request, this.context.getResponse());
-
-			return;
-		} else if (re.startsWith(RenderType.FREEMARKER + ":")) {
-			String location = re.substring((RenderType.FREEMARKER + ":").length());
-			// FreeMarker 渲染
-			Configuration cfg = new Configuration();
-			// 指定模板从何处加载的数据源，这里设置成一个文件目录。
-			cfg.setDirectoryForTemplateLoading(new File(ConfigConstant.ROOT_PATH + MVCConfigConstant.FORWARD_BASE_PATH));
-			// 指定模板如何检索数据模型
-			cfg.setObjectWrapper(new DefaultObjectWrapper());
-			cfg.setDefaultEncoding("utf-8");
-
-			Template template = cfg.getTemplate(location);
-			template.setEncoding("utf-8");
-
-			template.process(context.getModel(), this.context.getWriter());
-
-			return;
-		} else if (re.startsWith(RenderType.VELOCITY + ":")) {
-			String location = re.substring((RenderType.VELOCITY + ":").length());
-			File viewsDir = new File(ConfigConstant.ROOT_PATH + MVCConfigConstant.FORWARD_BASE_PATH);
-			 // 初始化Velocity模板引擎
-	        Properties p = new Properties();
-	        p.setProperty("resource.loader", "file");
-	        p.setProperty("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.FileResourceLoader");
-	        p.setProperty("file.resource.loader.path", viewsDir.getAbsolutePath());
-	        p.setProperty("file.resource.loader.cache", "true");
-	        p.setProperty("file.resource.loader.modificationCheckInterval", "2");
-	        p.setProperty("input.encoding", "utf-8");
-	        p.setProperty("output.encoding", "utf-8");
-	        VelocityEngine ve = new VelocityEngine(p);
-	        // Velocity获取模板文件，得到模板引用
-	        org.apache.velocity.Template t = ve.getTemplate(location);
-			VelocityContext velocityCtx = new VelocityContext();
-			for (Iterator<Entry<String, Object>> it = this.context.getModel().entrySet().iterator(); it.hasNext(); ){
-				Entry<String, Object> e = it.next();
-				velocityCtx.put(e.getKey(), e.getValue());
-			}
+		} else if (re.startsWith(RenderType.FORWARD + ":") 
+				|| re.startsWith(RenderType.JSP + ":")
+				|| re.endsWith("."+RenderType.JSP)) {
+			String[] str = re.split("@");
+			re = str[0];
+			String location = re;
+			if (re.startsWith(RenderType.FORWARD + ":"))
+				location = re.substring((RenderType.FORWARD + ":").length());
+			else if (re.startsWith(RenderType.JSP + ":"))
+				location = re.substring((RenderType.JSP + ":").length());
 			
-			// 将环境变量和输出部分结合
-	        t.merge(velocityCtx, this.context.getWriter());
+			//渲染JSP
+	        JSPRendererImpl render = new JSPRendererImpl();
+	        render.setContext(context);
+	        if (str.length > 1)
+	        	render.layout(str[1]);
+	        
+	        render.target(location).render(context.getWriter(), context.getModel());
+			
+			return;
+		} else if (re.startsWith(RenderType.FREEMARKER + ":") 
+				|| re.startsWith(RenderType.FREEMARKER2 + ":")
+				|| re.endsWith("."+RenderType.FREEMARKER2)) {
+			String[] str = re.split("@");
+			re = str[0];
+			String location = re;
+			if (re.startsWith(RenderType.FREEMARKER + ":"))
+				location = re.substring((RenderType.FREEMARKER + ":").length());
+			else if (re.startsWith(RenderType.FREEMARKER2 + ":"))
+				location = re.substring((RenderType.FREEMARKER2 + ":").length());
+			
+			//渲染Freemarker
+	        Renderer render = RenderFactory.create(RenderType.FREEMARKER).target(location);
+	        if (str.length > 1)
+	        	render.layout(str[1]);
+	        
+	        render.render(context.getWriter(), context.getModel());
+			
+	        this.context.getWriter().flush();
+			return;
+		}else if (re.startsWith(RenderType.VELOCITY + ":") 
+				|| re.startsWith(RenderType.VELOCITY2 + ":")
+				|| re.endsWith("."+RenderType.VELOCITY2)) {
+			String[] str = re.split("@");
+			re = str[0];
+			String location = re;
+			if (re.startsWith(RenderType.VELOCITY + ":"))
+				location = re.substring((RenderType.VELOCITY + ":").length());
+			else if (re.startsWith(RenderType.VELOCITY2 + ":"))
+				location = re.substring((RenderType.VELOCITY2 + ":").length());
+			
+			//渲染Velocity
+	        Renderer render = RenderFactory.create(RenderType.VELOCITY).target(location);
+	        if (str.length > 1)
+	        	render.layout(str[1]);
+	        
+	        render.render(context.getWriter(),context.getModel());
+			
 	        this.context.getWriter().flush();
 			return;
 		} else{

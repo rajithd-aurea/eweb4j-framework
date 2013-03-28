@@ -8,7 +8,6 @@ import org.eweb4j.orm.dao.config.DAOConfigConstant;
 import org.eweb4j.orm.dao.config.bean.DBInfoConfigBean;
 
 /**
- * 全局单件对象缓存
  * 
  * @author cfuture.aw
  * @since v1.a.0

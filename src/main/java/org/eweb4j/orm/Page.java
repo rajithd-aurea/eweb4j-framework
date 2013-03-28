@@ -27,12 +27,12 @@ public interface Page<T> {
 	/**
 	 * Return the total row count for all pages.
 	 */
-    public int getTotalRowCount();
+    public long getTotalRowCount();
     
     /**
      * Return the total number of pages.
      */
-    public int getTotalPageCount();
+    public long getTotalPageCount();
     
     /**
      * Return the index position of this page.

@@ -20,7 +20,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.HttpMethod;
 
 import org.eweb4j.config.ConfigConstant;
 import org.eweb4j.config.EWeb4JConfig;
@@ -31,6 +30,7 @@ import org.eweb4j.mvc.config.ActionConfig;
 import org.eweb4j.mvc.config.MVCConfigConstant;
 import org.eweb4j.mvc.interceptor.InterExecution;
 import org.eweb4j.mvc.upload.UploadFile;
+import org.eweb4j.mvc.upload.UploadUtil;
 import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.FileUtil;
 
@@ -85,6 +85,21 @@ public class EWebFilter implements Filter, Servlet {
 		System.out.println(info.toString());
 	}
 
+	public static final boolean isMultipartContent(HttpServletRequest request) {
+        if (!"post".equals(request.getMethod().toLowerCase())) {
+            return false;
+        }
+        String contentType = request.getContentType();
+        if (contentType == null) {
+            return false;
+        }
+        if (contentType.toLowerCase().startsWith("multipart/")) {
+            return true;
+        }
+        return false;
+    }
+
+	
 	/**
 	 * 初始化
 	 * 
@@ -103,7 +118,9 @@ public class EWebFilter implements Filter, Servlet {
 		context.setQueryParamMap(qpMap);
 		
 		//将上传的表单元素注入到context中
-		ParamUtil.handleUpload(context);
+		if (isMultipartContent(context.getRequest())) 
+			UploadUtil.handleUpload(context);
+		
 		return context;
 	}
 
@@ -212,7 +229,6 @@ public class EWebFilter implements Filter, Servlet {
 			servletContext.setAttribute(MVCConfigConstant.BASE_URL_KEY, baseUrl);
 			LogFactory.getMVCLogger(EWebFilter.class).debug("${" + MVCConfigConstant.BASE_URL_KEY + "} -> " + baseUrl);
 		}
-
 	}
 
 	/**
@@ -223,7 +239,7 @@ public class EWebFilter implements Filter, Servlet {
 	private String parseMethod(HttpServletRequest request) {
 		String reqMethod = request.getMethod();
 
-		if (!HttpMethod.POST.equalsIgnoreCase(reqMethod))
+		if (!Http.Method.POST.equalsIgnoreCase(reqMethod))
 			return reqMethod;
 
 		String _method = request.getParameter(MVCConfigConstant.HTTP_METHOD_PARAM);
@@ -231,10 +247,10 @@ public class EWebFilter implements Filter, Servlet {
 		if (_method == null)
 			return reqMethod;
 
-		if (HttpMethod.PUT.equalsIgnoreCase(_method.trim()))
-			reqMethod = HttpMethod.PUT;
-		else if (HttpMethod.DELETE.equalsIgnoreCase(_method.trim()))
-			reqMethod = HttpMethod.DELETE;
+		if (Http.Method.PUT.equalsIgnoreCase(_method.trim()))
+			reqMethod = Http.Method.PUT;
+		else if (Http.Method.DELETE.equalsIgnoreCase(_method.trim()))
+			reqMethod = Http.Method.DELETE;
 
 		return reqMethod;
 	}

@@ -4,7 +4,7 @@ package org.eweb4j.mvc.config;
  * @author cfuture.aw
  * @since v1.a.0
  */
-public class MVCConfigConstant {
+public final class MVCConfigConstant {
 	public final static String SUCCESS_RESULT = "success";
 	public final static String ERROR_RESULT = "error";
 	public final static String INPUT_RESULT = "input";
@@ -15,7 +15,9 @@ public class MVCConfigConstant {
 	public final static String JSON_OUT = "jsonOut";
 	public final static String AJAX_OUT = "ajaxOut";
 	
-	public static  String REQ_PARAM_MAP_NAME = "ReqParamMap";
+	public static String REQ_PARAM_MAP_NAME = "ReqParamMap";
+	public final static String APPLICATION_SCOPE_KEY = "Application";
+	public final static String SESSION_SCOPE_KEY = "Session";
 	
 	public static String BASE_URL = "";
 	

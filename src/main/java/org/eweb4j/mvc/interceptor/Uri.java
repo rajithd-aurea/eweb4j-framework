@@ -13,5 +13,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.ANNOTATION_TYPE)
 public @interface Uri {
 	String value() default "";
-	String type() default "all";
+	String type() default "all";//start, end, contains, all, regex, actions
 }
