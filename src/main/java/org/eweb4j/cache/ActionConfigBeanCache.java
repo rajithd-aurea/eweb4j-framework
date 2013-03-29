@@ -45,8 +45,7 @@ public final class ActionConfigBeanCache {
 	public static Map<String, List<?>> getByMatches(final String aUri,final String reqMethod) {
 		String uri = new String(aUri);
 		Map<String, List<?>> result = null;
-		for (Iterator<Entry<Object, ActionConfigBean>> it = ACTION_CFG_BEAN
-				.entrySet().iterator(); it.hasNext();) {
+		for (Iterator<Entry<Object, ActionConfigBean>> it = ACTION_CFG_BEAN.entrySet().iterator(); it.hasNext();) {
 
 			Entry<Object, ActionConfigBean> entry = it.next();
 			Object beanID = entry.getKey();
@@ -55,16 +54,16 @@ public final class ActionConfigBeanCache {
 				continue;
 
 			// 如果是String
-			String regex = String.valueOf(beanID).replace(
-					ActionMethod.CON + mvcBean.getHttpMethod(), "");
-			if (regex.contains("{") || regex.contains("}"))
+			String bid = String.valueOf(beanID).replace(ActionMethod.CON + mvcBean.getHttpMethod(), "");
+//			System.out.println("bid------>"+bid );
+			if (bid.contains("{") || bid.contains("}"))
 				continue;
 
 			if (aUri.endsWith("/"))
 				uri = aUri.substring(0, aUri.length() - 1);
 
-			if (regex.endsWith("/"))
-				regex = regex.substring(0, regex.length() - 1);
+			if (bid.endsWith("/"))
+				bid = bid.substring(0, bid.length() - 1);
 
 			String[] methods = mvcBean.getHttpMethod().split("\\|");
 			boolean checkMethod = false;
@@ -74,15 +73,18 @@ public final class ActionConfigBeanCache {
 					break;
 				}
 			}
-			if (regex != null && checkMethod && uri.matches(regex)) {
+			
+//			System.out.println("uri.matches(bid)->"+uri.matches(bid) + ", uri->" + uri);
+			
+			if (bid != null && checkMethod && uri.matches(bid)) {
 				result = new HashMap<String, List<?>>();
+				// 先将类似 {xxx} 的东西找出来，然后取里面的xxx作为参数名，匹配到的位置作为参数值，不考虑具体的数据类型
 				// 1.hello/{name}/test/{id}
 				// 2.{"hello/","{name}","/test/{id}"}
 				String urlMapping = mvcBean.getUriMapping();
 				// 如果urlMapping的开头是“/”要去掉
 				if (urlMapping.startsWith("/"))
 					urlMapping = urlMapping.substring(1);
-
 				String pattern = RegexList.path_var_regexp;
 				Pattern p = Pattern.compile(pattern);
 				Matcher m = p.matcher(urlMapping);
@@ -96,10 +98,15 @@ public final class ActionConfigBeanCache {
 //					System.out.println("list--->"+Arrays.asList(regexSplit));
 					String paramVal = UrlParamHandler.matchersUrlParam(uri, regexSplit);
 
-//					 System.out.println("pV->" + paramVal);
+//					System.out.println("pV->" + paramVal);
 					if (paramVal != null) {
 						urlParamValues.add(paramVal);
 						urlParamNames.add(g);
+						//要记得解析完一个就好把urlMapping的{xxx}参数的{和}给干掉,因为那个UrlParamHandler只能一次解析一个{xxx}参数值
+						urlMapping = urlMapping.replace(g, paramVal);
+					}else{
+						//要记得解析完一个就好把urlMapping的{xxx}参数的{和}给干掉,因为那个UrlParamHandler只能一次解析一个{xxx}参数值
+						urlMapping = urlMapping.replace(g, g.replace("{", "").replace("}", ""));
 					}
 				}
 

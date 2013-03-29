@@ -281,16 +281,13 @@ public class ParamUtil {
 		return map;
 	}
 	
-	public static Map<String, String[]> getPathParamMap(
-			Map<String, List<?>> urlParams) {
+	public static Map<String, String[]> getPathParamMap(Map<String, List<?>> urlParams) {
 
 		Map<String, String[]> map = new HashMap<String, String[]>();
 
-		List<String> urlParamNames = (List<String>) urlParams
-				.get("urlParamNames");
+		List<String> urlParamNames = (List<String>) urlParams.get("urlParamNames");
 
-		List<String> urlParamValues = (List<String>) urlParams
-				.get("urlParamValues");
+		List<String> urlParamValues = (List<String>) urlParams.get("urlParamValues");
 
 		if (urlParams == null || urlParamNames == null
 				|| urlParamNames.size() == 0 || urlParamValues == null

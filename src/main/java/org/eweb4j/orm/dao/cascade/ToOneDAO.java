@@ -8,12 +8,17 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
+import org.eweb4j.config.Log;
+import org.eweb4j.config.LogFactory;
 import org.eweb4j.orm.config.ORMConfigBeanUtil;
 import org.eweb4j.orm.dao.DAOException;
 import org.eweb4j.orm.dao.DAOFactory;
 import org.eweb4j.util.ReflectUtil;
 
 public class ToOneDAO {
+	
+	public final static Log log = LogFactory.getORMLogger(ToOneDAO.class);
+	
 	private String dsName;
 	private Object t;
 	private List<Field> fields;
@@ -149,12 +154,9 @@ public class ToOneDAO {
 		if (this.fields == null || this.fields.size() == 0)
 			return;
 		if (idVal == null || "0".equals(idVal) || "".equals(idVal)) {
+			log.warn("skip cascade select cause this pojo has no @Id value");
 			return;
 		} 
-//		else if (DAOFactory.getSelectDAO(dsName).selectOne(t, this.idField) == null) {
-//			// 检查一下当前对象的ID是否存在于数据库
-//			return;
-//		}
 
 		for (Field f : fields) {
 			Method tarGetter = ru.getGetter(f.getName());

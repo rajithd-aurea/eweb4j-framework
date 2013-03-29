@@ -119,7 +119,6 @@ public class ActionExecution {
 		Map<String, List<?>> pathParams = null;
 		if (ActionConfigBeanCache.containsKey(this.context.getUri()) 
 				|| (pathParams = ActionConfigBeanCache.getByMatches(this.context.getUri(), this.context.getHttpMethod())) != null) {
-
 			// 处理形如" /xxx/{id}/{name} "的URI
 			if (pathParams != null && pathParams.containsKey("mvcBean")) {
 				// 根据Url配置的UrlParam获取参数值

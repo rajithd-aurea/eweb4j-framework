@@ -99,8 +99,7 @@ public class CascadeDAO {
 	}
 
 	public <T> void select(T t, String fieldName) {
-		cascade(new Object[] { t }, new String[] { fieldName },
-				CascadeType.SELECT);
+		cascade(new Object[] { t }, new String[] { fieldName }, CascadeType.SELECT);
 	}
 
 	/**
