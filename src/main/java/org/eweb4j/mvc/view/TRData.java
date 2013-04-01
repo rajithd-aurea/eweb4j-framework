@@ -34,6 +34,4 @@ public class TRData {
 		data.setDatas(this.getDatas());
 		return data;
 	}
-	
-
 }

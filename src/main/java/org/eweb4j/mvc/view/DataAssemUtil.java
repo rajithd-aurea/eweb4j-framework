@@ -47,7 +47,6 @@ public class DataAssemUtil {
 				continue;
 
 			listPage.getTrdatas().add(data.clone());
-			// System.out.println(">>>>>>>data>>>>" + data);
 		}
 
 		return listPage;
@@ -78,9 +77,12 @@ public class DataAssemUtil {
 			else
 				name = _name;
 
-			if (getterVal != null && ClassUtil.isPojo(field.getType()))
+			//如果是POJO类型
+			if (getterVal != null && ClassUtil.isPojo(field.getType())){
+				//进入递归
 				getData(listPage, prop, data, name, getterVal, flag);
-
+			}
+			
 			if (getterVal == null) {
 				getterVal = " ";
 			}
@@ -88,8 +90,9 @@ public class DataAssemUtil {
 			String property = prop.get(name);
 			// System.out.println("name-->" + name + " | property-->" +
 			// property);
-			if (property == null)
+			if (property == null) {
 				continue;
+			}
 
 			// System.out.println(name + "-->" + getterVal);
 

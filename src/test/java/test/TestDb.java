@@ -11,6 +11,7 @@ import org.eweb4j.orm.dao.DAOFactory;
 import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.ReflectUtil;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 import test.po.Master;
 import test.po.Pet;
@@ -34,15 +35,15 @@ public class TestDb {
 	}
 	
 	public void testNotMappingColumn() throws Exception{
-		Number n = Db.ar(Pet.class).dao().update("fuck").set(-1).where().field("id").equal(12).execute();
-		System.out.println("number---->"+n);
 	}
 	
+	@Test
 	public void testInsert() throws Exception{
 		Pet pet = new Pet();
-		pet.setName("testName");
+		pet.setName("testName2222");
+		pet.setPetId(29);
 		
-		Db.ar(pet).create();
+		Db.ar(pet).save();
 	}
 	
 	public void testShow() throws Exception{
