@@ -9,8 +9,7 @@ import java.lang.annotation.Target;
 @Inherited
 @Documented  
 @Retention(RetentionPolicy.RUNTIME)  
-@Target(ElementType.METHOD)
-@Deprecated
+@Target(ElementType.METHOD) 
 public @interface Result {
 	String[] name() default "success";
 	String[] type() default "forward";

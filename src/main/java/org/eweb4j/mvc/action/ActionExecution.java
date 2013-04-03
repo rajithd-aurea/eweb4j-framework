@@ -758,63 +758,83 @@ public class ActionExecution {
 			
 	        this.context.getWriter().flush();
 			return;
-		} 
-//		else {
-//			List<ResultConfigBean> results = this.context.getActionConfigBean().getResult();
-//
-//			if (results == null || results.size() == 0) {
-//				this.context.getWriter().print(retn);
-//				this.context.getWriter().flush();
-//				return;
-//			}
-//
-//			boolean isOut = true;
-//			for (ResultConfigBean r : results) {
-//				if (!"_props_".equals(r.getName()) && !r.getName().equals(re)
-//						&& !"".equals(re)){
-//					continue;
-//				}
-//				
-//				isOut = false;
-//				String type = r.getType();
-//				String location = r.getLocation();
-//				if (RenderType.REDIRECT.equalsIgnoreCase(type)) {
-//					this.context.getResponse().sendRedirect(CommonUtil.replaceChinese2Utf8(location));
-//					
-//					return ;
-//				} else if (RenderType.FORWARD.equalsIgnoreCase(type)) {
-//					HttpServletRequest request = this.context.getRequest();
-//
-//					fields = ru.getFields();
-//					if (fields == null)
-//						return;
-//
-//					// 服务端跳转
-//					request.getRequestDispatcher(MVCConfigConstant.FORWARD_BASE_PATH + location).forward(request, this.context.getResponse());
-//					
-//					return ;
-//				} else if (RenderType.FREEMARKER.equalsIgnoreCase(type)) {
-//					
-//					return ;
-//				} else if (RenderType.ACTION.equalsIgnoreCase(type)) {
-//					// ACTION 重定向
-//					handleActionRedirect(context, location, baseUrl);
-//
-//					return ;
-//				} else if (RenderType.OUT.equalsIgnoreCase(type)
-//						|| location.trim().length() == 0) {
-//					this.context.getWriter().print(location);
-//					this.context.getWriter().flush();
-//					
-//					return ;
-//				} 
-//			}
-//			
-//			if (isOut){
-//				this.context.getWriter().print(retn);
-//				this.context.getWriter().flush();
-//			}
-//		}
+		} else {
+			List<ResultConfigBean> results = this.context.getActionConfigBean().getResult();
+
+			if (results == null || results.size() == 0) {
+				this.context.getWriter().print(retn);
+				this.context.getWriter().flush();
+				return;
+			}
+
+			boolean isOut = true;
+			for (ResultConfigBean r : results) {
+				if (!"_props_".equals(r.getName()) && !r.getName().equals(re)
+						&& !"".equals(re)){
+					continue;
+				}
+				
+				isOut = false;
+				String type = r.getType();
+				String location = r.getLocation();
+				
+				if (RenderType.REDIRECT.equalsIgnoreCase(type)) {
+					this.context.getResponse().sendRedirect(CommonUtil.replaceChinese2Utf8(location));
+					return ;
+				} else if (RenderType.FORWARD.equalsIgnoreCase(type)
+						|| RenderType.JSP.equalsIgnoreCase(type)) {
+					//渲染JSP
+					String[] str = location.split("@");
+			        JSPRendererImpl render = new JSPRendererImpl();
+			        render.setContext(context);
+			        if (str.length > 1)
+			        	render.layout(str[1]);
+			        
+			        render.target(str[0]).render(context.getWriter(), context.getModel());
+			        
+					return ;
+				} else if (RenderType.FREEMARKER.equalsIgnoreCase(type)
+						|| RenderType.FREEMARKER2.equalsIgnoreCase(type)) {
+					//渲染Freemarker
+					String[] str = location.split("@");
+			        Renderer render = RenderFactory.create(RenderType.FREEMARKER).target(str[0]);
+			        if (str.length > 1)
+			        	render.layout(str[1]);
+			        render.render(context.getWriter(), context.getModel());
+			        this.context.getWriter().flush();
+			        
+					return ;
+				} else if (RenderType.VELOCITY.equalsIgnoreCase(type)
+						|| RenderType.VELOCITY2.equalsIgnoreCase(type)){
+					//渲染Velocity
+					String[] str = location.split("@");
+			        Renderer render = RenderFactory.create(RenderType.VELOCITY).target(str[0]);
+			        if (str.length > 1)
+			        	render.layout(str[1]);
+			        render.render(context.getWriter(),context.getModel());
+			        this.context.getWriter().flush();
+			        
+			        return ;
+				} else if (RenderType.ACTION.equalsIgnoreCase(type)) {
+					
+					// ACTION 重定向
+					handleActionRedirect(context, location, baseUrl);
+
+					return ;
+				} else if (RenderType.OUT.equalsIgnoreCase(type)
+						|| location.trim().length() == 0) {
+					this.context.getWriter().print(location);
+					this.context.getWriter().flush();
+					
+					return ;
+				} 
+			}
+			
+			if (isOut){
+				this.context.getWriter().print(retn);
+				this.context.getWriter().flush();
+			}
+		}
 
 	}
 
