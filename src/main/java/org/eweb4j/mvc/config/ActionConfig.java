@@ -148,11 +148,11 @@ public class ActionConfig {
 		MVCConfigConstant.BASE_URL_KEY = key;
 	}
 
-	public static void setREQ_PARAM_MAP_NAME(String key) {
+	public static void setREQ_PARAM_SCOPE_KEY(String key) {
 		if (key == null || key.trim().length() == 0)
 			return;
 
-		MVCConfigConstant.REQ_PARAM_MAP_NAME = key;
+		MVCConfigConstant.REQ_PARAM_SCOPE_KEY = key;
 	}
 
 	public static void setFORWARD_BASE_PATH(String key) {

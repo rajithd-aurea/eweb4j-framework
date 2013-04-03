@@ -64,7 +64,7 @@ public class EWebFilter implements Filter, Servlet {
 		
 		ActionConfig.setBASE_URL_KEY(config.getInitParameter(MVCCons.BASE_URL_KEY));
 
-		ActionConfig.setREQ_PARAM_MAP_NAME(config.getInitParameter(MVCCons.REQ_PARAM_MAP_KEY));
+		ActionConfig.setREQ_PARAM_SCOPE_KEY(config.getInitParameter(MVCCons.REQ_PARAM_MAP_KEY));
 		
 		ActionConfig.setHTTP_HEADER_ACCEPT_PARAM(config.getInitParameter(MVCCons.HTTP_METHOD_PARAM));
 		
@@ -80,7 +80,7 @@ public class EWebFilter implements Filter, Servlet {
 		
 		info.append("LayoutScreenContentKey --> ").append(MVCConfigConstant.LAYOUT_SCREEN_CONTENT_KEY).append("\n");
 
-		info.append("ReqParamMapKey --> ").append(MVCConfigConstant.REQ_PARAM_MAP_NAME).append("\n");
+		info.append("ReqParamMapKey --> ").append(MVCConfigConstant.REQ_PARAM_SCOPE_KEY).append("\n");
 
 		System.out.println(info.toString());
 	}

@@ -659,6 +659,7 @@ public class ActionExecution {
 
 		String re = String.valueOf(retn);
 
+		//model driven
 		for (Field f : fields) {
 			Method getter = ru.getGetter(f.getName());
 			if (getter == null)
@@ -672,13 +673,10 @@ public class ActionExecution {
 		}
 		
 		this.context.getModel().put(MVCConfigConstant.BASE_URL_KEY, this.context.getServletContext().getAttribute(MVCConfigConstant.BASE_URL_KEY));
-//		this.context.getModel().put(MVCConfigConstant.APPLICATION_SCOPE_KEY, this.context.getServletContext());
 		this.context.getModel().put(MVCConfigConstant.APPLICATION_SCOPE_KEY, new ServletContextProxy(this.context.getServletContext()).attrs());
 		this.context.getModel().put(MVCConfigConstant.SESSION_SCOPE_KEY, new HttpSessionProxy(this.context.getSession()).attrs());
 		this.context.getModel().put(MVCConfigConstant.COOKIE_SCOPE_KEY, new CookieProxy(this.context.getRequest().getCookies()).attrs());
-//		this.context.getModel().put(MVCConfigConstant.SESSION_SCOPE_KEY, this.context.getSession());
-		
-		this.context.getModel().put(MVCConfigConstant.REQ_PARAM_MAP_NAME, this.context.getQueryParamMap());
+		this.context.getModel().put(MVCConfigConstant.REQ_PARAM_SCOPE_KEY, this.context.getQueryParamMap());
 		
 		// 客户端重定向
 		if (re.startsWith(RenderType.REDIRECT + ":")) {
@@ -760,80 +758,63 @@ public class ActionExecution {
 			
 	        this.context.getWriter().flush();
 			return;
-		} else {
-			List<ResultConfigBean> results = this.context.getActionConfigBean().getResult();
-
-			if (results == null || results.size() == 0) {
-				this.context.getWriter().print(retn);
-				this.context.getWriter().flush();
-				return;
-			}
-
-			boolean isOut = true;
-			for (ResultConfigBean r : results) {
-				if (!"_props_".equals(r.getName()) && !r.getName().equals(re)
-						&& !"".equals(re)){
-					continue;
-				}
-				
-				isOut = false;
-				String type = r.getType();
-				String location = r.getLocation();
-				if (RenderType.REDIRECT.equalsIgnoreCase(type)) {
-					this.context.getResponse().sendRedirect(CommonUtil.replaceChinese2Utf8(location));
-					
-					return ;
-				} else if (RenderType.FORWARD.equalsIgnoreCase(type)) {
-					HttpServletRequest request = this.context.getRequest();
-					request.setAttribute(MVCConfigConstant.REQ_PARAM_MAP_NAME, this.context.getQueryParamMap());
-
-					fields = ru.getFields();
-					if (fields == null)
-						return;
-
-					for (Iterator<Entry<String, Object>> it = this.context.getModel().entrySet()
-							.iterator(); it.hasNext();) {
-						Entry<String, Object> entry = it.next();
-						request.setAttribute(entry.getKey(), entry.getValue());
-					}
-					// 服务端跳转
-					request.getRequestDispatcher(MVCConfigConstant.FORWARD_BASE_PATH + location).forward(request, this.context.getResponse());
-					
-					return ;
-				} else if (RenderType.FREEMARKER.equalsIgnoreCase(type)) {
-//					// FreeMarker 渲染
-//					Configuration cfg = new Configuration();
-//					// 指定模板从何处加载的数据源，这里设置成一个文件目录。
-//					cfg.setDirectoryForTemplateLoading(new File(ConfigConstant.ROOT_PATH + MVCConfigConstant.FORWARD_BASE_PATH));
-//					// 指定模板如何检索数据模型
-//					cfg.setObjectWrapper(new DefaultObjectWrapper());
-//					cfg.setDefaultEncoding("utf-8");
+		} 
+//		else {
+//			List<ResultConfigBean> results = this.context.getActionConfigBean().getResult();
 //
-//					Template template = cfg.getTemplate(location);
-//					template.setEncoding("utf-8");
+//			if (results == null || results.size() == 0) {
+//				this.context.getWriter().print(retn);
+//				this.context.getWriter().flush();
+//				return;
+//			}
 //
-//					template.process(this.context.getModel(), this.context.getWriter());
-					
-					return ;
-				} else if (RenderType.ACTION.equalsIgnoreCase(type)) {
-					// ACTION 重定向
-					handleActionRedirect(context, location, baseUrl);
-
-					return ;
-				} else if (RenderType.OUT.equalsIgnoreCase(type)
-						|| location.trim().length() == 0) {
-					this.context.getWriter().print(location);
-					this.context.getWriter().flush();
-					
-					return ;
-				} 
-			}
-			
-			if (isOut){
-				this.context.getWriter().print(retn);
-				this.context.getWriter().flush();
-			}
-		}
+//			boolean isOut = true;
+//			for (ResultConfigBean r : results) {
+//				if (!"_props_".equals(r.getName()) && !r.getName().equals(re)
+//						&& !"".equals(re)){
+//					continue;
+//				}
+//				
+//				isOut = false;
+//				String type = r.getType();
+//				String location = r.getLocation();
+//				if (RenderType.REDIRECT.equalsIgnoreCase(type)) {
+//					this.context.getResponse().sendRedirect(CommonUtil.replaceChinese2Utf8(location));
+//					
+//					return ;
+//				} else if (RenderType.FORWARD.equalsIgnoreCase(type)) {
+//					HttpServletRequest request = this.context.getRequest();
+//
+//					fields = ru.getFields();
+//					if (fields == null)
+//						return;
+//
+//					// 服务端跳转
+//					request.getRequestDispatcher(MVCConfigConstant.FORWARD_BASE_PATH + location).forward(request, this.context.getResponse());
+//					
+//					return ;
+//				} else if (RenderType.FREEMARKER.equalsIgnoreCase(type)) {
+//					
+//					return ;
+//				} else if (RenderType.ACTION.equalsIgnoreCase(type)) {
+//					// ACTION 重定向
+//					handleActionRedirect(context, location, baseUrl);
+//
+//					return ;
+//				} else if (RenderType.OUT.equalsIgnoreCase(type)
+//						|| location.trim().length() == 0) {
+//					this.context.getWriter().print(location);
+//					this.context.getWriter().flush();
+//					
+//					return ;
+//				} 
+//			}
+//			
+//			if (isOut){
+//				this.context.getWriter().print(retn);
+//				this.context.getWriter().flush();
+//			}
+//		}
 
 	}
 

@@ -15,9 +15,9 @@ public final class MVCConfigConstant {
 	public final static String JSON_OUT = "jsonOut";
 	public final static String AJAX_OUT = "ajaxOut";
 	
-	public static String REQ_PARAM_MAP_NAME = "ReqParamMap";
 	public final static String APPLICATION_SCOPE_KEY = "GLOBAL";
 	public final static String SESSION_SCOPE_KEY = "SESSION";
+	public static String REQ_PARAM_SCOPE_KEY = "PARAM";
 	public final static String COOKIE_SCOPE_KEY = "COOKIE";
 	
 	public static String BASE_URL = "";
