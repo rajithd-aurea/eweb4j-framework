@@ -132,6 +132,14 @@ public class FileUtil {
 		return true;
 	}
 
+	public static BufferedImage getBufferedImage(String imagePath, boolean isRemote) throws Exception {
+		return getBufferedImage(imagePath, isRemote, 0, 1*1000);
+	}
+	
+	public static BufferedImage getBufferedImage(String imagePath) throws Exception {
+		return getBufferedImage(imagePath, false, 0, 1*1000);
+	}
+	
 	public static BufferedImage getBufferedImage(String imagePath, int retryTimes, long sleep) throws Exception {
 		return getBufferedImage(imagePath, false, retryTimes, sleep);
 	}

@@ -1481,7 +1481,7 @@ public class CommonUtil {
 	
 	public static void main(String[] args){
 		String baseUrl = "http://www.guddeal.com.my";
-		String relativeUrl = "../assets/images/banner/010313_211004.jpg?param1=111&param2=222&xxx=fff";
+		String relativeUrl = "../../assets/images/banner/010313_211004.jpg?param1=111&param2=222&xxx=fff";
 		System.out.println(resolveUrl(baseUrl, relativeUrl));
 	}
 	

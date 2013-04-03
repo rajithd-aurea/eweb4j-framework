@@ -9,7 +9,7 @@ public class Ddl {
 	private String generate = "true";
 	
 	@AttrTag
-	private String override = "false";
+	private String override = "true";
 
 	@AttrTag
 	private String run = "false";

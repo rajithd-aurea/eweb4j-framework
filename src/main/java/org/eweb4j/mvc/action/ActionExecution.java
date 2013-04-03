@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -27,18 +26,19 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.Consumes;
 
 import org.eweb4j.cache.ActionConfigBeanCache;
 import org.eweb4j.cache.SingleBeanCache;
-import org.eweb4j.config.ConfigConstant;
 import org.eweb4j.config.Log;
 import org.eweb4j.config.LogFactory;
 import org.eweb4j.ioc.IOC;
 import org.eweb4j.mvc.Context;
+import org.eweb4j.mvc.CookieProxy;
 import org.eweb4j.mvc.Http;
+import org.eweb4j.mvc.HttpSessionProxy;
 import org.eweb4j.mvc.MIMEType;
 import org.eweb4j.mvc.ParamUtil;
+import org.eweb4j.mvc.ServletContextProxy;
 import org.eweb4j.mvc.action.annotation.Ioc;
 import org.eweb4j.mvc.action.annotation.Singleton;
 import org.eweb4j.mvc.action.annotation.Transactional;
@@ -672,8 +672,11 @@ public class ActionExecution {
 		}
 		
 		this.context.getModel().put(MVCConfigConstant.BASE_URL_KEY, this.context.getServletContext().getAttribute(MVCConfigConstant.BASE_URL_KEY));
-		this.context.getModel().put(MVCConfigConstant.APPLICATION_SCOPE_KEY, this.context.getServletContext());
-		this.context.getModel().put(MVCConfigConstant.SESSION_SCOPE_KEY, this.context.getSession());
+//		this.context.getModel().put(MVCConfigConstant.APPLICATION_SCOPE_KEY, this.context.getServletContext());
+		this.context.getModel().put(MVCConfigConstant.APPLICATION_SCOPE_KEY, new ServletContextProxy(this.context.getServletContext()).attrs());
+		this.context.getModel().put(MVCConfigConstant.SESSION_SCOPE_KEY, new HttpSessionProxy(this.context.getSession()).attrs());
+		this.context.getModel().put(MVCConfigConstant.COOKIE_SCOPE_KEY, new CookieProxy(this.context.getRequest().getCookies()).attrs());
+//		this.context.getModel().put(MVCConfigConstant.SESSION_SCOPE_KEY, this.context.getSession());
 		
 		this.context.getModel().put(MVCConfigConstant.REQ_PARAM_MAP_NAME, this.context.getQueryParamMap());
 		
