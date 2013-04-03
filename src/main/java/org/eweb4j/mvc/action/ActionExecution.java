@@ -645,7 +645,7 @@ public class ActionExecution {
 				this.context.getWriter().print("暂时不支持JSON 、XML以外的表述形式");
 			}
 			
-			this.context.getWriter().flush();
+//			this.context.getWriter().flush();
 
 			return;
 		}
@@ -695,7 +695,7 @@ public class ActionExecution {
 		} else if (re.startsWith(RenderType.OUT + ":")) {
 			String location = re.substring((RenderType.OUT + ":").length());
 			this.context.getWriter().print(location);
-			this.context.getWriter().flush();
+//			this.context.getWriter().flush();
 
 			return;
 		} else if (re.startsWith(RenderType.FORWARD + ":") 
@@ -736,7 +736,7 @@ public class ActionExecution {
 	        
 	        render.render(context.getWriter(), context.getModel());
 			
-	        this.context.getWriter().flush();
+//	        this.context.getWriter().flush();
 			return;
 		}else if (re.startsWith(RenderType.VELOCITY + ":") 
 				|| re.startsWith(RenderType.VELOCITY2 + ":")
@@ -756,14 +756,14 @@ public class ActionExecution {
 	        
 	        render.render(context.getWriter(),context.getModel());
 			
-	        this.context.getWriter().flush();
+//	        this.context.getWriter().flush();
 			return;
 		} else {
 			List<ResultConfigBean> results = this.context.getActionConfigBean().getResult();
 
 			if (results == null || results.size() == 0) {
 				this.context.getWriter().print(retn);
-				this.context.getWriter().flush();
+//				this.context.getWriter().flush();
 				return;
 			}
 
@@ -801,7 +801,7 @@ public class ActionExecution {
 			        if (str.length > 1)
 			        	render.layout(str[1]);
 			        render.render(context.getWriter(), context.getModel());
-			        this.context.getWriter().flush();
+//			        this.context.getWriter().flush();
 			        
 					return ;
 				} else if (RenderType.VELOCITY.equalsIgnoreCase(type)
@@ -812,7 +812,7 @@ public class ActionExecution {
 			        if (str.length > 1)
 			        	render.layout(str[1]);
 			        render.render(context.getWriter(),context.getModel());
-			        this.context.getWriter().flush();
+//			        this.context.getWriter().flush();
 			        
 			        return ;
 				} else if (RenderType.ACTION.equalsIgnoreCase(type)) {
@@ -824,7 +824,7 @@ public class ActionExecution {
 				} else if (RenderType.OUT.equalsIgnoreCase(type)
 						|| location.trim().length() == 0) {
 					this.context.getWriter().print(location);
-					this.context.getWriter().flush();
+//					this.context.getWriter().flush();
 					
 					return ;
 				} 
@@ -832,7 +832,7 @@ public class ActionExecution {
 			
 			if (isOut){
 				this.context.getWriter().print(retn);
-				this.context.getWriter().flush();
+//				this.context.getWriter().flush();
 			}
 		}
 

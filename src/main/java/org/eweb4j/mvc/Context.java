@@ -173,10 +173,7 @@ public class Context {
 	}
 
 	public HttpSession getSession() {
-		if (session == null)
-			session = request.getSession();
-
-		return session;
+		return request.getSession(true);
 	}
 
 	public void setSession(HttpSession session) {

@@ -1,6 +1,7 @@
 package org.eweb4j.orm.dao;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.eweb4j.orm.Page;
@@ -512,6 +513,14 @@ public interface DAO {
 	 * @return
 	 */
 	public DAO fillArgs(Object... args);
+	
+	/**
+	 * 
+	 * 获取跟占位符?相对应的参数
+	 * @date 2013-4-3 上午10:07:32
+	 * @return
+	 */
+	public List<Object> getArgs();
 
 	/**
 	 * 清除sql语句缓存，一般在每次需要重新构建sql语句的时候使用

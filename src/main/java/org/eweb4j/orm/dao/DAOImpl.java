@@ -1221,4 +1221,8 @@ public class DAOImpl implements DAO {
 			this.cls = cls;
 		}
 	}
+
+	public List<Object> getArgs() {
+		return this.args;
+	}
 }
