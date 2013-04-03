@@ -944,16 +944,6 @@ public class CommonUtil {
 		return time;
 	}
 	
-//	public static String resolveUrl(String url, String host){
-//		if (url.startsWith("http://") || url.startsWith("https://"))
-//			return url;
-//		
-//		String rep = host;
-//		if (host.endsWith("/"))
-//			rep = host.substring(0, host.length()-1);
-//		return host+url.replace(rep, "");
-//	}
-	
 	public static Date newDate(){
 		return new Date();
 	}
@@ -1486,7 +1476,7 @@ public class CommonUtil {
 	}
 	
 	@Deprecated
-	public static String resoveUrl(final String baseUrl, final String relativeUrl) {
+	public static String resoveUrl(final String relativeUrl, final String baseUrl) {
 		return resolveUrl(baseUrl, relativeUrl);
 	}
 	
