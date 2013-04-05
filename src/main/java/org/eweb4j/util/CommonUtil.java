@@ -45,7 +45,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 
 public class CommonUtil {
 	
-	public static void mains(String[] args){
+	public static void main(String[] args){
 		System.out.println(CommonUtil.formatTime(new Date(1357660800000L)));
 		String source = "2013-01-17 11:00";
 		Date date = CommonUtil.parse("yyyy-MM-dd HH:mm", source);
@@ -61,6 +61,18 @@ public class CommonUtil {
 //		for (int i = 0; i < 20; i++){
 //			System.out.println(CommonUtil.random(min, max).doubleValue());
 //		}
+		
+		System.out.println(evalCalculateExp("*", "13.25 * 1.21").floatValue());
+	}
+	
+	public static Number evalCalculateExp(String op, String exp){
+		String _op = op;
+		if ("*".equals(op)) _op = "\\*";
+			
+		String[] s = exp.split(_op);
+		double left = toDouble(s[0].trim());
+		double right = toDouble(s[1].trim());
+		return "-".equals(op) ? left-right : ("+".equals(op) ? left+right : ("*".equals(op) ? left*right : ("/".equals(op) ? left/right : null)));
 	}
 	
 	public static Number random(double min, double max){
@@ -1467,12 +1479,6 @@ public class CommonUtil {
 		}
 
 		return sb.toString();
-	}
-	
-	public static void main(String[] args){
-		String baseUrl = "http://www.guddeal.com.my";
-		String relativeUrl = "../../assets/images/banner/010313_211004.jpg?param1=111&param2=222&xxx=fff";
-		System.out.println(resolveUrl(baseUrl, relativeUrl));
 	}
 	
 	@Deprecated
