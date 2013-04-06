@@ -829,8 +829,8 @@ public class CommonUtil {
 	public static Date parse(String format, String source, Locale locale) {
 		int aaIndex = format.indexOf(" aa");
 		if (aaIndex > -1){
-			format = format.replace(" aa", "");
 			String apm = source.substring(aaIndex+1, aaIndex+1+2);
+			format = format.replace(" aa", "");
 			return parse(format, source.substring(0, aaIndex), apm, locale);
 		}
 		
@@ -850,8 +850,13 @@ public class CommonUtil {
 		SimpleDateFormat sdf = new java.text.SimpleDateFormat(format, locale);
 		try {
 			Date date = sdf.parse(source);
+			int HH = toInt(CommonUtil.formatTime("HH", date));
 			if ("PM".equalsIgnoreCase(amOrPm)){
-				date = CommonUtil.addHour(date, 12);
+				if (HH <= 12)
+					date = CommonUtil.addHour(date, 12);
+			}else if ("AM".equalsIgnoreCase(amOrPm)){
+				if (HH >= 12)
+					date = CommonUtil.addHour(date, -12);
 			}
 			return date;
 		} catch (ParseException e) {
