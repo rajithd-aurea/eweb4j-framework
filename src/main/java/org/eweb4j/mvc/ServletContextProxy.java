@@ -20,6 +20,9 @@ public class ServletContextProxy {
 		this.ctx = ctx;
 		
 		Enumeration<String> names = ctx.getAttributeNames();
+		if (names == null)
+			return ;
+		
 		while (names.hasMoreElements()){
 			String name = names.nextElement();
 			Object val = ctx.getAttribute(name);

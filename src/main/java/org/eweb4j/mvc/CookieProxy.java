@@ -15,6 +15,9 @@ public class CookieProxy {
 	private Map<String, Object> attrs = new HashMap<String, Object>();
 	
 	public CookieProxy(Cookie[] cookies){
+		if (cookies == null)
+			return ;
+		
 		for (Cookie c : cookies){
 			String name = c.getName();
 			String val = c.getValue();

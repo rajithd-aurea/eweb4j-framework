@@ -21,6 +21,9 @@ public class HttpSessionProxy {
 		this.session = session;
 		
 		Enumeration<String> names = session.getAttributeNames();
+		if (names == null)
+			return ;
+		
 		while (names.hasMoreElements()){
 			String name = names.nextElement();
 			Object val = session.getAttribute(name);
