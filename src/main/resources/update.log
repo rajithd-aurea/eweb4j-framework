@@ -676,3 +676,95 @@ ioc.xml
 (17)bug fix: 解决DAO的带where条件修改问题
 (18)bug fix: 解决MVC的URL Path参数只有一个并且整个url映射是/{xxx}这种方式的时候出现的无法正确解析参数问题
 (19)improve: 增加action返回值文件名后缀来决定模板引擎切换的特性，例如 return "index.vm" 是 velocity解析， "index.fm"是 freemarker解析 "index.jsp"是jsp解析 
+(20)feature: 添加@Consumes("json")支持，需要在客户端发送一个名为："_json_data_"的参数，其参数值是符合json格式的串，然后就可以绑定到方法参数或者类属性上了。
+             //绑定一般的参数
+             HTTP 1.1 GET /hello?_json_data_={"name":"weiwei"}
+             
+             @Path("/hello")
+             @Consumes("json")
+             public String hello(@QueryParam("name") String name) {
+                 return "hello, " + name;
+             }
+             
+             //绑定对象参数
+             HTTP 1.1 GET /hello?_json_data_={"user":{"name":"weiwei"}}
+             
+             @Path("/hello")
+             @Consumes("json")
+             public String hello(@QueryParam("user") User user) {
+                 return "hello, " + user.getName();
+             }
+(21)bug fix: 解决IOC多线程安全问题 
+(22)improve: 将MVC.view DWZ相关的类对List的依赖修改为Collection
+(23)feature: 添加Db.batchXXX 数据库批量操作API
+(24)bug fix: 解决CommonUtil.toHTML() 问题
+(25)improve: 重构MVC的视图处理模块
+(26)feature: MVC模块添加 layout 的支持，可以在控制器里面动态的给模板文件装上另外一个模板文件作为布局，模板文件本身并不知道对方的存在
+             
+             ${ViewBasePath}/common/layout.html
+             <div style="padding:10px; background:red">
+             <!--这个地方是用来被替换的-->
+             ${ScreenContent}
+             </div>
+             
+             ${ViewBasePath}/hello.html
+             I am hello.html             
+             
+             @Path("/hello")
+             private String hello(){
+                 return "hello.html@common/layout.html";
+             }
+             
+             output:
+             <div style="padding:10px; background:red">
+             <!--这个地方是用来被替换的-->
+             I am hello.html
+             </div>
+             
+             //你也可以在一个布局文件里面装入多个内容块
+             ${ViewBasePath}/common/layout.html
+             <div style="padding:10px; background:red">
+                 <div style='background:blue; padding:5px;'>
+                 <!--替换位置 1-->
+                 ${ScreenContent_1}
+                 </div>
+                 <div style='background:blue; padding:5px;'>
+                 <!--替换位置 2-->
+                 ${ScreenContent_2}
+                 </div>
+             </div>
+             
+             ${ViewBasePath}/hello_1.html
+             I am hello_1.html  
+             
+             ${ViewBasePath}/hello_2.html
+             I am hello_2.html  
+             
+             @Path("/hello")
+             private String hello(){
+                 return "ScreenContent_1->hello_1.html,ScreenContent_2->hello_2.html@common/layout.html";
+             }
+             
+             output:
+             <div style="padding:10px; background:red">
+                 <div style='background:blue; padding:5px;'>
+                 <!--替换位置 1-->
+                 I am hello_1.html
+                 </div>
+                 <div style='background:blue; padding:5px;'>
+                 <!--替换位置 2-->
+                 I am hello_2.html
+                 </div>
+             </div>
+
+(27)improve: 为ORM.ddl增加override配置，取值 1|true|0|false, 可以覆盖原来生成的sql文件
+(28)improve: 为ORM增加Timestamp字段类型支持，修改int默认对应mysql的数据类型为int(8)
+(29)improve: 添加CommonUtil.resolveUrl方法
+(30)improve: 改善sql日志，完善发生异常时占位符?对应的arg显示
+(31)improve: 清除框架对编译期功能类库的强关系，将其修改为provided，这样其他项目使用框架的时候默认只会引入几个必须的jar
+(32)improve: 解决MVC @Path("/{param}/xxx/{param2}") 无法正确解析获取其中参数值的问题
+(33)feature: MVC模块增加 ${GLOBAL} ${SESSION} ${COOKIE} 几个内置对象，JSP、Velocity、Freemarker通用
+(34)feature: 添加一个可以设置过期时间的缓存模块
+             Cache cache = new SimpleCache(10);
+             cache.put("pojos", Db.ar(Pojo.class).findAll(), "1h");//可以是字符串 "1s" "1m" "1h" "1d", 也可以是数字 ,单位是秒
+             
