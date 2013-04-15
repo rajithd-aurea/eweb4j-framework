@@ -3,10 +3,14 @@ package test;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.List;
+
+import junit.framework.Assert;
 
 import org.eweb4j.config.EWeb4JConfig;
 import org.eweb4j.orm.Db;
 import org.eweb4j.orm.config.ORMConfigBeanUtil;
+import org.eweb4j.orm.dao.DAO;
 import org.eweb4j.orm.dao.DAOFactory;
 import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.ReflectUtil;
@@ -15,6 +19,7 @@ import org.junit.Test;
 
 import test.po.Master;
 import test.po.Pet;
+import test.render.TestRender.Pojo;
 
 /**
  * TODO
@@ -34,7 +39,14 @@ public class TestDb {
 	public static void main(String[] args) throws IOException{
 	}
 	
+	@Test
 	public void testNotMappingColumn() throws Exception{
+		DAO dao = Db.ar(Pet.class).dao().update("fuckyou").set("heihei").where().field("id").equal(11);
+		String sql = dao.toSql();
+		List<Object> args = dao.getArgs();
+		System.out.println(sql + ", args->"+args);
+		Assert.assertEquals(" UPDATE t_pet SET fuckyou = ?   WHERE  id  = ? ", sql);
+		Assert.assertEquals("[heihei, 11]", args.toString());
 	}
 	
 	@Test
