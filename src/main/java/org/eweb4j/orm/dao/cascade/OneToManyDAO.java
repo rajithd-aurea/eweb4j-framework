@@ -469,15 +469,15 @@ public class OneToManyDAO {
 			if (orderAnn == null) 
 				orderAnn = f.getAnnotation(OrderBy.class);
 			
-			String orderBy = "";
-			if (orderAnn != null)
-				orderBy = " ORDER BY "+orderAnn.value();
-			
-			String mappedBy = ann.mappedBy();
-			
 			Class<?> tarClass = ann.targetEntity();
 			if (void.class.isAssignableFrom(tarClass))
 				tarClass = ClassUtil.getGenericType(f);
+			
+			String orderBy = "";
+			if (orderAnn != null && orderAnn.value().trim().length() > 0) 
+				orderBy = " ORDER BY "+orderAnn.value().replace("t.", tarClass.getSimpleName().toLowerCase()+".");
+			
+			String mappedBy = ann.mappedBy();
 			try {
 				ReflectUtil tarRu = new ReflectUtil(tarClass);
 				

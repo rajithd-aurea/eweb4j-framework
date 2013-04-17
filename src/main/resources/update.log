@@ -768,3 +768,9 @@ ioc.xml
              Cache cache = new SimpleCache(10);
              cache.put("pojos", Db.ar(Pojo.class).findAll(), "1h");//可以是字符串 "1s" "1m" "1h" "1d", 也可以是数字 ,单位是秒
              
+1.10.x-hotfix 2013-04-16
+
+04-16 17:57
+(1)bug fix: 解决ORM.@OneToMany的@OrderBy不支持 t.xxxx这种表达
+
+             

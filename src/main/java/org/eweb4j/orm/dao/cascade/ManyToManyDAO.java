@@ -363,7 +363,7 @@ public class ManyToManyDAO {
 				orderAnn = f.getAnnotation(OrderBy.class);
 			
 			String orderBy = "";
-			if (orderAnn != null)
+			if (orderAnn != null && orderAnn.value().trim().length() > 0)
 				orderBy = " ORDER BY "+orderAnn.value().replace("t.", tarClass.getSimpleName().toLowerCase()+".");
 			
 			// 目标类对应的数据库表Id字段

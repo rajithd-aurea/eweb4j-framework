@@ -4,7 +4,7 @@
 
 	<groupId>org.eweb4j</groupId>
 	<artifactId>eweb4j-all</artifactId>
-	<version>1.10</version>
+	<version>1.10-final</version>
 	<packaging>jar</packaging>
 
 	<name>eweb4j-all</name>
