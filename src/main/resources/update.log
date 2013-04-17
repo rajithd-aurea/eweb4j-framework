@@ -776,3 +776,19 @@ ioc.xml
 1.10-final 2013-04-17
 04-17 09:39
 (1)feature: FileUtil增加Collection<String> readLine(File file) 方法
+(2)feature: 将@Upload的上传验证器重构跟其他@Required等验证器一致的逻辑，不再注解到方法上，而是注解在属性里，并且重构验证失败消息的配置
+            
+            @Upload(
+					suffix={"gif", "jpg"}, 
+					maxFileSize="45k", 
+					maxRequestSize="70k",
+					
+					msg=@Upload.Msg(
+						suffix="文件类型限制为{suffix}",
+						maxFileSize="每个文件大小不超过{maxFileSize}",
+						maxRequestSize="文件总大小不超过{maxRequestSize}"
+					)
+			)
+			private UploadFile image;//或者 private File image
+            
+(2)bug fix: 解决UploadFile 的验证器失败的bug

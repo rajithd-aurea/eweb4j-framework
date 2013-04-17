@@ -55,6 +55,9 @@ public class ValidatorFactory {
 		}else if (Validators.ENUM.equalsIgnoreCase(type)){
 			//枚举类型
 			return new EnumValidator();
+		}else if (Validators.UPLOAD.equalsIgnoreCase(type)){
+			//枚举类型
+			return new UploadValidator();
 		}
 			
 		return null;

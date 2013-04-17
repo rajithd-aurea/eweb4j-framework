@@ -458,8 +458,7 @@ public class ActionAnnotationConfig extends ScanPackage {
 		String[] excepts = validate.except();
 		if (fields != null) {
 			// 读取Action object 的属性 验证信息
-			List<ValidatorConfigBean> fieldVal = ValidatorUtil.readValidator(
-					fields, excepts, null, ru, null, null);
+			List<ValidatorConfigBean> fieldVal = ValidatorUtil.readValidator(fields, excepts, null, ru, null, null);
 			if (fieldVal != null)
 				vals.addAll(fieldVal);
 		}

@@ -4,22 +4,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.eweb4j.config.Log;
 import org.eweb4j.config.LogFactory;
+import org.eweb4j.mvc.Context;
 import org.eweb4j.mvc.action.Validation;
 import org.eweb4j.mvc.config.bean.ValidatorConfigBean;
 import org.eweb4j.util.CommonUtil;
 
 public class ValidateExecution {
-
+	
 	private static Log log = LogFactory.getMVCLogger(ValidateExecution.class);
 
-	public static Validation checkValidate(List<ValidatorConfigBean> valList, Map<String, String[]> paramMap, HttpServletRequest req) {
-
+	public static Validation execute(Context context) {
 		Validation validation = new Validation();
-
+		List<ValidatorConfigBean> valList = context.getActionConfigBean().getValidator();
 		if (valList == null || valList.isEmpty())
 			return validation;
 
@@ -41,7 +39,7 @@ public class ValidateExecution {
 			if (validator == null)
 				continue;
 
-			Map<String, Map<String, String>> err = validator.validate(val, paramMap, req).getErrors();
+			Map<String, Map<String, String>> err = validator.validate(val,context).getErrors();
 			for (Entry<String, Map<String,String>> en : err.entrySet()){
 				String key = en.getKey();
 				Map<String,String> value = en.getValue();

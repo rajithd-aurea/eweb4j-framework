@@ -18,8 +18,7 @@ public interface Validators {
 	static String IP = "ip";
 	static String REGEX = "regex";
 	static String EQUALS = "equals";
-	
-	
+	static String UPLOAD = "upload";
 	
 	static String EQUALS_TO_PARAM = "to";
 	static String MIN_SIZE_PARAM = "minSize";
@@ -30,6 +29,17 @@ public interface Validators {
 	static String ENUM_WORD_PARAM = "enumWord";
 	static String REGEX_PARAM = "regex";
 	static String DATE_FORMAT_PARAM = "format";
+	
+	static String UPLOAD_MAX_REQ_SIZE = "maxRequestSize";
+	static String UPLOAD_MAX_MEMORY_SIZE = "maxMemorySize";
+	static String UPLOAD_MAX_FILE_SIZE = "maxFileSize";
+	static String UPLOAD_TMP_DIR = "tmpDir";
+	static String UPLOAD_SUFFIX = "suffix";
+	
+	static String UPLOAD_MAX_REQ_SIZE_MSG = "maxRequestSizeMsg";
+	static String UPLOAD_MAX_MEMORY_SIZE_MSG = "maxMemorySizeMsg";
+	static String UPLOAD_MAX_FILE_SIZE_MSG = "maxFileSizeMsg";
+	static String UPLOAD_SUFFIX_MSG = "suffixMsg";
 	
 	static String ALERT_LOC = "alert";
 	static String OUT_LOC = "out";

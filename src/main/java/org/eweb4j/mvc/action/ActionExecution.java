@@ -104,8 +104,7 @@ public class ActionExecution {
 
 	// 验证器
 	private void handleValidator() throws Exception {
-
-		this.context.setValidation(ValidateExecution.checkValidate(context.getActionConfigBean().getValidator(), context.getQueryParamMap(), context.getRequest()));
+		context.setValidation(ValidateExecution.execute(context));
 	}
 
 	public ActionExecution(String uri, String httpMethod, Context context) {
@@ -601,7 +600,6 @@ public class ActionExecution {
 		
 		if (!String.class.isAssignableFrom(retn.getClass())) {
 			String mimeType = null;
-//			Produces prod = this.method.getAnnotation(Produces.class);
 			boolean hasProduces = JAXWSUtil.hasProduces(method);
 			if (hasProduces){
 				String[] mimeTypes = ProducesUtil.getProducesValue(method);
@@ -642,7 +640,9 @@ public class ActionExecution {
 				this.context.getResponse().setContentType(MIMEType.XML);
 				this.context.getWriter().print(writer.toXml());
 			} else {
-				this.context.getWriter().print("暂时不支持JSON 、XML以外的表述形式");
+				//默认都用json
+				this.context.getResponse().setContentType(MIMEType.JSON);
+				this.context.getWriter().print(CommonUtil.toJson(retn));
 			}
 			
 //			this.context.getWriter().flush();
@@ -884,76 +884,6 @@ public class ActionExecution {
 		context.getWriter().print(form + js);
 	}
 
-	public void validateUpload() throws Exception{
-		String tmpDir = null;
-		long memoryMax = 0;
-		long allSizeMax = 0;
-		long oneSizeMax = 0;
-		String[] suffixArray = null;
-		Upload _upload = method.getAnnotation(Upload.class);
-		if (_upload != null){
-			if (_upload.tmpDir().trim().length() > 0)
-				tmpDir = _upload.tmpDir();
-			
-			if (_upload.maxMemorySize().trim().length() > 0)
-				memoryMax =  CommonUtil.strToInt(CommonUtil.parseFileSize(_upload.maxMemorySize())+"");
-			
-			if (_upload.maxRequestSize().trim().length() > 0)
-				allSizeMax = CommonUtil.parseFileSize(_upload.maxRequestSize());
-			
-			if (_upload.maxFileSize().trim().length() > 0)
-				oneSizeMax = CommonUtil.parseFileSize(_upload.maxFileSize());
-			
-			if (_upload.suffix().length > 0)
-				suffixArray = _upload.suffix();
-		}
-		
-		long countAllSize = 0;
-		for (Iterator<Entry<String, List<UploadFile>>> it = this.context.getUploadMap().entrySet().iterator(); it.hasNext(); ){
-			Entry<String, List<UploadFile>> e = it.next();
-			String fieldName = e.getKey();
-			List<UploadFile> files = e.getValue(); 
-			for (UploadFile file : files) {
-				String fileName = file.getFileName();
-				String fileContentType = file.getContentType();	
-				if (suffixArray != null && suffixArray.length > 0) {
-					boolean isOk = false;
-					for (String suffix : suffixArray){
-						if (fileName.endsWith("."+suffix)){
-							isOk = true;
-							break;
-						}
-					}
-					
-					if (!isOk){
-						String err = "your upload file "+fileName+" type invalid ! only allow " + Arrays.asList(suffixArray);
-						Map<String,String> errMap = new HashMap<String,String>();
-						errMap.put(fieldName, err);
-						context.getValidation().getErrors().put("upload", errMap);
-						return ;
-					}
-				}
-				long fileSize = file.getSize();
-				if (fileSize > oneSizeMax){
-					Map<String,String> errMap = new HashMap<String,String>();
-					String err = "your upload file "+fileName+" size overflow, only allow less than " + oneSizeMax;
-					errMap.put(fieldName, err);
-					context.getValidation().getErrors().put("upload", errMap);
-					return ;
-				}
-				
-				countAllSize += fileSize;
-				if (countAllSize > allSizeMax){
-					Map<String,String> errMap = new HashMap<String,String>();
-					String err = "your upload files all size overflow, only allow less than " + allSizeMax;
-					errMap.put(fieldName, err);
-					context.getValidation().getErrors().put("upload", errMap);
-					return ;
-				}
-			}
-		}
-	}
-	
 	/**
 	 * 执行Action
 	 * 
@@ -1136,9 +1066,6 @@ public class ActionExecution {
 		// 执行验证器
 		this.handleValidator();
 		try{
-			// upload validation
-			this.validateUpload();
-			
 			// 注入mvc action 请求参数
 			ParamUtil.injectParam(this.context, this.ru, null);
 	

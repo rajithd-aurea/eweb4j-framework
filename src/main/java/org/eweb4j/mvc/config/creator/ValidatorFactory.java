@@ -18,6 +18,7 @@ import org.eweb4j.mvc.validator.annotation.QQ;
 import org.eweb4j.mvc.validator.annotation.Regex;
 import org.eweb4j.mvc.validator.annotation.Required;
 import org.eweb4j.mvc.validator.annotation.Size;
+import org.eweb4j.mvc.validator.annotation.Upload;
 import org.eweb4j.mvc.validator.annotation.Url;
 import org.eweb4j.mvc.validator.annotation.Zip;
 
@@ -66,6 +67,8 @@ public class ValidatorFactory {
 			return new UrlImpl((Url) ann);
 		else if (Zip.class.getName().equals(clsName))
 			return new ZipImpl((Zip) ann);
+		else if (Upload.class.getName().equals(clsName))
+			return new UploadImpl((Upload) ann);
 		else if (MyValidator.class.getName().equals(clsName))
 			return new MyValidatorImpl((MyValidator) ann);
 

@@ -19,6 +19,7 @@ public class ServletContextProxy {
 	public ServletContextProxy(ServletContext ctx){
 		this.ctx = ctx;
 		
+		@SuppressWarnings("unchecked")
 		Enumeration<String> names = ctx.getAttributeNames();
 		if (names == null)
 			return ;

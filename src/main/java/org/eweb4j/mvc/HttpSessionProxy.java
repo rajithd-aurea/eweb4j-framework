@@ -4,7 +4,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -20,6 +19,7 @@ public class HttpSessionProxy {
 	public HttpSessionProxy(HttpSession session){
 		this.session = session;
 		
+		@SuppressWarnings("unchecked")
 		Enumeration<String> names = session.getAttributeNames();
 		if (names == null)
 			return ;

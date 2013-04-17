@@ -48,6 +48,7 @@ public class Context {
 	/**
 	 * http session
 	 */
+	@SuppressWarnings("unused")
 	private HttpSession session;
 	
 	/**
@@ -64,6 +65,8 @@ public class Context {
 	 * http request method
 	 */
 	private String httpMethod;
+	
+	private String ip;
 	
 	/**
 	 * a properties which named action class name
@@ -286,4 +289,11 @@ public class Context {
 		this.validation = validation;
 	}
 
+	public String getIp() {
+		return this.ip;
+	}
+
+	public void setIp(String ip){
+		this.ip = ip;
+	}
 }

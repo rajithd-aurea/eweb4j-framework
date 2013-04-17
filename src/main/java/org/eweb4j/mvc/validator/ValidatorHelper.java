@@ -3,8 +3,7 @@ package org.eweb4j.mvc.validator;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
+import org.eweb4j.mvc.Context;
 import org.eweb4j.mvc.action.Validation;
 import org.eweb4j.mvc.config.bean.FieldConfigBean;
 import org.eweb4j.mvc.config.bean.ValidatorConfigBean;
@@ -22,12 +21,11 @@ public class ValidatorHelper implements ValidatorIF {
 		this.regex = regex;
 	}
 
-	public Validation validate(ValidatorConfigBean val,
-			Map<String, String[]> map, HttpServletRequest request) {
+	public Validation validate(ValidatorConfigBean val, Context context) {
 		Map<String, String> valError = new HashMap<String, String>();
 		for (FieldConfigBean f : val.getField()) {
-			String key = f.getName();
-			String[] value = map.get(key);
+			String fieldName = f.getName();
+			String[] value = context.getQueryParamMap().get(fieldName);
 			if (value == null || value.length == 0)
 				continue;
 
@@ -37,14 +35,12 @@ public class ValidatorHelper implements ValidatorIF {
 					if (mess.length() == 0)
 						mess = " %s-validator : your input { %s = %s } must matches [ %s ]";
 
-					valError.put(key,
-							String.format(mess, val.getName(), key, v, regex));
+					valError.put(fieldName, String.format(mess, val.getName(), fieldName, v, regex));
 					break;
 				}
 			}
 
-			request.setAttribute(key, value);
-
+			context.getRequest().setAttribute(fieldName, value);
 		}
 
 		Validation validation = new Validation();

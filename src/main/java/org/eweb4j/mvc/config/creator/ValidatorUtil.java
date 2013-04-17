@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eweb4j.mvc.config.bean.ValidatorConfigBean;
+import org.eweb4j.mvc.upload.UploadFile;
 import org.eweb4j.mvc.validator.annotation.Skip;
 import org.eweb4j.util.ClassUtil;
 import org.eweb4j.util.ReflectUtil;
@@ -108,8 +109,12 @@ public class ValidatorUtil {
 	 * @param hasCls
 	 * @return
 	 */
-	public static <T> List<ValidatorConfigBean> readValidator(final String[] params,final String[] excepts, String scopeName,
-			ReflectUtil ru, List<ValidatorConfigBean> vList,
+	public static <T> List<ValidatorConfigBean> readValidator(
+			final String[] params,
+			final String[] excepts,
+			String scopeName,
+			ReflectUtil ru,
+			List<ValidatorConfigBean> vList,
 			Set<Class<?>> hasCls) {
 		if (params == null || params.length == 0)
 			return null;
@@ -129,8 +134,7 @@ public class ValidatorUtil {
 			Skip iv = f.getAnnotation(Skip.class);
 			if (iv != null)
 				continue;
-
-			if (ClassUtil.isPojo(f.getType())) {
+			if (ClassUtil.isPojo(f.getType()) && !UploadFile.class.isAssignableFrom(f.getType())) {
 				// 解决无限递归问题
 				if (hasCls == null)
 					hasCls = new HashSet<Class<?>>();
@@ -141,7 +145,6 @@ public class ValidatorUtil {
 						scopeName = scopeName+"."+f.getName();
 					else
 						scopeName = f.getName();
-					
 					try {
 						readValidator(params,excepts, scopeName, new ReflectUtil(f.getType()),vList, hasCls);
 						scopeName = null;
