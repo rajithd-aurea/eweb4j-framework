@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -98,6 +99,29 @@ public class FileUtil {
 		}
 
 		return sb.toString();
+	}
+	
+	public static Collection<String> readLine(File f) {
+		Collection<String> result = new ArrayList<String>();
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new InputStreamReader(new FileInputStream(f), "utf-8"));
+			String line = null;
+			while ((line = reader.readLine()) != null)
+				result.add(line);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return result;
 	}
 
 	public static String getExt(File f) {
