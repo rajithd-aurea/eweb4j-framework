@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -101,8 +102,8 @@ public class FileUtil {
 		return sb.toString();
 	}
 	
-	public static Collection<String> readLine(File f) {
-		Collection<String> result = new ArrayList<String>();
+	public static List<String> readLine(File f) {
+		List<String> result = new ArrayList<String>();
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new InputStreamReader(new FileInputStream(f), "utf-8"));

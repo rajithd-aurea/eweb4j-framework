@@ -773,4 +773,6 @@ ioc.xml
 04-16 17:57
 (1)bug fix: 解决ORM.@OneToMany的@OrderBy不支持 t.xxxx这种表达
 
-             
+1.10-final 2013-04-17
+04-17 09:39
+(1)feature: FileUtil增加Collection<String> readLine(File file) 方法
