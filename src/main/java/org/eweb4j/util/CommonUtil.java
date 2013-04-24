@@ -1,5 +1,8 @@
 package org.eweb4j.util;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -62,6 +65,39 @@ public class CommonUtil {
 //		}
 		
 		System.out.println(evalCalculateExp("*", "13.25 * 1.21").floatValue());
+	}
+	
+	public static String fetchUrl(String _url) {
+		return fetchUrl(_url, null);
+	}
+	
+	public static String fetchUrl(String _url, String charset) {
+		
+		BufferedReader reader = null;
+		try {
+			URL url = new URL(_url);
+			if (charset == null)
+				reader = new BufferedReader(new InputStreamReader(url.openStream()));
+			else
+				reader = new BufferedReader(new InputStreamReader(url.openStream(), charset));
+			
+			StringBuilder sb = new StringBuilder();
+			String line = null;
+			while ((line = reader.readLine()) != null){
+				sb.append(line);
+			}
+			
+			return sb.toString();
+		} catch (Throwable e){
+			throw new RuntimeException(e);
+		} finally {
+			if (reader != null){
+				try {
+					reader.close();
+				} catch (IOException e) {
+				}
+			}
+		}
 	}
 	
 	public static Number evalCalculateExp(String op, String exp){

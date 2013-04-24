@@ -13,11 +13,20 @@ import java.util.Map;
  */
 public class URLUtil {
 	
-	public static String read(String link){
+	public static String read(String _url) {
+		return read(_url, null);
+	}
+	
+	public static String read(String _url, String charset) {
+		
 		BufferedReader reader = null;
 		try {
-			URL url = new URL(link);
-			reader = new BufferedReader(new InputStreamReader(url.openStream()));
+			URL url = new URL(_url);
+			if (charset == null)
+				reader = new BufferedReader(new InputStreamReader(url.openStream()));
+			else
+				reader = new BufferedReader(new InputStreamReader(url.openStream(), charset));
+			
 			StringBuilder sb = new StringBuilder();
 			String line = null;
 			while ((line = reader.readLine()) != null){
@@ -26,18 +35,15 @@ public class URLUtil {
 			
 			return sb.toString();
 		} catch (Throwable e){
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		} finally {
 			if (reader != null){
 				try {
 					reader.close();
 				} catch (IOException e) {
-					e.printStackTrace();
 				}
 			}
 		}
-		
-		return null;
 	}
 
 	public static void main(String[] args){
