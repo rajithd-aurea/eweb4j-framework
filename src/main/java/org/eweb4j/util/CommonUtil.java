@@ -65,7 +65,81 @@ public class CommonUtil {
 //		}
 		
 		System.out.println(evalCalculateExp("*", "13.25 * 1.21").floatValue());
+		
+		String coords = "157,117, 55,407, 114,438, 138,359, 126,299, 164,232, 200,297, 157,413, 179,431, 219,388, 236,271, 193,186, 259,206, 260,337, 268,404, 336,346, 501,346, 710,369, 828,53, 595,314, 567,237, 359,213, 299,168, 255,103, 199,164, 161,115";
+		String center = null;//309,299.5
+		center = CommonUtil.getCenterCoord(coords);
+		System.out.println(center);
 	}
+	
+	public static String getCenterCoord(final String _coords){
+		if (_coords == null || _coords.trim().length() == 0)
+			return null;
+		
+		String coords = _coords.trim();
+		String[] pts = coords.split(" ");
+		int nPts = pts.length;
+		float x = 0; 
+		float y = 0;
+		float f;
+		int j = nPts-1;
+		String p1;
+		String p2;
+		
+		for (int i = 0; i < nPts; j = i++) {
+			p1 = pts[i].trim();
+			if (p1.length() == 0)
+				continue;
+	      
+			float p1_x = CommonUtil.toFloat(p1.split(",")[0]);
+			float p1_y = CommonUtil.toFloat(p1.split(",")[1]);
+	      
+			p2 = pts[j].trim();
+			if (p2.length() == 0)
+				continue;
+	      
+			float p2_x = CommonUtil.toFloat(p2.split(",")[0]);
+			float p2_y = CommonUtil.toFloat(p2.split(",")[1]);
+	      
+			f = p1_x * p2_y - p2_x * p1_y;
+			x +=(p1_x + p2_x) * f;
+			y +=(p1_y + p2_y) * f;
+	   }
+		
+		f = CommonUtil.area(pts) * 6;
+		
+		return x/f + ","+ y/f;
+	}
+	
+	private static float area(String[] pts) {
+		float area = 0;
+		int nPts = pts.length;
+		int j = nPts-1;
+		String p1; 
+		String p2;
+		
+		for (int i = 0; i < nPts; j = i++) {
+			p1 = pts[i].trim();
+			if (p1.length() == 0)
+				continue;
+				
+			float p1_x = CommonUtil.toFloat(p1.split(",")[0]);
+			float p1_y = CommonUtil.toFloat(p1.split(",")[1]);
+			
+			p2 = pts[j].trim();
+			if (p2.length() == 0)
+				continue;
+			
+			float p2_x = CommonUtil.toFloat(p2.split(",")[0]);
+			float p2_y = CommonUtil.toFloat(p2.split(",")[1]);
+			
+			area += p1_x * p2_y;
+			area -= p1_y * p2_x;
+		}
+		
+		area/=2;
+		return area;
+	};
 	
 	public static String fetchUrl(String _url) {
 		return fetchUrl(_url, null);
