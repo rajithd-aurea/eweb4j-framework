@@ -95,14 +95,9 @@ public class InterceptorConfig {
 			tsb.append(sb.toString());
 			log.error(tsb.toString());
 			error = tsb.toString();
-		} catch (Exception e1) {
-			e1.printStackTrace();
+		} catch (Throwable e1) {
 			StringBuilder sb2 = new StringBuilder(ConfigErrCons.CANNOT_REPAIR_CONFIG_FILE + e1.toString());
-			for (StackTraceElement ste : e1.getStackTrace()) {
-				sb2.append("\n").append(ste.toString());
-			}
-
-			log.error(sb2.toString()); 
+			log.error(sb2.toString(), e1); 
 			error = sb2.toString();
 		}
 		return error;

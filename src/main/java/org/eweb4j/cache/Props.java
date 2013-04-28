@@ -45,18 +45,12 @@ public class Props {
 	private static Log log = LogFactory.getIOCLogger(Props.class);
 
 	private static Set<String> i18nIds = new HashSet<String>();
-
-	/**
-	 * Global properties
-	 */
+	
 	private static Map<String, String> globalMap = new Hashtable<String, String>();
-
-	/**
-         * 
-         */
+	
 	private static Map<String, Map<String, String>> props = new Hashtable<String, Map<String, String>>();
 
-	private static class MapProxy<K, V> implements Map<K, V> {
+	public static class MapProxy<K, V> implements Map<K, V> {
 		private String id;
 
 		private Map<K, V> map() {

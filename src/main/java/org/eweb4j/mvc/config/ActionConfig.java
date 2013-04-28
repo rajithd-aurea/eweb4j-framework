@@ -123,13 +123,10 @@ public class ActionConfig {
 			error = tsb.toString();
 			// log-----
 			log.error(error);
-		} catch (Exception e1) {
-			e1.printStackTrace();
+		} catch (Throwable e1) {
 			StringBuilder sb2 = new StringBuilder(ConfigErrCons.CANNOT_REPAIR_CONFIG_FILE);
-			sb2.append(CommonUtil.getExceptionString(e1));
-
 			error = sb2.toString();
-			log.error(error);
+			log.error(error, e1);
 		}
 		return error;
 	}

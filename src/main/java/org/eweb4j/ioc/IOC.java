@@ -273,11 +273,11 @@ public class IOC {
 					}
 				}
 			}
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			log.error("IOC.getBean(" + beanID + ") failed!", e);
 		}
 
-		String info = "IOC.getBean(" + beanID + ") ——> " + t;
+		String info = "IOC.getBean(" + beanID + ") -> " + t;
 		log.debug(info);
 
 		return t;

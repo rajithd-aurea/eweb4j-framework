@@ -102,14 +102,11 @@ public class IOCConfig {
 			sb.append(error);
 
 			log.error(sb.toString());
-		} catch (Exception e1) {
-			e1.printStackTrace();
+		} catch (Throwable e1) {
 			StringBuilder sb2 = new StringBuilder( ConfigInfoCons.CANNOT_REPAIR_FILE);
-
-			sb2.append(CommonUtil.getExceptionString(e1));
 			error = sb2.toString();
 
-			log.error(error);
+			log.error(error, e1);
 		}
 
 		return error;

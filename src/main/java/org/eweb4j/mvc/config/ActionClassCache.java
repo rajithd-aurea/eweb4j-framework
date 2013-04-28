@@ -23,7 +23,7 @@ public class ActionClassCache {
 		if (beanID != null && o != null) {
 			if (!ht.containsKey(beanID)) {
 				ht.put(beanID, o);
-				String info = "ActionClassCache:add...finished..." + beanID;
+				String info = "cache " + beanID + " ok";
 				log.debug(info);
 			}
 		}

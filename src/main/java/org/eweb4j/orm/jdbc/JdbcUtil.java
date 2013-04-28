@@ -429,18 +429,13 @@ public class JdbcUtil {
 	}
 
 	private static void logException(StringBuilder sql, SQLException e) {
-		StringBuilder sb = new StringBuilder(e.toString());
-		for (StackTraceElement ste : e.getStackTrace())
-			sb.append("\n").append(ste.toString());
-
-		sb.append(sql.append("execute sql fail!").toString());
-		log.error(sb.toString());
+		log.error(sql.append("execute sql fail!").toString(), e);
 	}
 
 	private static void logToOrm(String sql, Object[][] args, Number[] result) {
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("execute sql：").append(sql);
+		sb.append("execute sql->").append(sql);
 		if (args != null) {
 			sb.append(" args->");
 			for (Object[] arg : args){
@@ -454,7 +449,7 @@ public class JdbcUtil {
 	private static void logToOrm(String[] sqls, Object[][] args, Number[] result, int i) {
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("execute sql：").append(sqls[i]);
+		sb.append("execute sql->").append(sqls[i]);
 		if (args != null && args[i] != null)
 			sb.append(" args->").append(Arrays.asList(args[i]));
 		sb.append(" result->").append(result[i]).append(";");
@@ -463,34 +458,31 @@ public class JdbcUtil {
 
 	private static void logException(String sql, Object[] args, Exception e) {
 		StringBuilder sb = new StringBuilder(e.toString());
-		for (StackTraceElement ste : e.getStackTrace()) {
-			sb.append("\n").append(ste.toString());
-		}
-		sb.append(sql);
+		sb.append(" ").append(sql);
 		if (args != null)
 			sb.append(" args->").append(Arrays.asList(args));
 		sb.append(" execute sql fail!");
-		log.error(sb.toString());
+		log.error(sb.toString(), e);
 	}
 
 	private static <T> void logOrm(String sql, Object[] args, List<T> list) {
 
 		StringBuilder sb = new StringBuilder();
 		int count = list == null ? 0 : list.size();
-		sb.append("execute sql：").append(sql);
+		sb.append("execute sql->").append(sql);
 		if (args != null)
 			sb.append(" args->").append(Arrays.asList(args));
-		sb.append(" affected rows：").append(count).append(";");
+		sb.append(" affected rows->").append(count).append(";");
 		log.debug(sb.toString());
 	}
 
 	private static void logOrm(String sql, Object[] args, Map<String, Object> result) {
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("execute sql：").append(sql);
+		sb.append("execute sql->").append(sql);
 		if (args != null)
 			sb.append(" args->").append(Arrays.asList(args));
-		sb.append(" result rows：").append(result.size()).append(";");
+		sb.append(" result rows->").append(result.size()).append(";");
 		log.debug(sb.toString());
 	}
 

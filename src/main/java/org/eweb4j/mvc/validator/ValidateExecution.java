@@ -32,7 +32,7 @@ public class ValidateExecution {
 					try {
 						validator = (ValidatorIF) Thread.currentThread().getContextClassLoader().loadClass(val.getClazz()).newInstance();
 					} catch (Exception e) {
-						log.error(CommonUtil.getExceptionString(e));
+						log.error(e.toString(), e);
 					}
 			}
 

@@ -77,16 +77,11 @@ public class ActionAnnotationConfig extends ScanPackage {
 				} else
 					obj = cls.newInstance();
 
-			} catch (Error er) {
-				// er.printStackTrace();
-				log.warn("the action class new instance failued -> " + clsName + " | " + er.toString());
+			} catch (Throwable e) {
+				log.warn("the action class new instance failued -> " + clsName + " | " + e.toString(), e);
 				return false;
-			} catch (Exception e) {
-				// e.printStackTrace();
-				log.warn("the action class new instance failued -> " + clsName + " | " + e.toString());
-				return false;
-			}
-
+			} 
+			
 			ReflectUtil ru = new ReflectUtil(obj);
 			Method[] ms = ru.getMethods();
 			if (ms == null)

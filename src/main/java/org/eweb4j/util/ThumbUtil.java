@@ -22,7 +22,11 @@ import net.coobird.thumbnailator.geometry.Positions;
 public class ThumbUtil {
 
 	public static ByteArrayOutputStream generateThumb(String imagePath, String outputFormat, int failRetryTimes, long sleep, int outputWidth, int outputHeight) throws Exception {
-		return generateThumb(imagePath, 0, 0.9f, 0, 0, outputFormat, failRetryTimes, sleep, outputWidth, outputHeight);
+		return generateThumb(imagePath, 0, 0.9f, 0, 0, outputFormat, failRetryTimes, sleep, outputWidth, outputHeight, false);
+	}
+	
+	public static ByteArrayOutputStream generateThumb(String imagePath, String outputFormat, int failRetryTimes, long sleep, int outputWidth, int outputHeight, boolean isCrop) throws Exception {
+		return generateThumb(imagePath, 0, 0.9f, 0, 0, outputFormat, failRetryTimes, sleep, outputWidth, outputHeight, isCrop);
 	}
 	
 	public static ByteArrayOutputStream generateThumb(String imagePath,
@@ -30,7 +34,15 @@ public class ThumbUtil {
 			float quality, float contrast, float brightness,
 			String outputFormat, int failRetryTimes, long sleep,
 			int outputWidth, int outputHeight) throws Exception {
-		BufferedImage img = generate(imagePath, sharpenTimes, quality, contrast, brightness, outputFormat, failRetryTimes, sleep, outputWidth, outputHeight);
+		return generateThumb(imagePath, sharpenTimes, quality, contrast, brightness, outputFormat, failRetryTimes, sleep, outputWidth, outputHeight, false);
+	}
+	
+	public static ByteArrayOutputStream generateThumb(String imagePath,
+			int sharpenTimes,
+			float quality, float contrast, float brightness,
+			String outputFormat, int failRetryTimes, long sleep,
+			int outputWidth, int outputHeight, boolean isCrop) throws Exception {
+		BufferedImage img = generate(imagePath, sharpenTimes, quality, contrast, brightness, outputFormat, failRetryTimes, sleep, outputWidth, outputHeight, isCrop);
 		
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		ImageIO.write(img, outputFormat, os);
@@ -81,8 +93,15 @@ public class ThumbUtil {
 				.sourceRegion(x1, y1, x2-x1, y2-y1);
 	}
 	
+	public static BufferedImage generate(String imagePath,
+			int sharpenTimes,
+			float quality, float contrast, float brightness,
+			String outputFormat, int failRetryTimes, long sleep,
+			int outputWidth, int outputHeight) throws Exception {
+		return generate(imagePath, sharpenTimes, quality, contrast, brightness, outputFormat, failRetryTimes, sleep, outputWidth, outputHeight, false);
+	}
 	/**
-	 * 注意！当宽度和高度都给定的情况下会进行裁剪。裁剪规则是：先按照比例压缩，然后将多出的部分分两边裁剪。
+	 * 注意！当宽度和高度都给定且isCrop=true的情况下会进行裁剪。裁剪规则是：先按照比例压缩，然后将多出的部分分两边裁剪。
 	 * 
 	 * @param imagePath
 	 *            图片path，如果是以 http:// || https:// 开头则认为是远程图片
@@ -102,12 +121,16 @@ public class ThumbUtil {
 	 *            希望生成的缩略图宽度
 	 * @param outputHeight
 	 *            希望生成的缩略图高度
+	 * @param isCrop 
+	 * 			是否要裁剪图片
 	 */
 	public static BufferedImage generate(String imagePath,
 			int sharpenTimes,
 			float quality, float contrast, float brightness,
 			String outputFormat, int failRetryTimes, long sleep,
-			int outputWidth, int outputHeight) throws Exception {
+			int outputWidth, int outputHeight,
+			boolean isCrop) throws Exception {
+		
 		if (imagePath == null || imagePath.trim().length() == 0)
 			throw new Exception("ImageURL required");
 
@@ -137,6 +160,23 @@ public class ThumbUtil {
 		//原图大小
 		int sw = bi.getWidth();
 		int sh = bi.getHeight();
+		
+		/*
+		 * :如果给定了目标宽度和高度，且isCrop=false，即不进行裁剪的情况下，使用以下算法:
+		 * 如果原图宽高比大于等于目标宽高比，则使用宽度优先压缩，高度按压缩比例进行缩放
+		 * 如果原图宽高比小于目标宽高比，则使用高度优先压缩，宽度按压缩比例进行缩放
+		 */
+		if (outputWidth > 0 && outputHeight > 0 && !isCrop) {
+			double sourceScale = Double.parseDouble(String.valueOf(sw))/Double.parseDouble(String.valueOf(sh));
+			double outputScale = Double.parseDouble(String.valueOf(outputWidth))/Double.parseDouble(String.valueOf(outputHeight));
+			if (sourceScale >= outputScale){
+//				return generate(imagePath, sharpenTimes, quality, contrast, brightness, outputFormat, failRetryTimes, sleep, outputWidth, 0, false);
+				outputHeight = 0;
+			}else{
+//				return generate(imagePath, sharpenTimes, quality, contrast, brightness, outputFormat, failRetryTimes, sleep, 0, outputHeight, false);
+				outputWidth = 0;
+			}
+		}
 		
 		// 如果原图比目标长宽要少，用原图大小,这样就不会进行放大了
 		if (sw < outputWidth)
@@ -189,8 +229,8 @@ public class ThumbUtil {
 			bi = filter.filter(bi, null);
 		}
 
-		// 如果给了两个参数，则剪裁
-		if (output.containsKey(W) && output.containsKey(H)) {
+		// 如果给了两个参数，且isCrop=true则剪裁
+		if (output.containsKey(W) && output.containsKey(H) && isCrop) {
 			
 			// 裁剪的话因为要保留最大区域所以按照比例最小的那端进行裁剪
 			double scale ;
@@ -214,15 +254,15 @@ public class ThumbUtil {
 							output.get(H)).outputQuality(quality)
 					.outputFormat(outputFormat).asBufferedImage();
 
-		} else {
-			// 算出比例
-			double scale = Double.parseDouble(String.valueOf(source.get(min))) / Double.parseDouble(String.valueOf(output.get(min)));
-			int sW = new Double(sw / scale).intValue();
-			int sH = new Double(sh / scale).intValue();
-			// 压缩
-			return Thumbnails.of(bi).size(sW, sH).outputQuality(quality)
-					.outputFormat(outputFormat).asBufferedImage();
-		}
+		} 
+		
+		// 算出比例
+		double scale = Double.parseDouble(String.valueOf(source.get(min))) / Double.parseDouble(String.valueOf(output.get(min)));
+		int sW = new Double(sw / scale).intValue();
+		int sH = new Double(sh / scale).intValue();
+		
+		// 压缩
+		return Thumbnails.of(bi).size(sW, sH).outputQuality(quality).outputFormat(outputFormat).asBufferedImage();
 	}
 
 	//锐化
@@ -242,6 +282,24 @@ public class ThumbUtil {
  
         return desc;
     }
+	/**
+	 * 使用绘制的方式去掉图像的alpha值
+	 * @param $image
+	 * @param $bgColor
+	 * @return
+	 */
+//	public static BufferedImage removeAlpha(BufferedImage image, Color bgColor)
+//	{
+//	    int $w = image.getWidth();
+//	    int $h = image.getHeight();
+//	    BufferedImage __image = new BufferedImage($w, $h, BufferedImage.TYPE_INT_RGB);
+//	    Graphics2D __graphic = __image.createGraphics();
+//	    __graphic.setColor(bgColor);
+//	    __graphic.fillRect(0,0,$w,$h);
+//	    __graphic.drawRenderedImage(image, null);
+//	    __graphic.dispose();
+//	    return __image; 
+//	}
 
 	public static void main(String[] args) throws Exception {
 		// 原图，也可以是本地的d:/xx.jpg
@@ -260,23 +318,26 @@ public class ThumbUtil {
 //		String remoteImageUrl = "http://gd.image-gmkt.com/mi/207/546/419546207.jpg";
 //		String remoteImageUrl = "http://test.shoplay.com/cache/bigpic/20121108/470/55c5b78e5c_w470.jpg";
 		
-		String remoteImageUrl = "d:/test3.jpg";
+		String remoteImageUrl = "http://www.imm.sg/resources/imm/images/common/logo.png";
 		int sharpenTimes = 0;// 锐化次数
 		float quality = 1f;// 质量
 		String outputFormat = "jpg";// 输出格式
 		String name = CommonUtil.getNowTime("yyyyMMddHHmmss");
-		int outputWidth = 192;// 宽度
-		int outputHeight = 288;// 高度
+		int outputWidth = 400;// 宽度
+		int outputHeight = 300;// 高度
+		boolean isCrop = false;//是否裁剪图片
 		float contrast = 0f; // 对比度
 		float brightness = 0f; // 亮度 0 表示不调整
 
 		File file = new File("d:/" + name + "_w" + outputWidth + "h" + outputHeight + "_sharpen" + sharpenTimes + "_contrat" + contrast + "_quality"+quality + "." + outputFormat);
+		
 		BufferedImage image = ThumbUtil.generate(
 				remoteImageUrl, 
 				sharpenTimes,
 				quality, contrast, brightness, outputFormat, 10, // 远程图片下载失败重试次数
 				1 * 1000, // 失败后休眠时间
-				outputWidth, outputHeight);
+				outputWidth, outputHeight,
+				isCrop);
 		
 		boolean isOK = ImageIO.write(image, outputFormat, new FileOutputStream(file));
 		if (!isOK)

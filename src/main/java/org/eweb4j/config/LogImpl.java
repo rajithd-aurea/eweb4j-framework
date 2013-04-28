@@ -27,7 +27,15 @@ public class LogImpl implements Log {
 	public LogImpl() {
 	}
 
-	private String write(final int level, final String mess) {
+	private String write(final int level, final String msg, Throwable th) {
+		String mess = msg;
+		if (th != null) {
+			StringWriter strWriter = new StringWriter();
+			PrintWriter writer = new PrintWriter(strWriter, true);
+			th.printStackTrace(writer);
+			mess = new StringBuilder(mess).append(" cause by:\n\t" + strWriter.getBuffer().toString()).toString();
+		}
+		
 		if (logs == null || logs.getLog() == null)
 			return mess;
 
@@ -42,11 +50,10 @@ public class LogImpl implements Log {
 			sb.append("[");
 			sb.append(LogLevel.level(level).toUpperCase());
 			sb.append("] ");
-			sb.append(CommonUtil.getNowTime("HH:mm:ss"));
+			sb.append(CommonUtil.getNowTime("yyyy-MM-dd HH:mm:ss"));
 			sb.append(this.module.toLowerCase());
 			sb.append(" ~ ");
-			Exception e = new Exception(this.clazz.getName());
-			StackTraceElement s = e.getStackTrace()[2];
+			StackTraceElement s = new Exception(this.clazz.getName()).getStackTrace()[2];
 			String m = s.getClassName() + "." + s.getMethodName();
 			sb.append(s.toString().replace(m, ""));
 			sb.append(" ");
@@ -63,14 +70,18 @@ public class LogImpl implements Log {
 
 			BufferedWriter bw = null;
 			try {
-				if (log.getFile() != null) {
+				if (log.getFile() != null && log.getFile().trim().length() > 0) {
 					File file = new File(ConfigConstant.CONFIG_BASE_PATH + log.getFile());
 					if (!file.exists()) {
-						FileUtil.createFile(log.getFile());
+						File parentDir = file.getParentFile();
+						if (!parentDir.isDirectory() || !parentDir.exists())
+							return result.toString();
+						
+						FileUtil.createFile(file.getAbsolutePath());
+						System.out.println("log file->" + file.getAbsolutePath() + " create...");
 					}
 
-					if (file.length() / (1024 * 1024) >= Integer.parseInt(log
-							.getSize())) {
+					if (file.length() / (1024 * 1024) >= Integer.parseInt(log.getSize())) {
 						File tf = new File(file.getAbsolutePath() + "." + CommonUtil.getNowTime("_MMddHHmmss"));
 						FileUtil.copy(file, tf);
 						file.delete();
@@ -83,14 +94,14 @@ public class LogImpl implements Log {
 					bw.newLine();
 					bw.write(sb.toString());
 				}
-			} catch (Exception ex) {
-
+			} catch (Throwable ex) {
+				ex.printStackTrace();
 			} finally {
 				if (bw != null) {
 					try {
 						bw.flush();
 						bw.close();
-					} catch (IOException ex) {
+					} catch (IOException e) {
 						e.printStackTrace();
 					}
 				}
@@ -101,30 +112,35 @@ public class LogImpl implements Log {
 	}
 
 	public String debug(String debug) {
-		return this.write(1, debug);
+		return this.write(1, debug, null);
 	}
 
 	public String info(String info) {
-		return this.write(2, info);
+		return this.write(2, info, null);
 	}
 	
 	public String warn(String warn) {
-		return this.write(3,  warn);
+		return this.write(3,  warn, null);
 	}
 	
-	public String warn(String warn, Exception e) {
-		StringWriter strWriter = new StringWriter();
-		PrintWriter writer = new PrintWriter(strWriter, true);
-		e.printStackTrace(writer);
-		StringBuffer sb = strWriter.getBuffer();
-		
-		String err = warn + " cause by " + sb.toString();
-		
-		return this.write(3,  err);
+	public String warn(String warn, Throwable e) {
+		return this.write(3,  warn, e);
 	}
 
 	public String error(String error) {
-		return this.write(4,  error);
+		return this.write(4,  error, null);
+	}
+	
+	public String error(String error, Throwable e) {
+		return this.write(4,  error, e);
+	}
+	
+	public String fatal(String fatal) {
+		return this.write(5,  fatal, null);
+	}
+	
+	public String fatal(String fatal, Throwable e) {
+		return this.write(5,  fatal, e);
 	}
 	
 	public static void main(String[] args){
@@ -136,37 +152,11 @@ public class LogImpl implements Log {
 			e.printStackTrace(writer);
 			StringBuffer sb = strWriter.getBuffer();
 			
-			String err = " cause by " + sb.toString();
+			String err = " cause by:\n\t" + sb.toString();
 			System.out.println(err);
 		}
 	}
 	
-	public String error(String error, Exception e) {
-		StringWriter strWriter = new StringWriter();
-		PrintWriter writer = new PrintWriter(strWriter, true);
-		e.printStackTrace(writer);
-		StringBuffer sb = strWriter.getBuffer();
-		
-		String err = error + " cause by " + sb.toString();
-		
-		return this.write(4,  err);
-	}
-	
-	public String fatal(String fatal) {
-		return this.write(5,  fatal);
-	}
-	
-	public String fatal(String fatal, Exception e) {
-		StringWriter strWriter = new StringWriter();
-		PrintWriter writer = new PrintWriter(strWriter, true);
-		e.printStackTrace(writer);
-		StringBuffer sb = strWriter.getBuffer();
-		
-		String err = fatal + " cause by " + sb.toString();
-		
-		return this.write(5,  err);
-	}
-
 	public Class<?> getClazz() {
 		return clazz;
 	}

@@ -103,12 +103,12 @@ public class ORMConfig {
 			error = sb.toString();
 
 			log.error(error);
-		} catch (Exception e1) {
+		} catch (Throwable e1) {
 			e1.printStackTrace();
 			StringBuilder sb3 = new StringBuilder(CommonUtil.getExceptionString(e1));
 			sb3.append(ConfigInfoCons.CANNOT_REPAIR_CONFIG_FILE);
 			error = sb3.toString();
-			log.error(error);
+			log.error(error, e1);
 		}
 		return error;
 	}

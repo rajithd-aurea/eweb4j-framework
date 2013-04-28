@@ -138,7 +138,7 @@ public final class ActionConfigBeanCache {
 
 			if (!ACTION_CFG_BEAN.containsKey(beanID)) {
 				ACTION_CFG_BEAN.put(beanID, o);
-				info = "add...finished..." + beanID + " , " + o;
+				info = "http -> " + beanID + " mapping to class -> " + o.getClazz()+"." + o.getMethod() + " ok";
 			} else {
 				ActionConfigBean actionBean = ACTION_CFG_BEAN.get(beanID);
 				if (actionBean != null) {
@@ -169,11 +169,11 @@ public final class ActionConfigBeanCache {
 								+ o.getMethod() + "#uri-mapping:" + beanID
 								+ "level[" + level_2 + "]，so replaced。";
 					} else {
-						info = "add...fail repeat action..." + beanID;
+						info = "the http -> " + beanID + " is exists";
 					}
 				} else {
 					ACTION_CFG_BEAN.put(beanID, o);
-					info = "add...finished..." + beanID + " , " + o;
+					info = "http -> " + beanID + " mapping to class -> " + o.getClazz()+"." + o.getMethod() + " ok";
 				}
 			}
 

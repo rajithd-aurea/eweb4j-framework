@@ -91,7 +91,7 @@ public class DAOConfig {
 						error += error1;
 
 				}
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				e.printStackTrace();
 
 				error = rebuildXmlFile(configFile, CommonUtil.getExceptionString(e));
@@ -129,7 +129,7 @@ public class DAOConfig {
 			sb2.append(CommonUtil.getExceptionString(e1));
 			error = sb2.toString();
 
-			log.error(error);
+			log.error(error, e1);
 		}
 		return error;
 	}

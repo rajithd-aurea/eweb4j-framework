@@ -71,13 +71,10 @@ public class InterceptorAnnotationConfig extends ScanPackage{
 			}
 			inter.setUri(uriList);
 			InterConfigBeanCache.add(inter);
-		}  catch (Error er) {
-			log.warn("the interceptor class new instance failued -> " + clsName + " | " + er.toString());
+		}  catch (Throwable e) {
+			log.warn("the interceptor class new instance failued -> " + clsName + " | " + e.toString(), e);
 			return false;
-		} catch (Exception e) {
-			log.warn("the interceptor class new instance failued -> " + clsName + " | " + e.toString());
-			return false;
-		}
+		} 
 		
 		return true;
 	}

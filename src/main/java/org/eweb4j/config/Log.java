@@ -8,14 +8,14 @@ public interface Log {
 
 	public String warn(String warn);
 	
-	public String warn(String warn, Exception e);
+	public String warn(String warn, Throwable e);
 
 	public String error(String error);
 	
-	public String error(String error, Exception e);
+	public String error(String error, Throwable e);
 
 	public String fatal(String fatal);
 	
-	public String fatal(String fatal, Exception e);
+	public String fatal(String fatal, Throwable e);
 	
 }

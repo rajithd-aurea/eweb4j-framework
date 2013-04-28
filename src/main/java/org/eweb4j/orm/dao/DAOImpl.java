@@ -552,7 +552,7 @@ public class DAOImpl implements DAO {
 			
 			return result;
 		} catch (Exception e) {
-			log.error("sql-->" + sql + "exception:" + CommonUtil.getExceptionString(e));
+			log.error("sql-->" + sql, e);
 			throw new DAOException(sql + " execute exception", e);
 		}
 	}
@@ -682,7 +682,7 @@ public class DAOImpl implements DAO {
 				rs = JdbcUtil.update(ds.getConnection(), sql);
 			}
 		} catch (SQLException e) {
-			log.error("sql-->" + sql + "exception:" + CommonUtil.getExceptionString(e));
+			log.error("sql-->" + sql, e);
 			throw new DAOException(sql + " execute exception", e);
 		}
 
@@ -1121,8 +1121,8 @@ public class DAOImpl implements DAO {
 				_AliasField a = new _AliasField(alias, cls.getSimpleName().toLowerCase(), cls);
 				aliasMap.put(alias, a);
 				currentClazz = cls;
-			} catch (Exception e){
-				log.error(e.toString());
+			} catch (Throwable e){
+				log.error(e.toString(), e);
 			}
 		}
 	}

@@ -24,13 +24,12 @@
 		<orm>
 			<open>1</open>
 			<logs>
-				<log console="1" level="debug" file="" size="5" />
+				<log console="1" level="debug" file="orm.log" size="5" />
 	      	</logs>
 	      	<ddl generate="true" run="false" ds="myDBInfo"/>
 			<dataSource>com.mchange.v2.c3p0.ComboPooledDataSource</dataSource>
 			<scanPojoPackage>
-				<path>.</path>
-				<path>JAR:persistence-api-1.0</path>
+				<path>test</path>
 				<path>AP:${RootPath}/target/classes</path>
 			</scanPojoPackage>
 			<ormXmlFiles />
@@ -41,11 +40,11 @@
 		<mvc>
 			<open>1</open>
 			<logs>
-				<log console="1" level="debug" file="" size="5" />
+				<log console="1" level="debug" file="mvc.log" size="5" />
 	      	</logs>
 	      	<upload tmp="${RootPath}/WEB-INF/tmp" maxMemorySize="4M" maxRequestSize="4M" />
 			<scanActionPackage>
-				<path>.</path>
+				<path>test</path>
 				<path>AP:${RootPath}/target/classes</path>
 			</scanActionPackage>
 			<scanInterceptorPackage>

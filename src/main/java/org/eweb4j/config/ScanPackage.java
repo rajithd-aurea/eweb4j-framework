@@ -55,7 +55,7 @@ public abstract class ScanPackage {
 
 			//all ok
 			onOk();
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			error = log.error("", e);
 		}
 

@@ -38,7 +38,7 @@ public class IOCConfigBeanCache {
 		String info = null;
 		if (!ht.containsKey(beanID)) {
 			ht.put(beanID, o);
-			info = "IOCConfigBeanCache:add...finished..." + o;
+			info = "bean_id->" + beanID + ", Class->" + o.getClazz();
 			log.debug(info);
 		}
 	}

@@ -93,11 +93,8 @@ public class PojoAnnotationConfig extends ScanPackage {
 			ormBean.setTable(table);
 			ormBean.setProperty(properties);
 			ORMConfigBeanCache.add(clazz.getName(), ormBean);
-		} catch (Error er) {
-			log.warn("the entity class new instance failued -> " + clsName + " | " + er.toString());
-			return false;
-		} catch (Exception e) {
-			log.warn("the entity class new instance failued -> " + clsName + " | " + e.toString());
+		} catch (Throwable e) {
+			log.warn("the entity class new instance failued -> " + clsName + " | " + e.toString(), e);
 			return false;
 		}
 		
@@ -114,17 +111,14 @@ public class PojoAnnotationConfig extends ScanPackage {
 		return false;
 	}
 
-	private static List<Property> getProperties(Class<?> clazz, final List<Property> pList, final boolean requireSuper, Log log) throws Exception {
+	private static List<Property> getProperties(Class<?> clazz, final List<Property> pList, final boolean requireSuper, Log log) throws Throwable {
 		List<Property> result = new ArrayList<Property>();
 		ReflectUtil ru;
 		try {
 			ru = new ReflectUtil(clazz);
 			ru.setRequiredSuper(requireSuper);
-		} catch (Error e) {
-			log.warn(e.toString());
-			throw e;
-		} catch (Exception e) {
-			log.warn(e.toString());
+		} catch (Throwable e) {
+			log.warn(e.toString(), e);
 			throw e;
 		}
 

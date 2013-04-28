@@ -113,7 +113,7 @@ public class EWeb4JConfig {
 				}
 				
 				error = _start(error, cb);
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				// 重写配置文件
 				try {
 					// 保存为备份文件
@@ -126,7 +126,7 @@ public class EWeb4JConfig {
 					error = CommonUtil.getNowTime() + "EWeb4JConfig : " + info + "exception：" + CommonUtil.getExceptionString(e);
 
 					log.error(info, e);
-				} catch (Exception e1) {
+				} catch (Throwable e1) {
 					String info = "can not write any configuration";
 					error = CommonUtil.getNowTime() + "EWeb4JConfig : " + info + "exception：" + CommonUtil.getExceptionString(e1);
 					log.fatal(info, e);
@@ -236,7 +236,7 @@ public class EWeb4JConfig {
 							else
 								error += error13;
 					}
-				} catch (Exception e) {
+				} catch (Throwable e) {
 					log.warn(e.toString(), e);
 					if (error == null)
 						error = e.toString();

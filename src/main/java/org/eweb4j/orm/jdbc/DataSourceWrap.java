@@ -70,7 +70,7 @@ public final class DataSourceWrap implements DataSource {
 
 			return con;
 		} catch (SQLException e) {
-			log.error(CommonUtil.getExceptionString(e));
+			log.error(e.toString(), e);
 			// try {
 			// this.finalize();
 			// } catch (Throwable e1) {

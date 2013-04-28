@@ -130,7 +130,7 @@ public class InterExecution {
 				} else
 					found = false;
 
-				log.debug("uri -> " +value+ " found -> " + found);
+//				log.debug("uri -> " +value+ " found -> " + found);
 				
 				// 如果是 或者 
 				if (isOR){
@@ -163,8 +163,6 @@ public class InterExecution {
 			}else{
 				// 否则显示错误信息, 并且退出方法
 				log.debug("do interceptor -> " + inter.getClazz() + " error -> " + error);
-				logErr();
-				
 				return true;
 			}
 		}
@@ -331,13 +329,6 @@ public class InterExecution {
 			this.context.getWriter().print(re);
 			this.context.getWriter().flush();
 		}
-	}
-
-	private void logErr() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("intercepte -> ").append(this.context.getUri());
-		sb.append(" error info -> ").append(this.error);
-		log.debug(sb.toString());
 	}
 
 	public String getError() {
