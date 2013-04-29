@@ -48,6 +48,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 public class CommonUtil {
 	
 	public static void main(String[] args){
+		System.out.println(String.valueOf(null));
 		System.out.println(CommonUtil.formatTime(new Date(1357660800000L)));
 		String source = "2013-01-17 11:00";
 		Date date = CommonUtil.parse("yyyy-MM-dd HH:mm", source);
@@ -208,24 +209,50 @@ public class CommonUtil {
 		return toLong(String.valueOf(d1))+toLong(String.valueOf(d2));
 	}
 	
+	public static String toString(Object obj){
+		if (null == obj) return null;
+		
+		return String.valueOf(obj);
+	}
+	
 	public static Integer toInt(String str) {
-		return Integer.parseInt(str);
+		try {
+			return Integer.parseInt(str);
+		} catch (Throwable e){
+			return -1;
+		}
 	}
 	
 	public static Long toLong(String str) {
-		return Long.parseLong(str);
+		try {
+			return Long.parseLong(str);
+		} catch (Throwable e){
+			return -1L;
+		}
 	}
 	
 	public static Float toFloat(String str) {
-		return Float.parseFloat(str);
+		try {
+			return Float.parseFloat(str);
+		} catch (Throwable e){
+			return -1F;
+		}
 	}
 	
 	public static Double toDouble(String str) {
-		return Double.parseDouble(str);
+		try {
+			return Double.parseDouble(str);
+		} catch (Throwable e){
+			return -1D;
+		}
 	}
 	
 	public static Boolean toBoolean(String str) {
-		return Boolean.parseBoolean(str);
+		try {
+			return Boolean.parseBoolean(str);
+		} catch (Throwable e){
+			return null;
+		}
 	}
 	
 	public static String String(){
@@ -233,6 +260,9 @@ public class CommonUtil {
 	}
 	
 	public static String String(Object obj){
+		if (obj == null)
+			return null;
+		
 		return String.valueOf(obj);
 	}
 	
@@ -1481,12 +1511,6 @@ public class CommonUtil {
 
 	public static boolean isNullOrEmpty(Object obj) {
 		return obj == null || "".equals(obj.toString());
-	}
-
-	public static String toString(Object obj) {
-		if (obj == null)
-			return "null";
-		return obj.toString();
 	}
 
 	public static String join(Collection<?> s, String delimiter) {
