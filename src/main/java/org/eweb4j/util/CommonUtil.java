@@ -219,7 +219,7 @@ public class CommonUtil {
 		try {
 			return Integer.parseInt(str);
 		} catch (Throwable e){
-			return -1;
+			return null;
 		}
 	}
 	
@@ -227,7 +227,7 @@ public class CommonUtil {
 		try {
 			return Long.parseLong(str);
 		} catch (Throwable e){
-			return -1L;
+			return null;
 		}
 	}
 	
@@ -235,7 +235,7 @@ public class CommonUtil {
 		try {
 			return Float.parseFloat(str);
 		} catch (Throwable e){
-			return -1F;
+			return null;
 		}
 	}
 	
@@ -243,7 +243,7 @@ public class CommonUtil {
 		try {
 			return Double.parseDouble(str);
 		} catch (Throwable e){
-			return -1D;
+			return null;
 		}
 	}
 	
