@@ -107,7 +107,7 @@ public class FTPUtil implements ProtocolCommandListener{
 	}
 	
 	public static void main(String[] args){
-		FTPUtil ftp = new FTPUtil("shoplay.com", 21, "wfl", "wufulin");
+		FTPUtil ftp = new FTPUtil("shoplay.com", 21, "weiwei", "24abcdef");
 		try {
 			
 			ftp.client.setDataTimeout(10*60*1000);
@@ -126,9 +126,9 @@ public class FTPUtil implements ProtocolCommandListener{
 			ftp.connectAndLogin();
 			ftp.client.setFileTransferMode(FTPClient.PASSIVE_REMOTE_DATA_CONNECTION_MODE);
 			
-			String root = "/wwwroot/longyan-web/";
-			String filePath = "cache/bigpic/20130131/600/today-s-deal-1-start-to-order-up-to-70-discount-excellent-bass-awei-es500i-headset-only-19-99-original-49-99_df88b985bf_w599h782.jpg";
-			String remoteFile = "http://www.shoplay.com/"+filePath;
+			String root = "/wwwroot/wwwilovedeals/cache/bigpic/20130518/";
+			String filePath = "660811591578957.jpg";
+			String remoteFile = "http://cdn.streetdeal.sg/images/deals/"+filePath;
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 			ImageIO.write(ThumbUtil.generate(remoteFile, 0, 0.2f, 0, 0, "jpg", 2, 1*1000, 100, 100), "jpg", os);
 //			System.out.println("os--->"+os);

@@ -48,7 +48,19 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 public class CommonUtil {
 	
 	public static void main(String[] args){
-		System.out.println(String.valueOf(null));
+		String[] ss = "+1d +16h +37m +40s".replace("+", "").split(" ");
+		System.out.println(Arrays.asList(ss));
+		long days = CommonUtil.toSeconds(ss[0]).longValue();
+		long hours = CommonUtil.toSeconds(ss[1]).longValue();
+		long mins = CommonUtil.toSeconds(ss[2]).longValue();
+		long secs = CommonUtil.toSeconds(ss[3]).longValue();
+		long all = CommonUtil.getNow()+(days+hours+mins+secs)*1000L;
+		System.out.println(all);
+		System.out.println(CommonUtil.formatTime(new Date(all)));
+		System.out.println(CommonUtil.calculateTime(new Date().getTime(), all));
+		
+		if (true) return ;
+		
 		System.out.println(CommonUtil.formatTime(new Date(1357660800000L)));
 		String source = "2013-01-17 11:00";
 		Date date = CommonUtil.parse("yyyy-MM-dd HH:mm", source);
@@ -59,6 +71,9 @@ public class CommonUtil {
 		System.out.println((""+time).substring(0, 10));
 		System.out.println(CommonUtil.formatTime(new Date(time)));
 		
+		String x = "x                                        Crystal Jade Kitchen and Crystal Jade Korean BBQ                    #01-01/02                    Tel: 6634 4920";
+		
+		System.out.println(Arrays.asList(x.split(" ")));
 //		double min = 0.01;
 //		double max = 0.99;
 //		for (int i = 0; i < 20; i++){
@@ -1605,7 +1620,7 @@ public class CommonUtil {
 		if (baseUrl == null) 
 			return relativeUrl;
 		
-		if (relativeUrl == null) 
+		if (relativeUrl == null || relativeUrl.trim().length() == 0) 
 			return null;
 		
 //		if (relativeUrl.startsWith("http://") || relativeUrl.startsWith("https://"))

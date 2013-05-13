@@ -317,8 +317,8 @@ public class ThumbUtil {
 //		String remoteImageUrl = "http://shoppetreatz.com/wp-content/themes/DailyDeal/thumb.php?src=http://shoppetreatz.com/wp-content/uploads/2012/11/13541581271295634499.jpg&w=560&h=280&zc=1&q=80&bid=1";
 //		String remoteImageUrl = "http://gd.image-gmkt.com/mi/207/546/419546207.jpg";
 //		String remoteImageUrl = "http://test.shoplay.com/cache/bigpic/20121108/470/55c5b78e5c_w470.jpg";
-		
-		String remoteImageUrl = "http://www.imm.sg/resources/imm/images/common/logo.png";
+//		String remoteImageUrl = "http://www.imm.sg/resources/imm/images/common/logo.png";
+		String remoteImageUrl = "http://www.marinasquare.com.sg/images/msq//tenants/arte.jpg";
 		int sharpenTimes = 0;// 锐化次数
 		float quality = 1f;// 质量
 		String outputFormat = "jpg";// 输出格式
