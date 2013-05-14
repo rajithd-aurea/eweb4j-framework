@@ -59,8 +59,6 @@ public class CommonUtil {
 		System.out.println(CommonUtil.formatTime(new Date(all)));
 		System.out.println(CommonUtil.calculateTime(new Date().getTime(), all));
 		
-		if (true) return ;
-		
 		System.out.println(CommonUtil.formatTime(new Date(1357660800000L)));
 		String source = "2013-01-17 11:00";
 		Date date = CommonUtil.parse("yyyy-MM-dd HH:mm", source);
@@ -86,6 +84,29 @@ public class CommonUtil {
 		String center = null;//309,299.5
 		center = CommonUtil.getCenterCoord(coords);
 		System.out.println(center);
+		
+		System.out.println(resolveCoords("1,2,3,4,5,6"));
+	}
+	
+	/**
+	 * 将类似 1,2,3,4,5,6 修复为: 1,2 3,4 5,6
+	 * @date 2013-5-14 下午06:01:25
+	 * @param _coords
+	 * @return
+	 */
+	public static String resolveCoords(final String _coords) {
+		String[] cs = _coords.split(",");
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < cs.length ; i++) {
+			//逢偶数就添加一个空格
+			if ((i+1) % 2 == 0){
+				if (sb.length() > 0)
+					sb.append(" ");
+				sb.append(cs[i-1]).append(",").append(cs[i]);
+			}
+		}
+		
+		return sb.toString();
 	}
 	
 	public static String getCenterCoord(final String _coords){
