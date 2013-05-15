@@ -88,6 +88,14 @@ public class CommonUtil {
 		System.out.println(resolveCoords("1,2,3,4,5,6"));
 	}
 	
+	public static String appendString(Object... objs) {
+		StringBuilder sb = new StringBuilder();
+		for (Object obj : objs) {
+			sb.append(obj);
+		}
+		return sb.toString();
+	}
+	
 	/**
 	 * 将类似 1,2,3,4,5,6 修复为: 1,2 3,4 5,6
 	 * @date 2013-5-14 下午06:01:25
