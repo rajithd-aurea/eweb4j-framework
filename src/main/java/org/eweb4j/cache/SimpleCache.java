@@ -73,7 +73,7 @@ public class SimpleCache<K, V> implements Cache<K, V> {
 			throw new IllegalArgumentException("Invalid Key.");
 		}
 		if (value == null) {
-			throw new IllegalArgumentException("Invalid Value.");
+			return;
 		}
 
 		long expireBy = secondsToLive != -1 ? System.currentTimeMillis()
