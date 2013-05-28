@@ -792,3 +792,7 @@ ioc.xml
 			private UploadFile image;//或者 private File image
             
 (2)bug fix: 解决UploadFile 的验证器失败的bug
+(3)feature: 新增CommonUtil.getCenterCoord("x1,y1 x2,y2 x3,y3")方法，用于获取多边形的中心点坐标
+(4)feature: 新增CommonUtil.fetchUrl 用于简单的获取某个URL返回的内容
+(5)bug fix: 解决CommonUtil.resolveUrl问题,当给定的相对路径为空的时候应该返回空值而不是HOST值
+(6)bug fix: 解决SimpleCache.put(key, null)问题，当给定的value是null时不应该报运行期异常
