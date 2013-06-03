@@ -1,10 +1,14 @@
 package test.sql;
 
+import java.util.Collection;
+
 import junit.framework.Assert;
 
 import org.eweb4j.config.EWeb4JConfig;
+import org.eweb4j.orm.Db;
 import org.eweb4j.orm.dao.DAO;
 import org.eweb4j.orm.dao.DAOFactory;
+import org.eweb4j.util.CommonUtil;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -19,6 +23,18 @@ public class TestDAOSql {
 		dao = DAOFactory.getDAO(Pet.class);
 	}
 
+	@Test
+	public void testSql(){
+		String sql = "select * from t_pet where id > ? limit 10";
+		Collection<Pet> pets = 
+			Db.ar(Pet.class)
+				.dao()
+				.sql(sql).fillArgs(2)
+				.query();
+		
+		System.out.println("!!!!fuck!!!!!pets=====>" + CommonUtil.toJson(pets));
+	}
+	
 	@Test
 	public void testSelectStr() {
 

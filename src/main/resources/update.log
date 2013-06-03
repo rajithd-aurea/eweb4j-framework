@@ -796,3 +796,6 @@ ioc.xml
 (4)feature: 新增CommonUtil.fetchUrl 用于简单的获取某个URL返回的内容
 (5)bug fix: 解决CommonUtil.resolveUrl问题,当给定的相对路径为空的时候应该返回空值而不是HOST值
 (6)bug fix: 解决SimpleCache.put(key, null)问题，当给定的value是null时不应该报运行期异常
+1.10.1 2013-04-17
+05-31 15:17
+(1)bug fix: 解决文件上传@Required注解后，验证器工作实效导致总是报字段值必填的错误
