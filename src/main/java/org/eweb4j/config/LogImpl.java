@@ -27,7 +27,7 @@ public class LogImpl implements Log {
 	public LogImpl() {
 	}
 
-	private String write(final int level, final String msg, Throwable th) {
+	private synchronized String write(final int level, final String msg, Throwable th) {
 		String mess = msg;
 		if (th != null) {
 			StringWriter strWriter = new StringWriter();
