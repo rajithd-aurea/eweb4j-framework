@@ -62,6 +62,8 @@ public class EWebFilter implements Filter, Servlet {
 		
 		ActionConfig.setLAYOUT_SCREEN_CONTENT_KEY(config.getInitParameter(MVCCons.LAYOUT_SCREEN_CONTENT_KEY));
 		
+		ActionConfig.setBASE_URL_PARSE_TYPE(config.getInitParameter(MVCCons.BASE_URL_PARSE_TYPE));
+		
 		ActionConfig.setBASE_URL_KEY(config.getInitParameter(MVCCons.BASE_URL_KEY));
 
 		ActionConfig.setREQ_PARAM_SCOPE_KEY(config.getInitParameter(MVCCons.REQ_PARAM_MAP_KEY));
@@ -246,14 +248,19 @@ public class EWebFilter implements Filter, Servlet {
 		HttpServletRequest request = context.getRequest();
 		String uri = context.getUri();
 
-		if (servletContext.getAttribute(MVCConfigConstant.BASE_URL_KEY) == null) {
-			String url = URLDecoder.decode(request.getRequestURL().toString(),"utf-8");
-
-			String baseUrl = url.replace(uri, "");
-			MVCConfigConstant.BASE_URL = baseUrl;
-			servletContext.setAttribute(MVCConfigConstant.BASE_URL_KEY, baseUrl);
-			LogFactory.getMVCLogger(EWebFilter.class).debug("${" + MVCConfigConstant.BASE_URL_KEY + "} -> " + baseUrl);
+		String parseType = MVCConfigConstant.BASE_URL_PARSE_TYPE;
+		//只要不是固定的，都是用动态策略
+		if (!"fixed".equalsIgnoreCase(parseType)){
+			MVCConfigConstant.BASE_URL = URLDecoder.decode(request.getRequestURL().toString(),"utf-8").replace(uri, "");
+			servletContext.setAttribute(MVCConfigConstant.BASE_URL_KEY, MVCConfigConstant.BASE_URL);
+		} else {
+			if (servletContext.getAttribute(MVCConfigConstant.BASE_URL_KEY) == null) {
+				MVCConfigConstant.BASE_URL = URLDecoder.decode(request.getRequestURL().toString(),"utf-8").replace(uri, "");
+				servletContext.setAttribute(MVCConfigConstant.BASE_URL_KEY, MVCConfigConstant.BASE_URL);
+			}
 		}
+		
+		LogFactory.getMVCLogger(EWebFilter.class).debug("${" + MVCConfigConstant.BASE_URL_KEY + "} -> " + MVCConfigConstant.BASE_URL);
 	}
 
 	/**

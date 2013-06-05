@@ -138,10 +138,17 @@ public class ActionConfig {
 		MVCConfigConstant.LAYOUT_SCREEN_CONTENT_KEY = key;
 	}
 	
-	public static void setBASE_URL_KEY(String key) {
+	public static void setBASE_URL_PARSE_TYPE(String key) {
 		if (key == null || key.trim().length() == 0)
 			return;
 
+		MVCConfigConstant.BASE_URL_PARSE_TYPE = key;
+	}
+	
+	public static void setBASE_URL_KEY(String key) {
+		if (key == null || key.trim().length() == 0)
+			return;
+		
 		MVCConfigConstant.BASE_URL_KEY = key;
 	}
 

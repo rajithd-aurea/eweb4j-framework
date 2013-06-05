@@ -22,6 +22,7 @@ public final class MVCConfigConstant {
 	
 	public static String BASE_URL = "";
 	
+	public static String BASE_URL_PARSE_TYPE = "dynamic";//dynamic | fixed
 	public static String BASE_URL_KEY = "BaseURL";
 	public static String LAYOUT_SCREEN_CONTENT_KEY = "ScreenContent";
 	public static String FORWARD_BASE_PATH = "";
