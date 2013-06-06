@@ -799,3 +799,5 @@ ioc.xml
 1.10.1 2013-04-17
 05-31 15:17
 (1)bug fix: 解决文件上传@Required注解后，验证器工作实效导致总是报字段值必填的错误
+(2)improve: MVC模块的${BaseURL}生成策略默认变成动态的，即每次request都会重新生成，原来是固定的，即第一次生成后，以后都复用之，此外还提供了一个配置项可配置为fixed，即固定的。
+            在web.xml里面配置初始化参数，参数名：BaseURLParseType 参数值：fixed 或 dynamic
