@@ -88,6 +88,10 @@ public class CommonUtil {
 		System.out.println(resolveCoords("1,2,3,4,5,6"));
 	}
 	
+	public static String getFileExt(String name){
+		return name.substring(name.lastIndexOf(".") + 1);
+	}
+	
 	public static String appendString(Object... objs) {
 		StringBuilder sb = new StringBuilder();
 		for (Object obj : objs) {

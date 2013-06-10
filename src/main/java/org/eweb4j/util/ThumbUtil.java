@@ -318,13 +318,14 @@ public class ThumbUtil {
 //		String remoteImageUrl = "http://gd.image-gmkt.com/mi/207/546/419546207.jpg";
 //		String remoteImageUrl = "http://test.shoplay.com/cache/bigpic/20121108/470/55c5b78e5c_w470.jpg";
 //		String remoteImageUrl = "http://www.imm.sg/resources/imm/images/common/logo.png";
-		String remoteImageUrl = "http://www.marinasquare.com.sg/images/msq//tenants/arte.jpg";
+//		String remoteImageUrl = "http://www.marinasquare.com.sg/images/msq//tenants/arte.jpg";
+		String remoteImageUrl = "http://www.moxdeals.sg/storage/32000/1682/a7caf8be7675fba0f932f0eeeb84e1d7.jpg";
 		int sharpenTimes = 0;// 锐化次数
 		float quality = 1f;// 质量
 		String outputFormat = "jpg";// 输出格式
 		String name = CommonUtil.getNowTime("yyyyMMddHHmmss");
 		int outputWidth = 400;// 宽度
-		int outputHeight = 300;// 高度
+		int outputHeight = 306;// 高度
 		boolean isCrop = false;//是否裁剪图片
 		float contrast = 0f; // 对比度
 		float brightness = 0f; // 亮度 0 表示不调整
