@@ -550,22 +550,22 @@ public class CheckConfigBean {
 		if ("true".equals(cb.getOrm().getOpen())
 				|| "1".equals(cb.getOrm().getOpen())) {
 			StringBuilder sb = new StringBuilder();
-			if (!DBType.MYSQL_DB.equalsIgnoreCase(dcb.getDataBaseType())
-					&& !DBType.MSSQL2000_DB.equalsIgnoreCase(dcb
-							.getDataBaseType())
-					&& !DBType.MSSQL2005_DB.equalsIgnoreCase(dcb
-							.getDataBaseType())
-					&& !DBType.ORACLE_DB
-							.equalsIgnoreCase(dcb.getDataBaseType())) {
-
-				sb.append("当前您填写的: ( dataBaseType=")
-						.append(dcb.getDataBaseType()).append(" )是错误的！它必须为：")
-						.append(DBType.MYSQL_DB).append("|")
-						.append(DBType.MSSQL2000_DB).append("|")
-						.append(DBType.MSSQL2005_DB).append("|")
-						.append(DBType.ORACLE_DB).append("|")
-						.append("中的其中一个,忽略大小写 ;").append("\n");
-			}
+//			if (!DBType.MYSQL_DB.equalsIgnoreCase(dcb.getDataBaseType())
+//					&& !DBType.MSSQL2000_DB.equalsIgnoreCase(dcb
+//							.getDataBaseType())
+//					&& !DBType.MSSQL2005_DB.equalsIgnoreCase(dcb
+//							.getDataBaseType())
+//					&& !DBType.ORACLE_DB
+//							.equalsIgnoreCase(dcb.getDataBaseType())) {
+//
+//				sb.append("当前您填写的: ( dataBaseType=")
+//						.append(dcb.getDataBaseType()).append(" )是错误的！它必须为：")
+//						.append(DBType.MYSQL_DB).append("|")
+//						.append(DBType.MSSQL2000_DB).append("|")
+//						.append(DBType.MSSQL2005_DB).append("|")
+//						.append(DBType.ORACLE_DB).append("|")
+//						.append("中的其中一个,忽略大小写 ;").append("\n");
+//			}
 
 			if (!"".equals(sb.toString())) {
 				error = "\n<br /><b>" + filePath + ":</b>\n" + sb.toString();

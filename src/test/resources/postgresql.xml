@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans>
+	<dataSource dsName="myDBInfo">
+		<dataBaseType>POSTGRESQL</dataBaseType>
+		<property key="driverClass" value="org.postgresql.Driver" />
+		<property key="jdbcUrl" value="jdbc:postgresql://localhost:5432/petstore_db" />
+		<property key="user" value="postgres" />
+		<property key="password" value="root" />
+	</dataSource>
+</beans>

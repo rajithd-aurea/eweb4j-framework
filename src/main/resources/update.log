@@ -801,3 +801,20 @@ ioc.xml
 (1)bug fix: 解决文件上传@Required注解后，验证器工作实效导致总是报字段值必填的错误
 (2)improve: MVC模块的${BaseURL}生成策略默认变成动态的，即每次request都会重新生成，原来是固定的，即第一次生成后，以后都复用之，此外还提供了一个配置项可配置为fixed，即固定的。
             在web.xml里面配置初始化参数，参数名：BaseURLParseType 参数值：fixed 或 dynamic
+(3)improve: 添加Db.ar(xxx).findBySql(sql, args) .executeBySql(sql, args) .支持 #name 语法
+			例子：
+			Number rs = 
+				Db.ar(User.class)
+					.executeBySql("update #table set #account = ? where #id = ?", "test-acc", 1);
+			
+			Collection<User> users = 
+				Db.ar(User.class)
+					.findBySql("select #account, #password from #table where #id = ?", 1); 
+			
+			//postgresql 的分页, 从0开始，取2条，且join了user表
+			Collection<Pet> pets = 
+				Db.ar(Pet.class)
+					.alias("p")
+					.join("user", "u")
+						.findBySql("select p.* from #p.table p, #u.table u where #p.user = #u.id order by #p.id asc limit ? offset ?", 2, 0);
+			
