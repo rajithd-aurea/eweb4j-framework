@@ -21,8 +21,6 @@ import org.eweb4j.util.ClassUtil;
 import org.eweb4j.util.CommonUtil;
 import org.eweb4j.util.ReflectUtil;
 
-import test.po.Pet;
-
 @SuppressWarnings("all")
 public class ORMConfigBeanUtil {
 
@@ -508,8 +506,5 @@ public class ORMConfigBeanUtil {
 
 		return list.isEmpty() ? result : list.toArray(new String[] {});
 	}
-	public static void main(String[] args) {
-		String q = ORMConfigBeanUtil.parseQuery("byNameAndTypeOrNumberIsNull", Map.class);
-		System.out.println(q);
-	}
+	
 }
