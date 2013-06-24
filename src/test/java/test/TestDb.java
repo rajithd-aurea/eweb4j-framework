@@ -3,7 +3,9 @@ package test;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -19,7 +21,6 @@ import org.junit.Test;
 
 import test.po.Master;
 import test.po.Pet;
-import test.render.TestRender.Pojo;
 
 /**
  * TODO
@@ -37,9 +38,16 @@ public class TestDb {
 	}
 	
 	public static void main(String[] args) throws IOException{
+		
 	}
 	
 	@Test
+	public void testMap(){
+		String countSql = "select count(*) as count from t_pet";
+		Map<String, Integer> countRecord = DAOFactory.getDAO(Map.class).setTable("t_pet").sql(countSql).queryOne();
+		System.out.println("count->"+countRecord.get("count"));
+	}
+	
 	public void testNotMappingColumn() throws Exception{
 		DAO dao = Db.ar(Pet.class).dao().update("fuckyou").set("heihei").where().field("id").equal(11);
 		String sql = dao.toSql();
@@ -49,7 +57,6 @@ public class TestDb {
 		Assert.assertEquals("[heihei, 11]", args.toString());
 	}
 	
-	@Test
 	public void testInsert() throws Exception{
 		Pet pet = new Pet();
 		pet.setName("testName2222");

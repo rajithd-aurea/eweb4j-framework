@@ -21,9 +21,14 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eweb4j.cache.SingleBeanCache;
 import org.eweb4j.config.ConfigConstant;
 import org.eweb4j.config.EWeb4JConfig;
+import org.eweb4j.config.EWeb4JListener;
 import org.eweb4j.config.LogFactory;
+import org.eweb4j.config.bean.ConfigBean;
+import org.eweb4j.config.bean.ListenerBean;
+import org.eweb4j.config.bean.Listeners;
 import org.eweb4j.i18n.Lang;
 import org.eweb4j.mvc.action.ActionExecution;
 import org.eweb4j.mvc.config.ActionConfig;
@@ -293,6 +298,21 @@ public class EWebFilter implements Filter, Servlet {
 	public void destroy() {
 		String info = "eweb4j filter destroy invoke...\n";
 		LogFactory.getMVCLogger(EWebFilter.class).debug(info);
+		//CallBack after destroy
+		ConfigBean cb = (ConfigBean)SingleBeanCache.get(ConfigBean.class.getName());
+		Listeners listeners = cb.getListeners();
+		if (listeners != null && listeners.getListener() != null && !listeners.getListener().isEmpty()) {
+			for (ListenerBean lb : listeners.getListener()){
+				String clazz = lb.getClazz();
+				try {
+					EWeb4JListener listener = (EWeb4JListener)CommonUtil.loadClass(clazz).newInstance();
+					listener.onDestroy();
+					LogFactory.getMVCLogger(EWebFilter.class).debug("listener->"+listener+".onDestroy execute...");
+				} catch (Throwable e) {
+					e.printStackTrace();
+				} 
+			}
+		}
 	}
 
 	private void normalReqLog(String uri) {

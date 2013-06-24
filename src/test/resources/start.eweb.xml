@@ -4,6 +4,9 @@
 	<eweb4j>
 		<reload>0</reload>
 		<debug>1</debug>
+		<listeners>
+			<listener class="test.StartupListener" />
+		</listeners>
 		<locales>
 			<locale language="en" country="US" />
 			<locale language="zh" country="CN" />

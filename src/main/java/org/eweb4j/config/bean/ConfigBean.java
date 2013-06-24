@@ -10,11 +10,14 @@ import org.eweb4j.cache.SingleBeanCache;
  * 
  */
 public class ConfigBean {
+	
 	private String reload = "0";
 
 	private String debug = "1";
 
 	private I18N locales;
+
+	private Listeners listeners;
 	
 	private Properties properties;
 	
@@ -35,6 +38,14 @@ public class ConfigBean {
 
 	public void setLocales(I18N locales) {
 		this.locales = locales;
+	}
+
+	public Listeners getListeners() {
+		return this.listeners;
+	}
+
+	public void setListeners(Listeners listeners) {
+		this.listeners = listeners;
 	}
 
 	public Properties getProperties() {

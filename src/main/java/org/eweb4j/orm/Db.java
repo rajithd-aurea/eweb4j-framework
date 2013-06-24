@@ -1,6 +1,9 @@
 package org.eweb4j.orm;
 
 import org.eweb4j.orm.dao.DAOFactory;
+import org.eweb4j.orm.jdbc.transaction.Trans;
+import org.eweb4j.orm.jdbc.transaction.Transaction;
+import org.eweb4j.orm.sql.Model2Table;
 
 /**
  * Db operator for Active Record Model Helper
@@ -8,6 +11,38 @@ import org.eweb4j.orm.dao.DAOFactory;
  * @date 2013-1-22 下午03:51:22
  */
 public class Db {
+	
+	public static void createTableIfNotExist(final Class<?> entity){
+		String script = Model2Table.generateOne(entity, false, false);
+		final String[] sqls = script.split(";");
+		
+		Transaction.execute(new Trans() {
+			public void run(Object... args) throws Exception {
+				for (String sql : sqls){
+					if (sql == null || sql.trim().length() == 0)
+						continue;
+					
+					Db.ar(entity).dao().sql(sql).execute();
+				}
+			}
+		});
+	}
+	
+	public static void forceCreateTable(final Class<?> entity){
+		String script = Model2Table.generateOne(entity, true, false);
+		final String[] sqls = script.split(";");
+		
+		Transaction.execute(new Trans() {
+			public void run(Object... args) throws Exception {
+				for (String sql : sqls){
+					if (sql == null || sql.trim().length() == 0)
+						continue;
+					
+					Db.ar(entity).dao().sql(sql).execute();
+				}
+			}
+		});
+	}
 	
 	public static <T> Number[] batchDelete(T[] ts){
 		if (ts == null || ts.length == 0)

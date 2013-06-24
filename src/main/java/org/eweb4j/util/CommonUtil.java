@@ -1,8 +1,12 @@
 package org.eweb4j.util;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -86,6 +90,92 @@ public class CommonUtil {
 		System.out.println(center);
 		
 		System.out.println(resolveCoords("1,2,3,4,5,6"));
+	}
+	
+	public static int getYears(Date date) {
+		Calendar cal = Calendar.getInstance();
+		return cal.get(Calendar.YEAR);
+	}
+	
+	public static int getMonths(Date date) {
+		Calendar cal = Calendar.getInstance();
+		return cal.get(Calendar.MONTH);
+	}
+	
+	public static int getDays(Date date, int type) {
+		Calendar cal = Calendar.getInstance();
+		return cal.get(type);
+	}
+	
+	public static int getHours(Date date) {
+		Calendar cal = Calendar.getInstance();
+		return cal.get(Calendar.HOUR_OF_DAY);
+	}
+	
+	public static int getMinute(Date date) {
+		Calendar cal = Calendar.getInstance();
+		return cal.get(Calendar.MINUTE);
+	}
+	
+	public static int getSecond(Date date) {
+		Calendar cal = Calendar.getInstance();
+		return cal.get(Calendar.SECOND);
+	}
+	
+	public static <T> byte[] serialize(T obj){
+		ObjectOutputStream oos = null;
+		ByteArrayOutputStream os = null;
+		try {
+			os = new ByteArrayOutputStream();
+			oos = new ObjectOutputStream(os);
+			oos.writeObject(obj);
+			return os.toByteArray();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (oos != null) {
+				try {
+					os.close();
+					oos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	public static <T> T deserialize(byte[] data){
+		ObjectInputStream ois = null;
+		ByteArrayInputStream is = null;
+		try {
+			is = new ByteArrayInputStream(data);
+			ois = new ObjectInputStream(is);
+			return (T) ois.readObject();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (ois != null) {
+				try {
+					is.close();
+					ois.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	public static Class<?> loadClass(String name) {
+		try {
+			return Thread.currentThread().getContextClassLoader().loadClass(name);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	public static String getFileExt(String name){
@@ -536,7 +626,7 @@ public class CommonUtil {
 					m.invoke(t, value);
 				} else if ("time".equalsIgnoreCase(type) || "java.sql.Time".equalsIgnoreCase(type)) {
 					m.invoke(t, value);
-				} else if ("byte[]".equalsIgnoreCase(type) || "[Ljava.lang.Byte;".equalsIgnoreCase(type)) {
+				} else if ("[B".equalsIgnoreCase(type) || "byte[]".equalsIgnoreCase(type) || "[Ljava.lang.Byte;".equalsIgnoreCase(type)) {
 					m.invoke(t, value);
 				} else if (PropType.ONE_ONE.equalsIgnoreCase(type) || PropType.MANY_ONE.equalsIgnoreCase(type)) {
 					if ("".equals(v))

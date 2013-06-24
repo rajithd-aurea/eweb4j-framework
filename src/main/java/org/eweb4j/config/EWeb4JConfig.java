@@ -13,6 +13,8 @@ import org.eweb4j.cache.ORMConfigBeanCache;
 import org.eweb4j.cache.Props;
 import org.eweb4j.cache.SingleBeanCache;
 import org.eweb4j.config.bean.ConfigBean;
+import org.eweb4j.config.bean.ListenerBean;
+import org.eweb4j.config.bean.Listeners;
 import org.eweb4j.ioc.config.IOCConfig;
 import org.eweb4j.mvc.config.ActionAnnotationConfig;
 import org.eweb4j.mvc.config.ActionConfig;
@@ -286,13 +288,14 @@ public class EWeb4JConfig {
 								log.debug("ddl.generate -> true");
 								DBInfoConfigBean dcb = DBInfoConfigBeanCache.get(cb.getOrm().getDdl().getDs());
 								if (DBType.MYSQL_DB.equals(dcb.getDataBaseType())) {
-									File sqlFile = new File(ConfigConstant.CONFIG_BASE_PATH()+ cb.getOrm().getDdl().getDs() + "-create.sql");
+									File sqlFile = new File(ConfigConstant.CONFIG_BASE_PATH() + "db-create.sql");
 									if ("1".equals(cb.getOrm().getDdl().getOverride()) 
 											|| "true".equals(cb.getOrm().getDdl().getOverride()) 
 											|| !sqlFile.exists()) {
-										String errr12 = Model2Table.write(cb.getOrm().getDdl().getDs());
-										if (errr12 != null) {
-											error = errr12;
+										
+										String sql = Model2Table.generate();
+										if (sql == null) {
+											error = "can not generate ddl file";
 										} else
 											log.debug("ddl.generate execute success -> " + sqlFile.getAbsolutePath());
 									} else {
@@ -398,10 +401,26 @@ public class EWeb4JConfig {
 					if (error == null)
 						log.debug("mvc module -> ok");
 				}// end mvc module
+			
+				//CallBack after startup
+				Listeners listeners = cb.getListeners();
+				if (listeners != null && listeners.getListener() != null && !listeners.getListener().isEmpty()) {
+					for (ListenerBean lb : listeners.getListener()){
+						String clazz = lb.getClazz();
+						try {
+							EWeb4JListener listener = (EWeb4JListener)CommonUtil.loadClass(clazz).newInstance();
+							listener.onStartup();
+							log.debug("listener->"+listener+".onStartup execute...");
+						} catch (Throwable e) {
+							e.printStackTrace();
+						} 
+					}
+				}
 				
 			}// end if error == null
 			
 		}// end else cb != null
+		
 		return error;
 	}
 

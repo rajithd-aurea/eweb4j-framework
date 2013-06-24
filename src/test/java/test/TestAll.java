@@ -26,12 +26,12 @@ public class TestAll {
 	
 	public void test(){
 		Number rs = 
-			Db.ar(User.class)
+			Db.ar(Users.class)
 				.executeBySql("update #table set #account = ? where #id = ?", "test-acc", 1);
 		System.out.println(rs);
 		
-		Collection<User> users = 
-			Db.ar(User.class)
+		Collection<Users> users = 
+			Db.ar(Users.class)
 				.findBySql("select #account, #password from #table where #id = ?", 1); 
 		System.out.println(users);
 		

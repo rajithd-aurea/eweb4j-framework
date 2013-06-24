@@ -1,5 +1,6 @@
 package test.po;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +23,9 @@ import org.eweb4j.orm.Model;
  */
 @Entity
 @Table(name = "t_master")
-public class Master extends Model<Master> {
+public class Master extends Model<Master> implements Serializable{
+
+	private static final long serialVersionUID = 7942731207121905695L;
 
 	@Required(mess = "姓名必填")
 	@Length(min = 2, max = 32, mess = "姓名2-32位")

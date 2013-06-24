@@ -12,6 +12,7 @@ import org.eweb4j.util.xml.AttrTag;
  * 
  */
 public class IOCConfigBean {
+	
 	@AttrTag
 	private String id;
 

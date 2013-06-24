@@ -13,9 +13,9 @@ import test.po.Pet;
 
 @Entity
 @Table(name = "t_user")
-public class User extends Model<User> {
+public class Users extends Model<Users> {
 	
-	public final static User inst = new User();
+	public final static Users inst = new Users();
 	
 	private String account;
 	private String password;

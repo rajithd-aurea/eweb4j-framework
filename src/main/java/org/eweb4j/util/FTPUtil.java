@@ -108,8 +108,9 @@ public class FTPUtil implements ProtocolCommandListener{
 	}
 	
 	public static void main(String[] args){
-		FTPUtil ftp = new FTPUtil("122.248.240.88", 21, "oldweb", "123654");
-		//FTPUtil ftp = new FTPUtil("sytime.com", 21, "wfl", "wufulin");
+//		FTPUtil ftp = new FTPUtil("122.248.240.88", 21, "oldweb", "123654");
+//		FTPUtil ftp = new FTPUtil("54.251.32.238", 21, "myilove", "24abcdef");
+		FTPUtil ftp = new FTPUtil("sytime.com", 21, "wfl", "wufulin");
 		try {
 			
 			ftp.client.setDataTimeout(10*60*1000);
@@ -129,8 +130,10 @@ public class FTPUtil implements ProtocolCommandListener{
 			//PASSIVE_REMOTE_DATA_CONNECTION_MODE
 			ftp.client.setFileTransferMode(FTPClient.PASSIVE_REMOTE_DATA_CONNECTION_MODE);
 			
-			String remote = "/var/www/html/files/deals/watch3.jpg";
-//			String remote = "/wwwroot/longyan-web/cache/store/watch.jpg";
+//			String remote = "/var/www/html/files/deals/watch3.jpg";
+			String remote = "/wwwroot/longyan-web/cache/store/watch.jpg";
+//			String remote = "/wwwroot/myilovedeals/cache/watch.jpg";
+			
 			String local = "d:/test_facebook.jpg";
 			File f = new File(local);
 			InputStream is = new FileInputStream(f);

@@ -1,5 +1,7 @@
 package test.po;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,12 +15,14 @@ import org.eweb4j.mvc.validator.annotation.Length;
 import org.eweb4j.mvc.validator.annotation.Required;
 import org.eweb4j.orm.Model;
 
-import test.User;
+import test.Users;
 
 @Entity
 @Table(name = "t_pet")
-public class Pet extends Model<Pet> {
+public class Pet extends Model<Pet> implements Serializable{
 	
+	private static final long serialVersionUID = 3841852708264752696L;
+
 	public final static Pet inst = new Pet();
 	
 	@Id
@@ -46,7 +50,7 @@ public class Pet extends Model<Pet> {
 	
 	@ManyToOne
 	@JoinColumn(name="user_id", referencedColumnName="id")
-	private User user;
+	private Users user;
 	
 	public String getNumber() {
 		return number;
@@ -96,11 +100,11 @@ public class Pet extends Model<Pet> {
 		this.petId = petId;
 	}
 
-	public User getUser() {
+	public Users getUser() {
 		return user;
 	}
 
-	public void setUser(User user) {
+	public void setUser(Users user) {
 		this.user = user;
 	}
 
