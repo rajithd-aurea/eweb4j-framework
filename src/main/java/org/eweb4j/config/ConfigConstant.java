@@ -16,6 +16,13 @@ public class ConfigConstant {
 	public static String START_FILE_NAME = "eweb4j-start-config.xml";
 	public static String CHECK_START_FILE_EXIST = "true";
 	
+	public static void setROOT_PATH(String path){
+		if (path == null)
+			return;
+		
+		ROOT_PATH = path;
+	}
+	
 	public static String CONFIG_BASE_PATH(){
 		CONFIG_BASE_PATH = CONFIG_BASE_PATH.replace("${RootPath}", ROOT_PATH);
 		

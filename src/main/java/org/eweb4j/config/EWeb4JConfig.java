@@ -432,9 +432,13 @@ public class EWeb4JConfig {
 	}
 
 	public static String about() {
-		return "EWeb4J Framework 1.9.2-SNAPSHOT";
+		return "EWeb4J Framework 1.10.1-SNAPSHOT";
 	}
 
+	public static void setROOT_PATH(String path){
+		ConfigConstant.setROOT_PATH(path);
+	}
+	
 	public static void setSTART_FILE_NAME(String START_FILE_NAME) {
 		if (START_FILE_NAME == null || START_FILE_NAME.trim().length() == 0)
 			return;

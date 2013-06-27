@@ -55,6 +55,8 @@ public class EWebFilter implements Filter, Servlet {
 	public void init(FilterConfig config) throws ServletException {
 		servletContext = config.getServletContext();
 
+		EWeb4JConfig.setROOT_PATH(config.getInitParameter("RootPath"));
+		
 		EWeb4JConfig.setCONFIG_BASE_PATH(config.getInitParameter(MVCCons.CONFIG_BASE_PATH));
 		
 		EWeb4JConfig.setCHECK_START_FILE_EXIST(config.getInitParameter(MVCCons.CHECK_START_FILE_EXIST));
@@ -79,6 +81,23 @@ public class EWebFilter implements Filter, Servlet {
 
 		StringBuilder info = new StringBuilder("eweb4j filter init \n");
 
+//		try {
+//			ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+//	        Class<?> cla = classLoader.getClass();
+//	        while (cla != ClassLoader.class)
+//	            cla = cla.getSuperclass();
+//	        Field field = cla.getDeclaredField("classes");
+//	        field.setAccessible(true);
+//	        Vector v = (Vector) field.get(classLoader);
+//	        for (int i = 0; i < v.size(); i++) {
+//	            System.out.println("fuck->>>>>>"+((Class)v.get(i)).getName());
+//	        }
+//		} catch (Throwable e) {
+//			e.printStackTrace();
+//		}
+        
+		info.append("ClassPath --> ").append(Thread.currentThread().getContextClassLoader().getResource("/").getPath()).append("\n");
+		
 		info.append("RootPath --> ").append(ConfigConstant.ROOT_PATH).append("\n");
 		info.append("ConfigBasePath --> ").append(ConfigConstant.CONFIG_BASE_PATH).append("\n");
 		info.append("StartFileName --> ").append(ConfigConstant.START_FILE_NAME).append("\n");
