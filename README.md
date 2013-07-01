@@ -78,6 +78,25 @@
     或 Controller 后的前缀。例如：PetsControl -> /pets/ 。
     
     控制器类的命名约定以 Action 或 Control 或 Controller 结尾。
+    
+    此外，框架还实现了 JAX-RS 规范：即使用@Path来配置uri路由，@GET @POST @PUT @DELETE 来配置HTTP Method等等
+    
+    @Path("/")
+    public class TestPojo{
+    
+        @Path("hello")
+        @GET
+        public String hello_world(@QueryParam("name")String name) {
+            return "hello, " + name;
+        }
+    
+        @Path("upload")
+        @POST
+        public String upload(@QueryParam("file")File file) {
+            return file.getPath();
+        }
+    
+    }
 
 == 2. 由客户端决定 HTTP 响应内容的格式 ==
 ----
