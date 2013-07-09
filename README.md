@@ -315,84 +315,83 @@
 
     因为，充血模型能让 DAO 层免去。这对于开发来说是一件好事，因为它使得开发更加简单了。我们都喜欢简单的东西，不是吗？
     说了这么多，不妨来看看 EWeb4J 的充血模型代码：
-    @Entity
-    public class Pet extends Model{
-    	private String name;
-    	private int age;
-    	@ManyToOne
-    	private Master master;
+
     	
-    	public Pet(){}
-    	public Pet(String name, int age){
-        	this.name = name;
-        	this.age = age;
-    	}
-    	//setter and getter
+    	@Entity
+    	public class Pet extends Model<Pet>{
+    	    private String name;
+    	    private int age;
+    	    
+    	    public Pet(){}
+    	    public Pet(String name, int age){
+        	    this.name = name;
+        	    this.age = age;
+    	    }
+    	    //setter and getter
+    	    
     	
-    	public static void main(String[] args){
-        	String err = EWeb4JConfig.start();
-        	if (err != null)
-            	return ;
+    	    public static void main(String[] args){
+        	    String err = EWeb4JConfig.start();
+        	    if (err != null)
+            	    return ;
         
-        	Pet pet = new Pet("小黑", 3);
-        	/* 插入记录，调用该方法后，pet 对象的 ID 值已经被注入了 */
+        	    Pet pet = new Pet("小黑", 3);
+        	    /* 插入记录，调用该方法后，pet 对象的 ID 值已经被注入了 */
+                pet.create();//或者是 pet.save();
+        	    pet.create("name", "age");//可以指定插入哪些字段
 
-        	pet.create();//或者是 pet.save();
-        	pet.create("name", "age");//也可以指定插入哪些字段
-
-        	/* 更新记录，将 ID=3 的记录的名字由 小黑 改成 小白 */
-
-        	pet.setName("小白");
+        	    /* 更新记录，将 ID=3 的记录的名字由 小黑 改成 小白 */
+        	    pet.setName("小白");
         
-        	pet.save();//相同的 save 方法，有 ID 值即是更新，否则是插入
-        	pet.save("name", "age");//也可以指定更新哪些字段
+        	    pet.save();//相同的 save 方法，有 ID 值即是更新，否则是插入
+        	    pet.save("name", "age");//可以指定更新哪些字段
         
-        	/* 删除记录,根据当前 pet 对象的 ID 值查找删除 */
-        	pet.delete();
+        	    /* 删除记录,根据当前 pet 对象的 ID 值查找删除 */
+        	    pet.delete();
 
-        	/* 级联查询 */
-        	pet.cascade().merge("master");//根据当前pet的ID获取master数据
-        	/* 级联插入 */
-        	pet.cascade().persist("master");//PS: XXToOne的关系不需要级联插入
-        	final long newId = 5L;
-        	/* 级联更新,对主键的更新级联到所有外键引用上去 */
-        	new Master().cascade().refresh(newId, "pets");
+        	    /* 级联查询 */
+        	    pet.cascade().fetch("master");//根据当前pet的ID获取master数据
+        	    /* 级联插入 */
+        	    pet.cascade().persist("master");//PS: XXToOne的关系不需要级联插入
+        	    final long newId = 5L;
+        	    /* 级联更新,对主键的更新级联到所有外键引用上去 */
+        	    new Master().cascade().merge(newId, "pets");
 	
-        	/* 级联删除 */
-        	user.cascade().remove("master");
+        	    /* 级联删除 */
+        	    user.cascade().remove("master");
         
-        	/* 查找记录 */
-       		List<Pet> list = pet.findAll();
-        	list = pet.find().fetch(1, 5);//分页
-        	/* 
-         	 * api: find(quey, params)
-         	 * query: byF1AndF2LikeAndF3NotLikeOrF4IsNullOrF5IsNotNull 
-           	 * -> f1 = ? and f2 like ? and f3 not like ? or f4 is null or f5 is not null  
-         	 */
-        	//所有的字段都要填写类属性名而不是表字段名,orm会自动处理
-        	Pet xh = pet.find("byNameAndAge", "小黑", 3).first();//条件查询
-        	xh = pet.find("name = ? and age = ?", "小黑", 3).first();//同上
+        	    /* 查找记录 */
+       		    List<Pet> list = pet.findAll();
+        	    list = pet.find().fetch(1, 5);//分页
+        	    /* 
+         	     * api: find(quey, params)
+         	     * query: byF1AndF2LikeAndF3NotLikeOrF4IsNullOrF5IsNotNull 
+           	     * -> f1 = ? and f2 like ? and f3 not like ? or f4 is null or f5 is not null  
+         	     */
+        	    //所有的字段填写类属性名,orm会自动映射为表字段名
+        	    Pet xh = pet.find("byNameAndAge", "小黑", 3).first();//条件查询
+        	    xh = pet.find("name = ? and age = ?", "小黑", 3).first();//同上
 
-        	xh = pet.find("byNameIsNullAndAge", 3).first();//
-        	xh = pet.find("name is null and age = ?", 3).first();//同上
+        	    xh = pet.find("byNameIsNullAndAge", 3).first();//
+        	    xh = pet.find("name is null and age = ?", 3).first();//同上
 
-        	xh = pet.find("byNameIsNotNullOrAgeLike", "%3").first();//
-        	xh = pet.find("name is not null or age like ?", "%3").first();//同上
+        	    xh = pet.find("byNameIsNotNullOrAgeLike", "%3").first();//
+        	    xh = pet.find("name is not null or age like ?", "%3").first();//同上
 
-        	xh = pet.find("byNameNotLikeAndAge", "小%", 3).first();//
-        	xh = pet.find("name not like ? and age = ?", "小%", 3).first();//同上
+        	    xh = pet.find("byNameNotLikeAndAge", "小%", 3).first();//
+        	    xh = pet.find("name not like ? and age = ?", "小%", 3).first();//同上
         
-        	sh = pet.findById(4);
+        	    sh = pet.findById(4);
 
-        	list = pet.find("name like ?", "小%").fetch(1, 6);//条件查询+分页
+        	    list = pet.find("name like ?", "小%").fetch(1, 6);//条件查询+分页
 
-        	pet.delete("byName", "小黑");//条件删除
-        	pet.deleteAll();
+        	    pet.delete("byName", "小黑");//条件删除
+        	    pet.deleteAll();
 
-        	long count = pet.count();
-        	count = pet.count("byAge", 3);    
-    	}
-    }
+        	    long count = pet.count();
+        	    count = pet.count("byAge", 3);    
+    	    }
+        }
 
 == 8. 事务支持 ==
 ----
