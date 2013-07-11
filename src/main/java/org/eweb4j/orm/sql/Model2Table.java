@@ -14,8 +14,10 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
 import org.eweb4j.cache.ORMConfigBeanCache;
+import org.eweb4j.cache.SingleBeanCache;
 import org.eweb4j.config.ConfigConstant;
 import org.eweb4j.config.LogFactory;
+import org.eweb4j.config.bean.ConfigBean;
 import org.eweb4j.orm.PropType;
 import org.eweb4j.orm.config.ORMConfigBeanUtil;
 import org.eweb4j.orm.config.bean.ORMConfigBean;
@@ -41,7 +43,6 @@ public class Model2Table {
 	public static String generateOne(final Class<?> entityClass, final boolean isDrop, boolean isCreateFile) {
 		StringBuilder sql = new StringBuilder();
 		StringBuilder manyMany = new StringBuilder();
-		
 		final ORMConfigBean ocb = ORMConfigBeanCache.get(entityClass.getName());
 		final String table = ocb.getTable();
 		
@@ -172,7 +173,8 @@ public class Model2Table {
 			return script;
 		
 		try {
-			File file = new File(ConfigConstant.CONFIG_BASE_PATH() + "db-create.sql");
+			ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
+			File file = new File(ConfigConstant.CONFIG_BASE_PATH() + cb.getOrm().getDdl().getDs()+"-create.sql");
 			FileWriter writer = new FileWriter(file);
 			writer.write(script);
 			writer.flush();
@@ -322,7 +324,8 @@ public class Model2Table {
 			return script;
 		
 		try {
-			File file = new File(ConfigConstant.CONFIG_BASE_PATH() + "db-create.sql");
+			ConfigBean cb = (ConfigBean) SingleBeanCache.get(ConfigBean.class.getName());
+			File file = new File(ConfigConstant.CONFIG_BASE_PATH() + cb.getOrm().getDdl().getDs() + "-create.sql");
 			FileWriter writer = new FileWriter(file);
 			writer.write(script);
 			writer.flush();

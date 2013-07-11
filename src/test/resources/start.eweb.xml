@@ -29,7 +29,7 @@
 			<logs>
 				<log console="1" level="debug" file="orm.log" size="5" />
 	      	</logs>
-	      	<ddl generate="true" run="false" ds="myDBInfo"/>
+	      	<ddl generate="true" run="true" ds="myDBInfo"/>
 			<dataSource>com.mchange.v2.c3p0.ComboPooledDataSource</dataSource>
 			<scanPojoPackage>
 				<path>test</path>

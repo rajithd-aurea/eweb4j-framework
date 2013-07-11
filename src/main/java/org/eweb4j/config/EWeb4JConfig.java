@@ -288,7 +288,7 @@ public class EWeb4JConfig {
 								log.debug("ddl.generate -> true");
 								DBInfoConfigBean dcb = DBInfoConfigBeanCache.get(cb.getOrm().getDdl().getDs());
 								if (DBType.MYSQL_DB.equals(dcb.getDataBaseType())) {
-									File sqlFile = new File(ConfigConstant.CONFIG_BASE_PATH() + "db-create.sql");
+									File sqlFile = new File(ConfigConstant.CONFIG_BASE_PATH() + cb.getOrm().getDdl().getDs()+ "-create.sql");
 									if ("1".equals(cb.getOrm().getDdl().getOverride()) 
 											|| "true".equals(cb.getOrm().getDdl().getOverride()) 
 											|| !sqlFile.exists()) {
