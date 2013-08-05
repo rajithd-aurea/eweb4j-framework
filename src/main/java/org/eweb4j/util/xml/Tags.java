@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eweb4j.util.CommonUtil;
+
 /**
  * 强大的XML标签过滤【通过正则】
  * @author weiwei l.weiwei@163.com
@@ -15,7 +17,25 @@ import java.util.regex.Pattern;
  */
 public class Tags {
 	
-	public static void main(String[] args) {
+	public static void mainss(String[] args){
+		String xml = "<p class='xx'>test</p><h1 title='weiwei'>111</h1><a href=\"javascript:alert('xxx')\" onclick=\"alert('xxx')\" target=\"_blank\">xxxxxxxx</a>";
+		final String fmt = "(?<=<%s{1,999999999} [\\s\\S]{0,999999999})%s=([\"'])[^=]*\\1";
+		String regex = String.format(fmt, "\\w", "\\w+");
+		System.out.println(CommonUtil.findByRegex(xml, regex));
+		//保留a标签
+		System.out.println(Attrs.me().xml(xml).tag("a").kp("href","target").filter(new Attrs.Filter() {
+			@Override
+			public String onAttr(String tag, String attrName, String attrValue) {
+				System.out.println(tag + ", " + attrName + ", " + attrValue);
+				if ("a".equals(tag) && "href".equals(attrName) && attrValue.toLowerCase().startsWith("\"javascript:"))
+					return "\"xxx\"";
+				
+				return attrValue;
+			}
+		}).ok());
+	}
+	
+	public static void main2(String[] args) {
 		String html = "<p><strong>What You Get</strong></p>For $38 per pax, you get a 5D4N Beijing Guided Tour with International 5-Star Hotel Stays, Meals and 2 way Airport Transfer (worth $888).	"+
 	
 "<a href=\"https://static.groupon.sg/97/77/1357554037797.jpg\" target=\"_blank\">View tour itinerary</a>.	"+
@@ -69,7 +89,7 @@ public class Tags {
 		System.out.println(Tags.me().xml(html).kp("h1").kp("h2").kp("h3").kp("h4").kp("h5").kp("h6").kp("table").kp("th").kp("tr").kp("td").kp("img").kp("p").kp("a").kp("ul").kp("ol").kp("li").kp("td").kp("em").kp("i").kp("u").kp("er").kp("b").kp("strong").ok());
 	}
 	
-	public static void mains(String[] args){
+	public static void main(String[] args){
 		//XML文本
 		String xml = "<div>This is div.</div><p>This is p.<ul><li>This is li.<a href='http://www.baidu.com'>This is link.</a></li></ul></p>";
 		//删除所有标签
@@ -91,24 +111,24 @@ public class Tags {
 		//Tags和Attrs两个类是可以同时使用的，切换的时候，上一个的执行结果作为下一个的参数继续处理
 		//删除div、ul、li标签然后删除a标签的href属性
 		String sRs = Tags.me().xml(xml).rm("div", "ul","li").Attrs().tag("a").rm("href").ok();
-		System.out.println("This is div.<p>This is p.This is li.<a>This is link.</a></p>".equals(sRs));
+		System.out.println("This is div.<p>This is p.This is li.<a >This is link.</a></p>".equals(sRs));
 		
 		//删除所有标签的href属性，然后保留div、a标签，其他标签都删除
-		String sRs2 = Attrs.me().xml(xml).rm("href").Tags().kp("div", "a").ok();
-		System.out.println("<div>This is div.</div>This is p.This is li.<a>This is link.</a>".equals(sRs2));
+		String sRs2 = Attrs.me().xml(xml).rm("href").exe().Tags().kp("div", "a").ok();
+		System.out.println("<div>This is div.</div>This is p.This is li.<a >This is link.</a>".equals(sRs2));
 
 		
-		String html = "<dd class=\"frinfo line_blue\">2013-01-07 08:40:03      <a style=\"font-weight:bold;padding:5px 0px 5px 20px;background:url('http://www.2cto.com/statics/images/icon/user_comment.png') left center no-repeat\" href=\"#comment_iframe\">我来说两句 </a>    来源：雨简 的BLOG    </dd>";
-		
-		System.out.println(Tags.me().xml(html).kp("p").empty().ok());
-		
-		List<String> tag = Tags.findByRegex(html, Tags.xmlTagsRegex("a"));
-		String regex = tag.get(0) + ".*" + tag.get(1);
-		System.out.println(regex);
-		html = html.replaceAll(regex, "");
-		System.out.println(html);
-		System.out.println(Attrs.me().xml(html).tag("a").rm().Tags().rm("a").empty().exe().rm("dd").ok());
-		System.out.println(Attrs.regex("a", "style"));
+//		String html = "<dd class=\"frinfo line_blue\">2013-01-07 08:40:03      <a style=\"font-weight:bold;padding:5px 0px 5px 20px;background:url('http://www.2cto.com/statics/images/icon/user_comment.png') left center no-repeat\" href=\"#comment_iframe\">我来说两句 </a>    来源：雨简 的BLOG    </dd>";
+//		
+//		System.out.println(Tags.me().xml(html).kp("p").empty().ok());
+//		
+//		List<String> tag = Tags.findByRegex(html, Tags.xmlTagsRegex("a"));
+//		String regex = tag.get(0) + ".*" + tag.get(1);
+//		System.out.println(regex);
+//		html = html.replaceAll(regex, "");
+//		System.out.println(html);
+//		System.out.println(Attrs.me().xml(html).tag("a").rm().Tags().rm("a").empty().exe().rm("dd").ok());
+//		System.out.println(Attrs.regex("a", "style"));
 	}
 	
 	private String xml = null;//需要操作的xml文本

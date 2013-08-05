@@ -3,6 +3,8 @@ package org.eweb4j.orm.jdbc;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
+import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
@@ -11,7 +13,6 @@ import org.eweb4j.config.Log;
 import org.eweb4j.config.LogFactory;
 import org.eweb4j.orm.dao.config.DAOConfigConstant;
 import org.eweb4j.orm.jdbc.transaction.ConThreadLocal;
-import org.eweb4j.util.CommonUtil;
 
 import com.mchange.v2.c3p0.DataSources;
 
@@ -141,6 +142,11 @@ public final class DataSourceWrap implements DataSource {
 
 	public Connection getConnection(String username, String password)
 			throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
 		// TODO Auto-generated method stub
 		return null;
 	}

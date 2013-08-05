@@ -52,6 +52,15 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 public class CommonUtil {
 	
 	public static void main(String[] args){
+		String xml = "<p class='xx'>test</p><h1 title='weiwei'>111</h1><a href=\"javascript:alert('xxx')\" onclick=\"alert('xxx')\" target=\"_blank\">xxxxxxxx</a>";
+		final String fmt = "(?<=<%s [\\s\\S]{0,99999999999999})%s=([\"'])[^=]*\\1";
+		String regex = String.format(fmt, "a", "\\w+");
+		//拿到所有属性
+		List<String> allAttrValues = CommonUtil.findByRegex(xml, regex);
+		System.out.println(allAttrValues);
+	}
+	
+	public static void mains(String[] args){
 		String[] ss = "+1d +16h +37m +40s".replace("+", "").split(" ");
 		System.out.println(Arrays.asList(ss));
 		long days = CommonUtil.toSeconds(ss[0]).longValue();

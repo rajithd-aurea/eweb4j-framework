@@ -78,7 +78,7 @@ public class UploadValidator implements ValidatorIF {
 				if (suffixArray != null && suffixArray.length > 0) {
 					boolean isOk = false;
 					for (String suffix : suffixArray){
-						if (fileName.endsWith("."+suffix)){
+						if (fileName.toLowerCase().endsWith("."+suffix.toLowerCase())){
 							isOk = true;
 							break;
 						}

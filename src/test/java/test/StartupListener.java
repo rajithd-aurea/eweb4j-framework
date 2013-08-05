@@ -14,7 +14,6 @@ import test.po.Pet;
  */
 public class StartupListener  implements EWeb4JListener{
 
-	@Override
 	public void onStartup() {
 		String sql = Model2Table.generateOne(MyEntity.class, false, false);
 		System.out.println(sql);

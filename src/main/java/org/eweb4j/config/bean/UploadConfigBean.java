@@ -8,10 +8,10 @@ public class UploadConfigBean {
 	private String tmp = "${RootPath}" + "/WEB-INF/tmp";
 
 	@AttrTag
-	private String maxMemorySize = "4M";
+	private String maxMemorySize = "100m";
 
 	@AttrTag
-	private String maxRequestSize = "4M";
+	private String maxRequestSize = "100m";
 
 	//private String suffix = "zip,rar,jpg,jpeg,png,bmp,gif,doc,docx,ppt,pptx,xls,xlsx";
 	
