@@ -50,6 +50,7 @@ public class Attrs {
 		for (String tag : this.tags) {
 			final String regex = String.format(fmt, tag, "\\w+");
 			List<String> attrs = CommonUtil.findByRegex(xml, regex);
+			if (attrs == null) continue;
 			for (String attr : attrs) {
 				String name = CommonUtil.findOneByRegex(attr, ".*(?=\\=)").trim();
 				String value = CommonUtil.findOneByRegex(attr, "(?<=\\=).*").trim();
@@ -211,6 +212,7 @@ public class Attrs {
 				continue;
 			String regex = String.format(fmt, tag, attr);
 			List<String> values = CommonUtil.findByRegex(xml, regex);
+			if (values == null) continue;
 			for (String _value : values) {
 				String value = _value;
 				xml = xml.replace(value, "");

@@ -162,4 +162,9 @@ public class Db {
 		inst.setDsName(dsName);
 		return inst;
 	}
+	
+	public static void main(String[] args){
+		Object cls = Db.class;
+		System.out.println(Class.class.isInstance(cls));
+	}
 }
