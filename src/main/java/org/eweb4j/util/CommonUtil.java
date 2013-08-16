@@ -58,6 +58,8 @@ public class CommonUtil {
 		//拿到所有属性
 		List<String> allAttrValues = CommonUtil.findByRegex(xml, regex);
 		System.out.println(allAttrValues);
+		
+		System.out.println(CommonUtil.generateByForeach(1,6, "hello->%s"));
 	}
 	
 	public static void mains(String[] args){
@@ -99,6 +101,19 @@ public class CommonUtil {
 		System.out.println(center);
 		
 		System.out.println(resolveCoords("1,2,3,4,5,6"));
+	}
+	
+	public static Collection<String> generateByForeach(int end, String fmt){
+		return generateByForeach(0, end, fmt);
+	}
+	
+	public static Collection<String> generateByForeach(int begin, int end, String fmt){
+		System.out.println("fuck->" + begin + ", " + end);
+		Collection<String> result = new ArrayList<String>();
+		for (int i = begin; i <= end; i++){
+			result.add(fmt.replace("{0}", i+""));
+		}
+		return result;
 	}
 	
 	public static int getYears(Date date) {

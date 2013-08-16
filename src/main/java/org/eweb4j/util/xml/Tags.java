@@ -92,6 +92,7 @@ public class Tags {
 	public static void main(String[] args){
 		//XML文本
 		String xml = "<div>This is div.</div><p>This is p.<ul><li>This is li.<a href='http://www.baidu.com'>This is link.</a></li></ul></p>";
+		xml = null;
 		//删除所有标签
 		String rs = Tags.me().xml(xml).rm().ok();
 		System.out.println("This is div.This is p.This is li.This is link.".equals(rs));
@@ -262,16 +263,17 @@ public class Tags {
 	/**
 	 * 删除标签
 	 * @date 2013-1-5 下午05:24:06
-	 * @param html
+	 * @param xml
 	 * @isRMCnt 是否删除标签内的所有内容
 	 * @param keepTags 保留的标签，如果不给定则删除所有标签
 	 * @return
 	 */
-	public static String cleanOtherXmlTags(String html, boolean isRMCnt, String... keepTags) {
+	public static String cleanOtherXmlTags(String xml, boolean isRMCnt, String... keepTags) {
+		if (xml == null || xml.trim().length() == 0) return "";
 		if (isRMCnt){
 			for (String keepTag : keepTags){
 				String x = inverseXmlTagsRegex(keepTag);
-				List<String> tag = findByRegex(html, x);
+				List<String> tag = findByRegex(xml, x);
 				if (tag == null || tag.isEmpty() || tag.size() % 2 != 0)
 					continue;
 				int size = tag.size() / 2;
@@ -288,35 +290,36 @@ public class Tags {
 				
 				for (List<String> _tag : tags) {
 					String regex = resolveRegex(_tag.get(0)) + ".*" + resolveRegex(_tag.get(1));
-					html = html.replaceAll(regex, "");
+					xml = xml.replaceAll(regex, "");
 				}
 			}
-			return html;
+			return xml;
 		}
-		return html.replaceAll(inverseXmlTagsRegex(keepTags), "");
+		return xml.replaceAll(inverseXmlTagsRegex(keepTags), "");
 	}
 	
 	/**
 	 * 删除标签
 	 * @date 2013-1-5 下午05:35:27
-	 * @param html
+	 * @param xml
 	 * @param isRMCnt 是否删除标签内的所有内容 <p>This is p.<a href="#">This is a.</a></p>如果干掉a标签，就变成=><p>This is p.</p>
 	 * @param delTags 需要删除的Tag，如果不给定则删除所有标签
 	 * @return
 	 */
-	public static String cleanXmlTags(String html, boolean isRMCnt, String... delTags) {
+	public static String cleanXmlTags(String xml, boolean isRMCnt, String... delTags) {
+		if (xml == null || xml.trim().length() == 0) return "";
 		if (isRMCnt){
 			for (String delTag : delTags){
-				List<String> tag = findByRegex(html, xmlTagsRegex(delTag));
+				List<String> tag = findByRegex(xml, xmlTagsRegex(delTag));
 				if (tag == null || tag.isEmpty() || tag.size() != 2)
 					continue;
 				String regex = resolveRegex(tag.get(0)) + ".*" + resolveRegex(tag.get(1));
-				html = html.replaceAll(regex, "");
+				xml = xml.replaceAll(regex, "");
 			}
-			return html;
+			return xml;
 		}
 		
-		return html.replaceAll(xmlTagsRegex(delTags), "");
+		return xml.replaceAll(xmlTagsRegex(delTags), "");
 	}
 	
 	public static String resolveRegex(String regex){
@@ -382,6 +385,7 @@ public class Tags {
 	}
 	
 	public static List<String> findByRegex(String input, String regex){
+		if (input == null || input.trim().length() == 0) return null;
 		List<String> result = new ArrayList<String>();
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(input);

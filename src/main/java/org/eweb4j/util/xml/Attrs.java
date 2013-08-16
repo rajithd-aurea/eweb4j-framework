@@ -17,7 +17,6 @@ public class Attrs {
 	public static void main(String[] args){
 		//XML文本
 		String xml = "<div style='width:250; height:auto;'>This is div.<img src='http://www.baidu.com/logo.gif' alt='This is img' /></div><p style='padding:5px;'>This is p.<ul><li>This is li.<a href='http://www.baidu.com'>This is link.</a></li></ul></p>";
-		
 		//删除所有标签的所有属性
 		String rs = Attrs.me().xml(xml).rm().ok();
 		System.out.println("<div >This is div.<img   /></div><p >This is p.<ul><li>This is li.<a >This is link.</a></li></ul></p>".equals(rs));
@@ -177,6 +176,7 @@ public class Attrs {
 	 * @return
 	 */
 	public String removeXmlTagAttr(String xml, Collection<String> tags, Collection<String> attrs){
+		if (xml == null || xml.trim().length() == 0) return "";
 		if (tags == null || tags.isEmpty())
 			return removeXmlTagAttr(xml, "", attrs);
 		String rs = xml;
@@ -195,6 +195,7 @@ public class Attrs {
 	 * @return
 	 */
 	public String removeXmlTagAttr(String xml, String tag, Collection<String> attrs){
+		if (xml == null || xml.trim().length() == 0) return "";
 //		String fmt = "(?<=<%s{1,255})\\s+%s=[\"'][^'\"]*[\"']";
 //		final String fmt = "(?<=<%s{1,255})\\s+%s=([\"'=])[^=]*\\1";
 		final String fmt = "(?<=<%s{1,999999999} [\\s\\S]{0,999999999})%s=([\"'])[^=]*\\1";
@@ -231,6 +232,8 @@ public class Attrs {
 	 * @return
 	 */
 	public String removeOtherXmlTagAttr(String xml, Collection<String> tags, Collection<String> keeps){
+		if (xml == null || xml.trim().length() == 0) return "";
+		
 		final String fmt = "(?<=<%s{1,999999999} [\\s\\S]{0,999999999})%s=([\"'])[^=]*\\1";
 		if (tags == null || tags.isEmpty())
 			tags = Arrays.asList(".");//all tags
