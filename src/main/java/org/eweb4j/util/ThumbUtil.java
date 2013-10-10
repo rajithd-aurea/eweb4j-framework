@@ -51,6 +51,7 @@ public class ThumbUtil {
 	
 	public static Builder<BufferedImage> build(
 			String imagePath, 
+			String outputFormat,
 			int sharpenTimes,
 			float contrast, 
 			float brightness, 
@@ -63,7 +64,7 @@ public class ThumbUtil {
 
 		BufferedImage bi = null;
 		try {
-			bi = FileUtil.getBufferedImage(imagePath, failRetryTimes, 1*1000);
+			bi = FileUtil.getBufferedImage(imagePath, failRetryTimes, 1*1000, outputFormat);
 		} catch (Exception e) {
 			throw e;
 		}
@@ -149,7 +150,7 @@ public class ThumbUtil {
 
 		BufferedImage bi = null;
 		try {
-			bi = FileUtil.getBufferedImage(imagePath, failRetryTimes, sleep);
+			bi = FileUtil.getBufferedImage(imagePath, failRetryTimes, sleep, outputFormat);
 		} catch (Exception e) {
 			throw e;
 		}
@@ -307,6 +308,7 @@ public class ThumbUtil {
 //		String remoteImageUrl = "http://www.shoplay.com/cache/bigpic/20121130/470/aaeed8a8dd_w470.jpg";
 //		String remoteImageUrl = "http://www.malijuthemeshop.com/live_previews/mws-admin/example/scottwills_squirrel.jpg";
 //		String remoteImageUrl = "http://static.sg.groupon-content.net/88/75/1357633937588.png";
+//		String remoteImageUrl = "http://localhost/uploads/cc%20icons/black/bug_icon&48.png";
 //		String remoteImageUrl = "http://coupree.com/image/ke7VpHtYCBwg6rCF.png/301/174";
 //		String remoteImageUrl = "http://www.featcher.sg/deal_images/wall street cafe/web3.jpg";
 //		String remoteImageUrl = "http://www.moxdeals.sg/images/Ace%20Tours%20&%20Travels/Ace%20Tours%20Logo.jpg";
@@ -317,12 +319,12 @@ public class ThumbUtil {
 //		String remoteImageUrl = "http://shoppetreatz.com/wp-content/themes/DailyDeal/thumb.php?src=http://shoppetreatz.com/wp-content/uploads/2012/11/13541581271295634499.jpg&w=560&h=280&zc=1&q=80&bid=1";
 //		String remoteImageUrl = "http://gd.image-gmkt.com/mi/207/546/419546207.jpg";
 //		String remoteImageUrl = "http://test.shoplay.com/cache/bigpic/20121108/470/55c5b78e5c_w470.jpg";
-//		String remoteImageUrl = "http://www.imm.sg/resources/imm/images/common/logo.png";
+		String remoteImageUrl = "http://www.imm.sg/resources/imm/images/common/logo.png";
 //		String remoteImageUrl = "http://www.marinasquare.com.sg/images/msq//tenants/arte.jpg";
-		String remoteImageUrl = "http://www.moxdeals.sg/storage/32000/1682/a7caf8be7675fba0f932f0eeeb84e1d7.jpg";
+//		String remoteImageUrl = "d:/tt";
 		int sharpenTimes = 0;// 锐化次数
 		float quality = 1f;// 质量
-		String outputFormat = "jpg";// 输出格式
+		String outputFormat = "png";// 输出格式
 		String name = CommonUtil.getNowTime("yyyyMMddHHmmss");
 		int outputWidth = 400;// 宽度
 		int outputHeight = 306;// 高度

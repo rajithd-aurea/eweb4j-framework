@@ -43,6 +43,10 @@ public class TestDb {
 	
 	@Test
 	public void testMap(){
+		Object[] values = "1,2,3".split(",");
+		String sql = Db.ar(Pet.class).dao().selectAll().where().field("name").in(values).toSql();
+		System.out.println("sql->"+sql);
+		
 		String countSql = "select count(*) as count from t_pet";
 		Map<String, Integer> countRecord = DAOFactory.getDAO(Map.class).setTable("t_pet").sql(countSql).queryOne();
 		System.out.println("count->"+countRecord.get("count"));

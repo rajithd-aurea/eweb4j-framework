@@ -818,3 +818,6 @@ ioc.xml
 					.join("user", "u")
 						.findBySql("select p.* from #p.table p, #u.table u where #p.user = #u.id order by #p.id asc limit ? offset ?", 2, 0);
 			
+(4)bug fix: 修复ddl相关的功能问题
+(5)improve: 改善Attrs和Tags的正则
+(6)bug fix: 解决Attrs和Tags传入的xml为null的时候报的NullPoint异常

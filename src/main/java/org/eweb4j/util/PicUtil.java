@@ -12,7 +12,7 @@ public class PicUtil {
 	public static void main(String[] args) throws Exception{
 		String url = "http://www.featcher.sg/deal_images/wall street cafe/web3.jpg";
 		PicsModel model = getAttrs(url);
-		BufferedImage img = FileUtil.getBufferedImage(url, 3, 1*1000);
+		BufferedImage img = FileUtil.getBufferedImage(url, 3, 1*1000, "jpg");
 		System.out.println(img.getWidth());
 		// "E://hekai//hk0001.jpg" 也是可以的
 		System.out.println("picextendname is:" + model.getExtName());

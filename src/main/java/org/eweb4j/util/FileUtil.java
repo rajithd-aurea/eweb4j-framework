@@ -128,6 +128,10 @@ public class FileUtil {
 	public static String getExt(File f) {
 		return f.getName().substring(f.getName().lastIndexOf(".") + 1);
 	}
+	
+	public static String getExt(String name) {
+		return name.substring(name.lastIndexOf(".") + 1);
+	}
 
 	public static boolean deleteFolder(File folder) {
 		return deleteFolderContents(folder) && folder.delete();
@@ -157,16 +161,16 @@ public class FileUtil {
 		return true;
 	}
 
-	public static BufferedImage getBufferedImage(String imagePath, boolean isRemote) throws Exception {
-		return getBufferedImage(imagePath, isRemote, 0, 1*1000);
+	public static BufferedImage getBufferedImage(String imagePath, boolean isRemote, String ext) throws Exception {
+		return getBufferedImage(imagePath, isRemote, 0, 1*1000, ext);
 	}
 	
-	public static BufferedImage getBufferedImage(String imagePath) throws Exception {
-		return getBufferedImage(imagePath, false, 0, 1*1000);
+	public static BufferedImage getBufferedImage(String imagePath, String ext) throws Exception {
+		return getBufferedImage(imagePath, false, 0, 1*1000, ext);
 	}
 	
-	public static BufferedImage getBufferedImage(String imagePath, int retryTimes, long sleep) throws Exception {
-		return getBufferedImage(imagePath, false, retryTimes, sleep);
+	public static BufferedImage getBufferedImage(String imagePath, int retryTimes, long sleep, String ext) throws Exception {
+		return getBufferedImage(imagePath, false, retryTimes, sleep, ext);
 	}
 	/**
 	 * 
@@ -177,7 +181,7 @@ public class FileUtil {
 	 * @param sleep
 	 * @return
 	 */
-	public static BufferedImage getBufferedImage(String imagePath, boolean isRemote, int retryTimes, long sleep) throws Exception {
+	public static BufferedImage getBufferedImage(String imagePath, boolean isRemote, int retryTimes, long sleep, String ext) throws Exception {
 		if (imagePath == null || imagePath.trim().length() == 0)
 			throw new Exception("image url can not be empty");
 
@@ -185,12 +189,12 @@ public class FileUtil {
 		while (true) {
 			try {
 				if (isRemote)
-					return getRemote(imagePath);
+					return getRemote(imagePath, ext);
 				
 				try {
-					return getLocal(imagePath);
+					return getLocal(imagePath, ext);
 				} catch (Throwable e) {
-					return getRemote(imagePath);
+					return getRemote(imagePath, ext);
 				}
 			} catch (Throwable e) {
 				if (count >= retryTimes) {
@@ -202,7 +206,9 @@ public class FileUtil {
 		}
 	}
 
-	private static BufferedImage getLocal(String imagePath) throws IOException {
+	private static BufferedImage getLocal(String imagePath, String ext) throws IOException {
+		if ("png".equals(ext)) 
+			return ImageIO.read(new File(imagePath));
 		try {
 			return toBufferedImage(Toolkit.getDefaultToolkit().getImage(imagePath));
 		} catch (Throwable e){
@@ -210,9 +216,11 @@ public class FileUtil {
 		}
 	}
 
-	private static BufferedImage getRemote(String imagePath)
-			throws MalformedURLException, IOException {
+	private static BufferedImage getRemote(String imagePath, String ext) throws MalformedURLException, IOException {
 		URL url = new URL(imagePath.replace(" ","%20"));
+		if ("png".equals(ext)) 
+			return ImageIO.read(url);
+		
 		try {
 			return toBufferedImage(Toolkit.getDefaultToolkit().getImage(url));
 		}catch (Throwable e1){
@@ -220,7 +228,7 @@ public class FileUtil {
 		}
 	}
 
-	public static BufferedImage toBufferedImage(Image image) {
+	private static BufferedImage toBufferedImage(Image image) {
 		if (image instanceof BufferedImage) {
 			return (BufferedImage) image;
 		}

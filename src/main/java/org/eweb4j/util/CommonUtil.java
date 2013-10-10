@@ -170,6 +170,7 @@ public class CommonUtil {
 		return null;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static <T> T deserialize(byte[] data){
 		ObjectInputStream ois = null;
 		ByteArrayInputStream is = null;
